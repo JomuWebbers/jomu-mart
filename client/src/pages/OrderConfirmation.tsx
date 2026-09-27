@@ -27,6 +27,17 @@ export default function OrderConfirmation() {
   const { token } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
   const [notFound, setNotFound] = useState(false)
+    const [copiedId, setCopiedId] = useState(false);
+
+  async function copyOrderId() {
+    try {
+      await navigator.clipboard.writeText(order?.id || id || "");
+      setCopiedId(true);
+      window.setTimeout(() => setCopiedId(false), 2000);
+    } catch {
+      setCopiedId(false);
+    }
+  }
 
   useEffect(() => {
     if (!id) return
@@ -55,7 +66,19 @@ export default function OrderConfirmation() {
           ✓
         </div>
         <h1 className="font-black uppercase text-2xl mb-2">Order Placed!</h1>
-        <p className="text-neutral-500 text-sm">Order #{order.id.slice(-8).toUpperCase()}</p>
+              <p className="text-neutral-500 text-sm">
+          Order #{order.id.slice(-8).toUpperCase()}
+        </p>
+        <p className="mx-auto mt-3 max-w-md break-all font-mono text-xs text-neutral-600">
+          Full order ID: {order.id}
+        </p>
+        <button
+          type="button"
+          onClick={() => void copyOrderId()}
+          className="mt-3 border-2 border-black px-4 py-2 text-xs font-bold uppercase"
+        >
+          {copiedId ? "Copied" : "Copy full order ID"}
+        </button>
       </div>
 
       <div className="border-2 border-black p-5 mb-6">
@@ -101,9 +124,23 @@ export default function OrderConfirmation() {
         </span>
       </div>
 
-      <Link to="/" className="block w-full py-4 text-center bg-black text-white text-[11px] tracking-[0.2em] uppercase font-black">
+      {/* <Link to="/" className="block w-full py-4 text-center bg-black text-white text-[11px] tracking-[0.2em] uppercase font-black">
         Continue Shopping
-      </Link>
+      </Link> */}
+            <div className="grid gap-3 sm:grid-cols-2">
+        <Link
+          to={`/track/${encodeURIComponent(order.id)}`}
+          className="block bg-black py-4 text-center text-xs font-bold uppercase tracking-widest text-white"
+        >
+          Track This Order
+        </Link>
+        <Link
+          to="/my-orders"
+          className="block border-2 border-black py-4 text-center text-xs font-bold uppercase tracking-widest"
+        >
+          View My Orders
+        </Link>
+      </div>
     </div>
   )
 }

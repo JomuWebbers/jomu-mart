@@ -8,6 +8,8 @@ import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes'
 import uploadRoutes from './routes/uploadRoutes'
 import streamRoutes from './routes/streamRoutes'
 import userRoutes from './routes/userRoutes'
+import returnRoutes from './routes/returnRoutes'
+
 
 dotenv.config()
 
@@ -27,7 +29,9 @@ app.use('/api/auth', authRoutes)
 
 
 app.use('/api/products', productRoutes)
+
 app.use('/api/orders', orderRoutes)
+app.use('/api/returns', returnRoutes) 
 app.use('/api/delivery-partners', deliveryPartnerRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/chat', streamRoutes)

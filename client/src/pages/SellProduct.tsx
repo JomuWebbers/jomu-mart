@@ -158,6 +158,22 @@ export default function SellProduct() {
         },
       });
 
+      const fee = await apiRequest(
+  `/products/${product.id}/listing-fee/initialize`,
+  {
+    method: "POST",
+    token,
+  },
+);
+
+if (fee.requiresPayment) {
+  window.location.assign(fee.authorizationUrl);
+  return;
+}
+
+toast.success("Listing submitted for review. Your monthly fee is already paid.");
+navigate("/");
+
       toast.success(product.status === "approved" ? "Product listing created" : "Listing submitted for review");
       navigate("/");
     } catch (error) {

@@ -9,6 +9,12 @@ import {
   reviewListing,
   getPendingListings,
 } from "../controllers/productController";
+
+import {
+  initializeListingFee,
+  verifyListingFee,
+} from "../controllers/listingFeeController";
+
 import { protect, isAdmin, optionalAuth } from '../middleware/authMiddleware'
 
 const router = Router()
@@ -19,6 +25,9 @@ router.get("/", getProducts);
 // Specific paths must come before /:id
 router.get("/pending", protect, isAdmin, getPendingListings);
 router.get("/my-listings", protect, getMyListings);
+router.post("/listing-fee/verify", protect, verifyListingFee);
+router.post("/:id/listing-fee/initialize", protect, initializeListingFee);
+
 
 // Generic product path goes after specific paths
 router.get("/:id", optionalAuth, getProductById);

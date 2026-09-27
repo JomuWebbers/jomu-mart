@@ -1,6 +1,6 @@
 
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboardIcon, PackageIcon, ShoppingBagIcon, TruckIcon, MessageCircleIcon, UsersIcon, LogOutIcon, ShieldIcon, ClipboardCheckIcon } from 'lucide-react'
+import { LayoutDashboardIcon, PackageIcon, ShoppingBagIcon, TruckIcon, MessageCircleIcon, UsersIcon, LogOutIcon, ShieldIcon, ClipboardCheckIcon, RotateCcwIcon } from 'lucide-react'
 
 
 const ADMIN_LINKS = [
@@ -11,6 +11,7 @@ const ADMIN_LINKS = [
   { to: '/admin/users', label: 'Users', icon: UsersIcon, end: false },
   { to: '/admin/support', label: 'Support Chat', icon: MessageCircleIcon, end: false },
   { to: "/admin/listings", label: "Listing Review", icon: ClipboardCheckIcon, end: false },
+  { to: "/admin/returns", label: "Returns & Refunds", icon: RotateCcwIcon, end: false },
 ]
 
 export default function AdminLayout() {

@@ -127,6 +127,63 @@ for (const item of items as { productId: string }[]) {
       },
     })
 
+        // Notify the customer in their existing support chat.
+    // A chat error should not undo a successfully created order.
+    try {
+      const [customer, admin] = await Promise.all([
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true, name: true },
+        }),
+        prisma.user.findFirst({
+          where: { role: "admin" },
+          select: { id: true, name: true, role: true },
+        }),
+      ]);
+
+      if (customer && admin) {
+        const server = getStreamChatServer();
+        const customerSid = streamUserId(customer.id);
+        const adminSid = streamUserId(admin.id);
+
+        await server.upsertUsers([
+          { id: customerSid, name: customer.name },
+          {
+            id: adminSid,
+            name: streamDisplayName(admin.role, admin.name),
+          },
+        ]);
+
+        const channel = server.channel(
+          "messaging",
+          `support-${customer.id}`,
+          {
+            members: [customerSid, adminSid],
+            created_by_id: adminSid,
+          },
+        );
+
+        // watch() gets or creates the support channel.
+        await channel.watch();
+
+        const frontendUrl =
+          process.env.FRONTEND_URL || "http://localhost:5173";
+        const trackingUrl =
+          `${frontendUrl}/track/${encodeURIComponent(order.id)}`;
+
+        await channel.sendMessage({
+          user_id: adminSid,
+          text:
+            `Hi ${customer.name}, your Naija Mart order has been placed.\n\n` +
+            `Order ID: ${order.id}\n` +
+            `Track your order: ${trackingUrl}\n\n` +
+            `You can also find this order anytime under My Orders.`,
+        });
+      }
+    } catch (chatError) {
+      console.error("Could not send order confirmation chat message:", chatError);
+    }
+    
     res.status(201).json(order)
   } catch (error) {
     console.error(error)
@@ -141,12 +198,66 @@ export const getMyOrders = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: 'Not authorized' })
     }
 
+    type OrderItemSnapshot = {
+      productId?: string;
+      name?: string;
+      qty?: number;
+      price?: number;
+      image?: string;
+    };
+
     const orders = await prisma.order.findMany({
       where: { userId },
+      include: {
+        returnRequests: {
+          select: {
+            id: true,
+            status: true,
+            reason: true,
+            refundAmount: true,
+            refundMethod: true,
+            adminNote: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     })
 
-    res.json(orders)
+    // Order items are a checkout snapshot and carry no image, so the current
+    // product image is attached for the order history thumbnails.
+    const productIds = orders.flatMap((order) =>
+      ((order.items ?? []) as unknown as OrderItemSnapshot[])
+        .map((item) => item.productId)
+        .filter((id): id is string => typeof id === 'string'),
+    )
+
+    const products = productIds.length
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true, image: true, images: true },
+        })
+      : []
+
+    const imageById = new Map(
+      products.map((product) => [
+        product.id,
+        product.image || product.images[0] || '',
+      ]),
+    )
+
+    res.json(
+      orders.map((order) => ({
+        ...order,
+        items: ((order.items ?? []) as unknown as OrderItemSnapshot[]).map(
+          (item) => ({
+            ...item,
+            image: imageById.get(item.productId ?? '') ?? '',
+          }),
+        ),
+      })),
+    )
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Failed to fetch orders' })

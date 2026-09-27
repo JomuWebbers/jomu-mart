@@ -158,6 +158,7 @@ export default function AdminOrders() {
               <tr>
                 <th className="px-6 py-4">Order</th>
                 <th className="px-6 py-4">Total</th>
+                <th className="px-6 py-4">Items / Seller Payout</th>
                 <th className="px-6 py-4">Delivery Partner</th>
                 <th className="px-6 py-4">Status</th>
               </tr>
@@ -166,7 +167,7 @@ export default function AdminOrders() {
               {orders.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-6 py-8 text-center text-zinc-500"
                   >
                     No orders yet.
@@ -189,7 +190,7 @@ export default function AdminOrders() {
                     <td className="px-6 py-4 font-medium">
                       ₦{order.total.toLocaleString()}
                     </td>
-                    <th className="px-6 py-4">Items / Seller Payout</th>
+
                     <td className="px-6 py-4">
                       <div className="space-y-3">
                         {(order.items ?? []).map((item) => {

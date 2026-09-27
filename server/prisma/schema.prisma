@@ -18,6 +18,7 @@ model User {
   role      String    @default("customer") // "customer" | "admin"
   addresses Address[]
   orders    Order[]
+  returnRequests            returnRequest[] 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
    accountBalance            Float    @default(0)
@@ -26,6 +27,7 @@ model User {
   isTrustedVendor           Boolean  @default(false)
   trustedVendorRequestStatus String? @default("none")  // "none" | "pending" | "approved" | "rejected"
   products Product[]
+  sellerListingFees SellerListingFee[]
 }
 
 model Address {
@@ -100,6 +102,7 @@ model Order {
   deliveryOtp       String?          @default("")
   liveLocation      Json?
   isPaid            Boolean?         @default(false)
+  returnRequests            returnRequest[] 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,6 +122,48 @@ model DeliveryPartner {
   updatedAt   DateTime @updatedAt
 }
 
+model SellerListingFee {
+  id                String   @id @default(cuid())
+  sellerId          String
+  seller            User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  monthKey          String
+  firstProductId    String
+  reference         String?  @unique
+  authorizationUrl  String?
+  amountKobo        Int      @default(100000)
+  status            String   @default("pending") // pending | paid
+  paidAt            DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([sellerId, monthKey])
+}
+
+model returnRequest {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Details submitted by customer
+  reason          String   // e.g. "Damaged / Defective", "Wrong item", "Not as described"
+  comments        String?  @default("")
+  images          String[] @default([]) // Photo proofs uploaded by customer
+
+  // Financial & status tracking
+  refundAmount    Float
+  refundMethod    String   @default("wallet") // "wallet" | "bank" | "original_payment"
+  status          String   @default("pending") // "pending" | "approved" | "rejected" | "item_picked_up" | "refunded"
+  adminNote       String?  @default("") // Reason if rejected, or inspection notes
+  statusHistory   Json?    @default("[]") // [{ status, timestamp, note }]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+}
 
 
 

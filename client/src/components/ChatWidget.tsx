@@ -1,32 +1,59 @@
-import { useState } from 'react'
+import { useEffect, useState } from "react";
 import {
-  Chat, Channel, Window, ChannelHeader, MessageList, MessageComposer,
-} from 'stream-chat-react'
-import { MessageCircleIcon, XIcon } from 'lucide-react'
-import { useAuth } from '../context/useAuth'
-import { useChat } from '../context/useChat'
+  Chat,
+  Channel,
+  Window,
+  ChannelHeader,
+  MessageList,
+  MessageComposer,
+} from "stream-chat-react";
+import { MessageCircleIcon, XIcon } from "lucide-react";
+import { useAuth } from "../context/useAuth";
+import { useChat } from "../context/useChat";
 
 export default function ChatWidget() {
-  const { user } = useAuth()
-  const { client, channel, connecting, unreadCount, markChatRead } = useChat()
-  const [open, setOpen] = useState(false)
+  const { user } = useAuth();
+  const { client, channel, connecting, unreadCount, markChatRead } = useChat();
+  const [open, setOpen] = useState(false);
 
-  if (!user || user.role === 'admin') return null
+  useEffect(() => {
+    function handleOpenSupportChat() {
+      setOpen(true);
+      markChatRead();
+    }
+
+    window.addEventListener(
+      "naija-mart:open-support-chat",
+      handleOpenSupportChat,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "naija-mart:open-support-chat",
+        handleOpenSupportChat,
+      );
+    };
+  }, [markChatRead]);
+  if (!user || user.role === "admin") return null;
 
   return (
     <>
       <button
         onClick={() => {
-          setOpen(o => !o)
-          if (!open) markChatRead()
+          setOpen((o) => !o);
+          if (!open) markChatRead();
         }}
         className="fixed bottom-5 right-5 z-40 size-14 rounded-full bg-black text-white flex items-center justify-center shadow-lg hover:bg-neutral-800 transition-colors"
         aria-label="Open help center chat"
       >
-        {open ? <XIcon className="size-6" /> : <MessageCircleIcon className="size-6" />}
+        {open ? (
+          <XIcon className="size-6" />
+        ) : (
+          <MessageCircleIcon className="size-6" />
+        )}
         {!open && unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-bold flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -51,7 +78,7 @@ export default function ChatWidget() {
         </div>
       )}
     </>
-  )
+  );
 }
 
 

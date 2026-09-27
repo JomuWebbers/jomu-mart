@@ -41,14 +41,18 @@ export default function Layout() {
             >
               Sell on Naija Mart
             </Link>
-            {["Track Order", "Help Center"].map((s) => (
-              <button
-                key={s}
-                className="text-[10px] tracking-[0.18em] uppercase font-semibold text-neutral-400 hover:text-white transition-colors"
-              >
-                {s}
-              </button>
-            ))}
+            <Link
+              to="/track-order"
+              className="text-[10px] tracking-[0.18em] uppercase font-semibold text-neutral-400 hover:text-white transition-colors"
+            >
+              Track Order
+            </Link>
+            <Link
+              to="/help"
+              className="text-[10px] tracking-[0.18em] uppercase font-semibold text-neutral-400 hover:text-white transition-colors"
+            >
+              Help Center
+            </Link>
           </div>
         </div>
       </div>
@@ -153,11 +157,11 @@ export default function Layout() {
                 </div>
               )}
             </div>
-
-            <button className="flex flex-col items-start">
+             <Link to="/my-orders" className="flex flex-col items-start">
               <MicroLabel>Returns</MicroLabel>
               <span className="text-[13px] font-bold mt-0.5">& Orders</span>
-            </button>
+            </Link>
+
             <Link to="/cart" className="flex flex-col items-start relative">
               <MicroLabel>Shopping</MicroLabel>
               <span className="text-[13px] font-bold mt-0.5">
@@ -231,9 +235,14 @@ export default function Layout() {
               </Link>
             )}
 
-            <div className="p-3 flex justify-between items-center">
+            <Link
+              to="/my-orders"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex justify-between items-center p-3 text-[11px] tracking-[0.15em] uppercase font-semibold hover:bg-neutral-100"
+            >
               <MicroLabel>Returns & Orders</MicroLabel>
-            </div>
+            </Link>
+            
             <Link
               to="/sell"
               onClick={() => setMobileMenuOpen(false)}

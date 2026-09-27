@@ -267,6 +267,30 @@ export const reviewListing = async (req: AuthRequest, res: Response) => {
         .json({ message: 'Status must be "approved" or "rejected"' });
     }
 
+    
+
+    const listing = await prisma.product.findUnique({
+  where: { id },
+  select: {
+    listingFeePaid: true,
+    seller: { select: { role: true } },
+  },
+});
+
+if (!listing) {
+  return res.status(404).json({ message: "Product not found" });
+}
+
+if (
+  status === "approved" &&
+  listing.seller.role !== "admin" &&
+  !listing.listingFeePaid
+) {
+  return res.status(402).json({
+    message: "The seller must pay this month's listing fee before approval",
+  });
+}
+
     const product = await prisma.product.update({
       where: { id },
       data: { status },
@@ -289,7 +313,7 @@ export const reviewListing = async (req: AuthRequest, res: Response) => {
 export const getPendingListings = async (_req: AuthRequest, res: Response) => {
   try {
     const products = await prisma.product.findMany({
-      where: { status: "pending" },
+      where: { status: "pending", listingFeePaid: true },
       include: {
         seller: {
           select: {
