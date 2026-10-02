@@ -18,7 +18,7 @@ model User {
   role      String    @default("customer") // "customer" | "admin"
   addresses Address[]
   orders    Order[]
-  returnRequests            returnRequest[] 
+  returnRequests            ReturnRequest[] 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
    accountBalance            Float    @default(0)
@@ -27,6 +27,7 @@ model User {
   isTrustedVendor           Boolean  @default(false)
   trustedVendorRequestStatus String? @default("none")  // "none" | "pending" | "approved" | "rejected"
   products Product[]
+  reviews Review[]
   sellerListingFees SellerListingFee[]
 }
 
@@ -77,6 +78,8 @@ model Product {
   listingFeePaid    Boolean  @default(false)
   listingFeeAmount  Float?   @default(0)
 
+  reviews Review[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -102,10 +105,29 @@ model Order {
   deliveryOtp       String?          @default("")
   liveLocation      Json?
   isPaid            Boolean?         @default(false)
-  returnRequests            returnRequest[] 
+  returnRequests            ReturnRequest[] 
+  reviews         Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId, createdAt])
+  @@index([orderId])
 }
 
 model DeliveryPartner {
@@ -139,7 +161,7 @@ model SellerListingFee {
   @@unique([sellerId, monthKey])
 }
 
-model returnRequest {
+model ReturnRequest {
   id              String   @id @default(cuid())
   orderId         String
   order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)

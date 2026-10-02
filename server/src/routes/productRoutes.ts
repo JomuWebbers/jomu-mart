@@ -14,6 +14,10 @@ import {
   initializeListingFee,
   verifyListingFee,
 } from "../controllers/listingFeeController";
+import {
+  getProductReviews,
+  submitProductReview,
+} from "../controllers/productReviewController";
 
 import { protect, isAdmin, optionalAuth } from '../middleware/authMiddleware'
 
@@ -26,6 +30,8 @@ router.get("/", getProducts);
 router.get("/pending", protect, isAdmin, getPendingListings);
 router.get("/my-listings", protect, getMyListings);
 router.post("/listing-fee/verify", protect, verifyListingFee);
+router.get("/:id/reviews", optionalAuth, getProductReviews);
+router.post("/:id/reviews", protect, submitProductReview);
 router.post("/:id/listing-fee/initialize", protect, initializeListingFee);
 
 
