@@ -1,10 +1,8 @@
 
 import { Response } from 'express'
 import bcrypt from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
+import prisma from '../lib/prisma'
 import type { AuthRequest } from '../middleware/authMiddleware'
-
-const prisma = new PrismaClient()
 
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {

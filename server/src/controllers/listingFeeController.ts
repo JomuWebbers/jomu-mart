@@ -1,14 +1,12 @@
 import { randomUUID } from "crypto";
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../lib/prisma";
 import type { AuthRequest } from "../middleware/authMiddleware";
 import {
   getStreamChatServer,
   streamDisplayName,
   streamUserId,
 } from "../lib/stream";
-
-const prisma = new PrismaClient();
 const MONTHLY_FEE_NAIRA = 1000;
 const MONTHLY_FEE_KOBO = MONTHLY_FEE_NAIRA * 100;
 

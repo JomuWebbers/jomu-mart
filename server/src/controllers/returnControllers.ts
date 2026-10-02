@@ -1,9 +1,7 @@
 
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../lib/prisma";
 import type { AuthRequest } from "../middleware/authMiddleware";
-
-const prisma = new PrismaClient();
 
 // Customer creates a return request for an order
 export const createReturnRequest = async (req: AuthRequest, res: Response) => {

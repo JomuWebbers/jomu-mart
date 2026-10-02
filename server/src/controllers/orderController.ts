@@ -1,6 +1,6 @@
 
 import { Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import prisma from '../lib/prisma'
 import type { AuthRequest } from '../middleware/authMiddleware'
 import { LGA_COORDINATES, STATE_WAREHOUSE } from '../data/lgaCoordinates'
 import { getStreamChatServer, streamUserId, streamDisplayName } from '../lib/stream'
@@ -8,9 +8,6 @@ import { getStreamChatServer, streamUserId, streamDisplayName } from '../lib/str
 function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
-
-const prisma = new PrismaClient()
-
 
 export const assignDeliveryPartner = async (req: AuthRequest, res: Response) => {
   try {

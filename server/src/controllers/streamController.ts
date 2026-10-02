@@ -1,10 +1,8 @@
 
 import { Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import prisma from '../lib/prisma'
 import { getStreamChatServer, streamApiKey, streamUserId, streamDisplayName } from '../lib/stream'
 import type { AuthRequest } from '../middleware/authMiddleware'
-
-const prisma = new PrismaClient()
 
 export const createStreamToken = async (req: AuthRequest, res: Response) => {
   try {
