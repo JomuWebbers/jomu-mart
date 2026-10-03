@@ -24,22 +24,34 @@ const client = globalThis.__naijaMartPrisma ?? new PrismaClient();
  * too. Wrapping those nested layers would retry a transaction at every level at
  * once, multiplying attempts and the wall-clock delay with each nesting depth.
  */
-const NON_RETRYABLE = new Set([
-  "$transaction",
-  "$connect",
-  "$disconnect",
-  "$on",
-  "$use",
-  "$extends",
+/**
+ * Only read operations are retried.
+ *
+ * Rewriting a write to "succeed twice" is the risk to avoid, and the array form
+ * `prisma.$transaction([prisma.order.update(...), ...])` requires its arguments
+ * to be genuine Prisma promises. Wrapping a write in a plain async function
+ * returns a native Promise instead, which Prisma rejects with "All elements of
+ * the array need to be Prisma Client promises", so every batched write in the
+ * app (seller payout, return refund) would 500.
+ *
+ * Reads are what a cold start actually breaks: the first GET after Neon resumes
+ * has no connection, and a read is safe to repeat. A write that loses its
+ * connection fails cleanly with no write applied, and the buyer retries.
+ */
+const RETRYABLE_READS = new Set([
+  "findUnique",
+  "findUniqueOrThrow",
+  "findFirst",
+  "findFirstOrThrow",
+  "findMany",
+  "count",
+  "aggregate",
+  "groupBy",
+  "exists",
 ]);
 
-function isRetryableProperty(prop: string): boolean {
-  // Covers Prisma's own internals ($transaction and its _ helpers).
-  return !prop.startsWith("$") && !prop.startsWith("_");
-}
-
 /**
- * Wraps every model operation in a transient-error retry.
+ * Wraps read operations in a transient-error retry.
  *
  * Without this, the first request after Neon wakes from idle fails with a 500,
  * because only the boot warmup retried. Callers across the app use `prisma`
@@ -53,7 +65,10 @@ function withRetry<T extends object>(target: T, label: string): T {
 
       const value = Reflect.get(obj, prop, receiver);
 
-      if (!isRetryableProperty(prop) || NON_RETRYABLE.has(prop)) return value;
+      // Prisma internals ($transaction and its _ helpers) and writes pass through
+      // untouched; only the named read operations below are safe to repeat.
+      if (prop.startsWith("$") || prop.startsWith("_")) return value;
+      if (!RETRYABLE_READS.has(prop)) return value;
 
       if (typeof value === "function") {
         // Bind to the real object so Prisma's internal `this` stays correct.

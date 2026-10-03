@@ -106,6 +106,7 @@ const products = await prisma.product.findMany({
   select: {
     id: true,
     name: true,
+    price: true,
     sellerId: true,
     status: true,
     stock: true,
@@ -118,6 +119,10 @@ const productsById = new Map(products.map((product) => [product.id, product]));
 
 // Delivery is never trusted from the client. Each seller may set their own fee
 // per listing, so a mixed-seller cart sums every applicable listing fee.
+//
+// The stored line items are rebuilt from these database rows further down
+// rather than saved as sent: `price` and `sellerId` decide what a seller is
+// later paid out, so a client that edited them would redirect payouts.
 let serverDeliveryFee = 0;
 
 for (const item of typedItems) {
@@ -161,11 +166,45 @@ if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
   });
 }
 
+// Rebuild every line from the database. Price, seller and name come from the
+    // product row, never the request body: payoutSeller pays out from the stored
+    // item, so a forged price or sellerId would pay the wrong account for the
+    // wrong amount. Only the quantity is taken from the client.
+    const orderItems = typedItems.map((item) => {
+      const product = productsById.get(item.productId)!;
+      return {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        qty: Number(item.qty),
+        sellerId: product.sellerId,
+        image: (item as { image?: unknown }).image ?? null,
+        payoutStatus: 'pending',
+      };
+    });
+
+    const serverSubtotal = orderItems.reduce(
+      (sum: number, item: { price: number; qty: number }) => sum + item.price * item.qty,
+      0,
+    );
+
+    // A client subtotal that disagrees with the live prices means the buyer
+    // reviewed a stale total, so reject rather than silently charge differently.
+    if (Math.abs(Number(subtotal) - serverSubtotal) > 1) {
+      return res.status(409).json({
+        message: 'A price in your cart changed. Please review it and try again.',
+        subtotal: serverSubtotal,
+      });
+    }
+
+
     if (!shippingAddress || !paymentMethod || subtotal === undefined) {
       return res.status(400).json({ message: 'Missing required order fields' })
     }
 
-    const total = subtotal + serverDeliveryFee + (tax || 0)
+    // serverSubtotal comes from the database prices above, so a tampered
+    // subtotal can never become the charged amount.
+    const total = serverSubtotal + serverDeliveryFee + (tax || 0)
 
     // Order creation and stock decrement share one transaction: if any line runs
     // out, nothing is written. updateMany's `stock >= qty` guard is what makes
@@ -193,10 +232,10 @@ if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
         return tx.order.create({
           data: {
             userId,
-            items,
+            items: orderItems,
             shippingAddress,
             paymentMethod,
-            subtotal,
+            subtotal: serverSubtotal,
             deliveryFee: serverDeliveryFee,
             tax: tax || 0,
             total,
