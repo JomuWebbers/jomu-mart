@@ -30,7 +30,10 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true)
     }
-    return callback(new Error(`Origin ${origin} is not allowed by CORS`))
+    // Deny without throwing: omitting the CORS headers makes the browser block the
+    // response, and a 500 here would misreport a policy decision as a server fault.
+    console.warn(`Blocked CORS request from disallowed origin: ${origin}`)
+    return callback(null, false)
   },
 }))
 app.use(express.json())
