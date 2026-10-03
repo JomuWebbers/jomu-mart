@@ -1,5 +1,5 @@
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { PlusIcon, TrashIcon, XIcon, LoaderCircleIcon, PhoneIcon, BikeIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/useAuth'
@@ -35,7 +35,7 @@ export default function AdminDeliveryPartners() {
       .finally(() => setLoading(false))
   }, [token])
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault()
 
     if (!form.name || !form.email || !form.phone) {

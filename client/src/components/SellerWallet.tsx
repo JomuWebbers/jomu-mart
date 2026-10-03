@@ -1,5 +1,5 @@
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { XIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/useAuth";
@@ -29,7 +29,7 @@ export default function SellerWallet() {
       .catch(() => toast.error("Could not load your seller balance"));
   }, [token]);
 
-  const saveBankAccount = async (event: FormEvent) => {
+  const saveBankAccount = async (event: SubmitEvent) => {
     event.preventDefault();
     if (!token) return;
 
@@ -60,7 +60,7 @@ export default function SellerWallet() {
     }
   };
 
-  const withdraw = async (event: FormEvent) => {
+  const withdraw = async (event: SubmitEvent) => {
     event.preventDefault();
     if (!token) return;
 

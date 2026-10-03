@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Divider, MicroLabel, PageShell } from "../components/wireframe-primitives";
@@ -166,7 +166,7 @@ export default function ProductDetail() {
   const reviews = currentReviewData?.reviews ?? [];
   const canReview = Boolean(token && currentReviewData?.canReview);
 
-  async function submitReview(event: FormEvent<HTMLFormElement>) {
+  async function submitReview(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!token || !id) {
       toast.error("Sign in to write a review.");

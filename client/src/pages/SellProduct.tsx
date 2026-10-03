@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ImagePlusIcon, LoaderCircleIcon, XIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -83,7 +83,7 @@ export default function SellProduct() {
     setFiles((current) => [...current, ...incoming]);
   };
 
-  const continueToDelivery = (event: FormEvent) => {
+  const continueToDelivery = (event: SubmitEvent) => {
     event.preventDefault();
     if (files.length === 0) {
       toast.error("Add at least one product photo");
@@ -105,7 +105,7 @@ export default function SellProduct() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
     if (form.fulfillmentMethod === "pickup" && (!form.sellerLga || !form.sellerAddress.trim())) {
       toast.error("Add the pickup LGA and street address");

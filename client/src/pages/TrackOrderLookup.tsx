@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageShell } from "../components/wireframe-primitives";
 import { useAuth } from "../context/useAuth";
@@ -9,7 +9,7 @@ export default function TrackOrderLookup() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const cleanedId = orderId.trim();

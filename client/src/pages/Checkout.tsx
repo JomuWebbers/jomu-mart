@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type SubmitEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -111,7 +111,7 @@ export default function Checkout() {
   }
 
   
-  const handlePlaceOrder = async (e: FormEvent) => {
+  const handlePlaceOrder = async (e: SubmitEvent) => {
     e.preventDefault();
 
     if (!name || !phone || !address || !city) {

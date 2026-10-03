@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { XIcon, LoaderCircleIcon, UploadIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/useAuth";
@@ -81,7 +81,7 @@ export default function ProductFormModal({
     return data.url;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
     if (

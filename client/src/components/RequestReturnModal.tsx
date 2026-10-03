@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import toast from "react-hot-toast";
 import { apiRequest } from "../lib/api";
 import { fmt } from "./wireframe-helpers";
@@ -40,7 +40,7 @@ export default function RequestReturnModal({
   const [refundMethod, setRefundMethod] = useState("wallet");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
     if (!reason.trim()) {
