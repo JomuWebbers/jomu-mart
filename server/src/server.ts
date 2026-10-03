@@ -9,7 +9,7 @@ import uploadRoutes from './routes/uploadRoutes'
 import streamRoutes from './routes/streamRoutes'
 import userRoutes from './routes/userRoutes'
 import returnRoutes from './routes/returnRoutes'
-import { warmDatabaseConnection } from './lib/dbRetry'
+import { warmDatabaseConnection } from './lib/prisma'
 
 
 dotenv.config()
