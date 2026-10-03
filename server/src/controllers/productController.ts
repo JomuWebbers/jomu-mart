@@ -184,9 +184,17 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       "sellerLga",
       "sellerAddress",
       "deliveryDays",
-      "chargeDeliveryFee",
+      "chargesDeliveryFee",
       "deliveryFeeAmount"
     ];
+
+    // Guard against typos in the allowlist above: a misspelled field would
+    // otherwise be silently dropped and the admin would think the edit saved.
+    const productFields = new Set(Object.keys(prisma.product.fields));
+    const mistyped = allowedFields.filter((field) => !productFields.has(field));
+    if (mistyped.length > 0) {
+      console.error(`updateProduct allowlist contains unknown fields: ${mistyped.join(", ")}`);
+    }
 
     const updateData: any = {};
     for (const field of allowedFields) {

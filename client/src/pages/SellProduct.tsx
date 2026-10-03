@@ -97,8 +97,14 @@ export default function SellProduct() {
       toast.error("Original price should be at least the selling price");
       return;
     }
-    if (form.stock && (!Number.isInteger(Number(form.stock)) || Number(form.stock) < 0)) {
-      toast.error("Stock must be a whole number of zero or more");
+    // Stock is enforced when orders are placed (0 = sold out, blank = unlimited),
+    // so an accidental zero would silently make the listing unbuyable.
+    if (form.stock === "") {
+      toast.error("Enter how many units you have available");
+      return;
+    }
+    if (!Number.isInteger(Number(form.stock)) || Number(form.stock) < 1) {
+      toast.error("Stock must be a whole number of 1 or more");
       return;
     }
     setStep(2);
@@ -261,7 +267,10 @@ export default function SellProduct() {
               </label>
               <label>
                 <span className={labelClass}>Available stock</span>
-                <input className={inputClass} type="number" min="0" step="1" value={form.stock} onChange={(e) => update("stock", e.target.value)} required />
+                <input className={inputClass} type="number" min="1" step="1" value={form.stock} onChange={(e) => update("stock", e.target.value)} required placeholder="How many units you can sell" />
+                <span className="mt-2 block text-xs text-neutral-500">
+                  Stock is reduced automatically every time one of these sells.
+                </span>
               </label>
               <label className="flex items-end pb-3">
                 <span className="flex items-center gap-3 text-sm">

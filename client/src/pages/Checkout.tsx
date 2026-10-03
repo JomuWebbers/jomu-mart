@@ -74,8 +74,12 @@ export default function Checkout() {
   const [payment, setPayment] = useState(PAYMENT_METHODS[0]);
   const [placing, setPlacing] = useState(false);
 
-  const deliveryFee = 3_500;
-  const total = subtotal + deliveryFee;
+  // Delivery is NOT a flat platform rate: each seller sets their own fee per
+  // listing, so a cart sums every applicable listing fee. It stays null until
+  // the live products are fetched, and is only a preview — the server
+  // recomputes it and rejects any mismatch.
+  const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
+  const total = subtotal + (deliveryFee ?? 0);
 
   function cancelBuyNow() {
     clearBuyNow();
@@ -202,6 +206,19 @@ export default function Checkout() {
         0,
       );
 
+      // Delivery is whatever the SELLER set per listing, summed across every
+      // listing in the cart. The server recomputes this and rejects a mismatch,
+      // so this value is a display estimate, not the source of truth.
+      const liveDeliveryFee = freshResults.reduce((sum, r) => {
+        const product = r.product as {
+          chargesDeliveryFee?: boolean | null;
+          deliveryFeeAmount?: number | null;
+        };
+        return sum + (product?.chargesDeliveryFee ? Number(product.deliveryFeeAmount ?? 0) : 0);
+      }, 0);
+
+      setDeliveryFee(liveDeliveryFee);
+
       const order = await apiRequest("/orders", {
         method: "POST",
         token: token ?? undefined,
@@ -210,7 +227,7 @@ export default function Checkout() {
           shippingAddress: { name, phone, address, city, state },
           paymentMethod: payment,
           subtotal: freshSubtotal,
-          deliveryFee,
+          deliveryFee: liveDeliveryFee,
         },
       });
 
@@ -386,8 +403,10 @@ export default function Checkout() {
                   <span>{fmt(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">Delivery Fee</span>
-                  <span>{fmt(deliveryFee)}</span>
+                  <span className="text-neutral-500">
+                    Delivery{deliveryFee === null ? " (calculated at checkout)" : ""}
+                  </span>
+                  <span>{deliveryFee === null ? "—" : fmt(deliveryFee)}</span>
                 </div>
               </div>
               <Divider thick />

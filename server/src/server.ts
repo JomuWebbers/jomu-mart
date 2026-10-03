@@ -9,6 +9,7 @@ import uploadRoutes from './routes/uploadRoutes'
 import streamRoutes from './routes/streamRoutes'
 import userRoutes from './routes/userRoutes'
 import returnRoutes from './routes/returnRoutes'
+import { warmDatabaseConnection } from './lib/dbRetry'
 
 
 dotenv.config()
@@ -63,6 +64,9 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
     console.log(`CORS allowed origins: ${allowedOrigins.join(', ')}`)
+    // Open the pooled connection at boot so the first customer request does
+    // not pay Neon's cold-start cost and return a 500.
+    void warmDatabaseConnection()
   })
 }
 

@@ -9,6 +9,15 @@ function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
+// Thrown inside the order transaction when a concurrent order took the last
+// units. Rolling the transaction back is what keeps stock and orders consistent.
+class StockConflictError extends Error {
+  constructor(public readonly productId: string) {
+    super(`Insufficient stock for product ${productId}`)
+    this.name = 'StockConflictError'
+  }
+}
+
 export const assignDeliveryPartner = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
@@ -79,15 +88,41 @@ if (productIds.some((id: unknown) => typeof id !== "string")) {
   return res.status(400).json({ message: "Every order item must have a valid product" });
 }
 
+// Quantities are validated up front: stock is decremented per unit below, so a
+// malformed qty must never reach the decrement.
+const typedItems = items as { productId: string; qty?: unknown }[];
+
+for (const item of typedItems) {
+  const qty = Number(item.qty);
+  if (!Number.isInteger(qty) || qty < 1) {
+    return res.status(400).json({
+      message: "Every order item needs a whole quantity of at least 1",
+    });
+  }
+}
+
 const products = await prisma.product.findMany({
   where: { id: { in: productIds as string[] } },
-  select: { id: true, sellerId: true, status: true },
+  select: {
+    id: true,
+    name: true,
+    sellerId: true,
+    status: true,
+    stock: true,
+    chargesDeliveryFee: true,
+    deliveryFeeAmount: true,
+  },
 });
 
 const productsById = new Map(products.map((product) => [product.id, product]));
 
-for (const item of items as { productId: string }[]) {
+// Delivery is never trusted from the client. Each seller may set their own fee
+// per listing, so a mixed-seller cart sums every applicable listing fee.
+let serverDeliveryFee = 0;
+
+for (const item of typedItems) {
   const product = productsById.get(item.productId);
+  const qty = Number(item.qty);
 
   if (!product || product.status !== "approved") {
     return res.status(400).json({
@@ -100,29 +135,91 @@ for (const item of items as { productId: string }[]) {
       message: "You can't purchase your own product",
     });
   }
+
+  // null means unlimited stock; a number is decremented per unit placed.
+  if (product.stock !== null && product.stock < qty) {
+    return res.status(409).json({
+      message:
+        product.stock <= 0
+          ? `${product.name} is out of stock`
+          : `Only ${product.stock} left of ${product.name}`,
+    });
+  }
+
+  if (product.chargesDeliveryFee) {
+    serverDeliveryFee += Number(product.deliveryFeeAmount ?? 0);
+  }
+}
+
+// Reject rather than silently correct a tampered delivery fee, so the buyer is
+// never charged a different amount than the one they reviewed.
+const claimedDeliveryFee = Number(deliveryFee ?? 0);
+if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
+  return res.status(409).json({
+    message: "The delivery fee for your cart changed. Please review it and try again.",
+    deliveryFee: serverDeliveryFee,
+  });
 }
 
     if (!shippingAddress || !paymentMethod || subtotal === undefined) {
       return res.status(400).json({ message: 'Missing required order fields' })
     }
 
-    const total = subtotal + (deliveryFee || 0) + (tax || 0)
+    const total = subtotal + serverDeliveryFee + (tax || 0)
 
-    const order = await prisma.order.create({
-      data: {
-        userId,
-        items,
-        shippingAddress,
-        paymentMethod,
-        subtotal,
-        deliveryFee: deliveryFee || 0,
-        tax: tax || 0,
-        total,
-        status: 'Placed',
-        statusHistory: [{ status: 'Placed', at: new Date().toISOString() }],
-        isPaid: paymentMethod !== 'Pay on Delivery' && paymentMethod !== 'Card (Paystack)',
-      },
-    })
+    // Order creation and stock decrement share one transaction: if any line runs
+    // out, nothing is written. updateMany's `stock >= qty` guard is what makes
+    // this safe when two buyers race for the last unit.
+    let order;
+    try {
+      order = await prisma.$transaction(async (tx) => {
+        for (const item of typedItems) {
+          const qty = Number(item.qty);
+          const product = productsById.get(item.productId);
+
+          // null means unlimited, so there is nothing to decrement.
+          if (product?.stock === null) continue;
+
+          const decremented = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: qty } },
+            data: { stock: { decrement: qty } },
+          });
+
+          if (decremented.count === 0) {
+            throw new StockConflictError(item.productId);
+          }
+        }
+
+        return tx.order.create({
+          data: {
+            userId,
+            items,
+            shippingAddress,
+            paymentMethod,
+            subtotal,
+            deliveryFee: serverDeliveryFee,
+            tax: tax || 0,
+            total,
+            status: 'Placed',
+            statusHistory: [{ status: 'Placed', at: new Date().toISOString() }],
+            isPaid: paymentMethod !== 'Pay on Delivery' && paymentMethod !== 'Card (Paystack)',
+          },
+        });
+      }, {
+        // Prisma's 5s default is too tight once several buyers are checking out
+        // at once against a pooled connection; the transaction is tiny but can
+        // queue behind other checkouts.
+        timeout: 15000,
+        maxWait: 10000,
+      });
+    } catch (error) {
+      if (error instanceof StockConflictError) {
+        return res.status(409).json({
+          message: "Someone bought the last of one of these items while you were checking out. Please review your cart.",
+        });
+      }
+      throw error;
+    }
 
         // Notify the customer in their existing support chat.
     // A chat error should not undo a successfully created order.
