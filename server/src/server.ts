@@ -15,7 +15,24 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
-app.use(cors({ origin: ['https://naija-mart-five.vercel.app', 'http://localhost:5173'] }))
+// Allowed frontend origins. FRONTEND_URL is the deployed client origin and is
+// already required for Paystack listing-fee callbacks, so reuse it here instead
+// of hardcoding a second copy that can silently drift out of date.
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://naija-mart-five.vercel.app',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim()] : []),
+].filter(Boolean)
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Same-origin/curl requests arrive without an Origin header.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+    return callback(new Error(`Origin ${origin} is not allowed by CORS`))
+  },
+}))
 app.use(express.json())
 
 
@@ -42,6 +59,7 @@ app.use('/api/users', userRoutes)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
+    console.log(`CORS allowed origins: ${allowedOrigins.join(', ')}`)
   })
 }
 
