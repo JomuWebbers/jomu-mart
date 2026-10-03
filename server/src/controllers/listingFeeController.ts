@@ -9,6 +9,7 @@ import {
 } from "../lib/stream";
 const MONTHLY_FEE_NAIRA = 1000;
 const MONTHLY_FEE_KOBO = MONTHLY_FEE_NAIRA * 100;
+const FREE_LISTINGS_QUOTA = 5;
 
 function currentMonthInLagos(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -52,6 +53,23 @@ function monthWindow(monthKey: string) {
 async function notifySellerInChat(
   seller: { id: string; name: string },
   monthKey: string,
+  variant:
+    | { kind: "paystack"; }
+    | {
+        kind: "free";
+        listingName: string;
+        freeUsed: number;
+      }
+    | {
+        kind: "wallet";
+        listingName: string;
+        newBalance: number;
+      }
+    | {
+        kind: "low-balance";
+        listingName: string;
+        balance: number;
+      } = { kind: "paystack" },
 ) {
   try {
     const admin = await prisma.user.findFirst({
@@ -86,12 +104,40 @@ async function notifySellerInChat(
     });
 
     await channel.create();
-    await channel.sendMessage({
-      user_id: adminSid,
-      text:
+    let text: string;
+    if (variant.kind === "free") {
+      const remaining = FREE_LISTINGS_QUOTA - variant.freeUsed;
+      text =
+        `Hi ${seller.name}, your listing '${variant.listingName}' ` +
+        `(${variant.freeUsed} of ${FREE_LISTINGS_QUOTA} free) is with our team for review. ` +
+        (remaining > 0
+          ? `You have ${remaining} free listing${remaining === 1 ? "" : "s"} left. After your ` +
+            `${FREE_LISTINGS_QUOTA}th free listing, a ₦${MONTHLY_FEE_NAIRA.toLocaleString()} ` +
+            `monthly fee will apply, deducted automatically from your seller balance.`
+          : `This was your last free listing — your next listing will trigger the ` +
+            `₦${MONTHLY_FEE_NAIRA.toLocaleString()} monthly fee, deducted automatically ` +
+            `from your seller balance.`);
+    } else if (variant.kind === "wallet") {
+      text =
+        `Hi ${seller.name}, we deducted your ₦${MONTHLY_FEE_NAIRA.toLocaleString()} ` +
+        `Naija Mart monthly listing fee for ${monthKey} from your seller balance ` +
+        `(new balance ₦${variant.newBalance.toLocaleString()}). '${variant.listingName}' is now ` +
+        `with our team for review. Further listings are free through ${monthEndLabel}.`;
+    } else if (variant.kind === "low-balance") {
+      text =
+        `Hi ${seller.name}, your seller balance (₦${variant.balance.toLocaleString()}) is below ` +
+        `the ₦${MONTHLY_FEE_NAIRA.toLocaleString()} monthly fee, so we're taking you to Paystack ` +
+        `to complete it for '${variant.listingName}'. Future months will deduct automatically ` +
+        `once your balance covers the fee.`;
+    } else {
+      text =
         `Hi ${seller.name}, we confirmed your ₦${MONTHLY_FEE_NAIRA.toLocaleString()} ` +
         `Naija Mart monthly listing fee for ${monthKey}. Your first listing is now ` +
-        `with our team for review. Additional listings are free through ${monthEndLabel}.`,
+        `with our team for review. Additional listings are free through ${monthEndLabel}.`;
+    }
+    await channel.sendMessage({
+      user_id: adminSid,
+      text,
     });
   } catch (error) {
     // A chat notification failure must not undo a confirmed payment.
@@ -115,7 +161,14 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
       where: { id },
       include: {
         seller: {
-          select: { id: true, name: true, email: true, role: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            freeListingsUsed: true,
+            accountBalance: true,
+          },
         },
       },
     });
@@ -133,6 +186,33 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
     }
 
     const monthKey = currentMonthInLagos();
+
+    // Step A: a seller's first FREE_LISTINGS_QUOTA listings are free.
+    // freeListingsUsed is incremented once in createProduct, so it already
+    // reflects this listing.
+    if (product.seller.freeListingsUsed < FREE_LISTINGS_QUOTA) {
+      const freeUsed = product.seller.freeListingsUsed;
+
+      await prisma.product.updateMany({
+        where: { id: product.id, listingFeePaid: false },
+        data: { listingFeePaid: true, listingFeeAmount: 0 },
+      });
+
+      await notifySellerInChat(
+        { id: sellerId, name: product.seller.name },
+        monthKey,
+        { kind: "free", listingName: product.name, freeUsed },
+      );
+
+      return res.json({
+        requiresPayment: false,
+        freeListing: true,
+        freeUsed,
+        freeRemaining: FREE_LISTINGS_QUOTA - freeUsed,
+        productId: product.id,
+      });
+    }
+
     const existingFee = await prisma.sellerListingFee.findUnique({
       where: {
         sellerId_monthKey: { sellerId, monthKey },
@@ -160,6 +240,100 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
         reference: existingFee.reference,
       });
     }
+
+    // Step C: deduct the fee from the seller balance when it covers the amount.
+    if ((product.seller.accountBalance ?? 0) >= MONTHLY_FEE_NAIRA) {
+      const { start, end } = monthWindow(monthKey);
+
+      const walletPayment = await prisma.$transaction(async (tx) => {
+        // Re-read inside the transaction so concurrent withdrawals cannot oversell it.
+        const freshSeller = await tx.user.findUnique({
+          where: { id: sellerId },
+          select: { accountBalance: true },
+        });
+
+        if (
+          !freshSeller ||
+          (freshSeller.accountBalance ?? 0) < MONTHLY_FEE_NAIRA
+        ) {
+          return null;
+        }
+
+        const newBalance = (freshSeller.accountBalance ?? 0) - MONTHLY_FEE_NAIRA;
+
+        await tx.user.update({
+          where: { id: sellerId },
+          data: { accountBalance: newBalance },
+        });
+
+        await tx.sellerListingFee.upsert({
+          where: { sellerId_monthKey: { sellerId, monthKey } },
+          create: {
+            sellerId,
+            monthKey,
+            firstProductId: product.id,
+            reference: null,
+            authorizationUrl: null,
+            amountKobo: MONTHLY_FEE_KOBO,
+            status: "paid",
+            paymentMethod: "wallet",
+            paidAt: new Date(),
+          },
+          update: {
+            firstProductId: product.id,
+            reference: null,
+            authorizationUrl: null,
+            amountKobo: MONTHLY_FEE_KOBO,
+            status: "paid",
+            paymentMethod: "wallet",
+            paidAt: new Date(),
+          },
+        });
+
+        // The monthly fee also covers this seller's other listings this month.
+        await tx.product.updateMany({
+          where: {
+            sellerId,
+            status: "pending",
+            listingFeePaid: false,
+            createdAt: { gte: start, lt: end },
+          },
+          data: { listingFeePaid: true, listingFeeAmount: 0 },
+        });
+
+        await tx.product.update({
+          where: { id: product.id },
+          data: {
+            listingFeePaid: true,
+            listingFeeAmount: MONTHLY_FEE_NAIRA,
+          },
+        });
+
+        return newBalance;
+      });
+
+      if (walletPayment !== null) {
+        await notifySellerInChat(
+          { id: sellerId, name: product.seller.name },
+          monthKey,
+          {
+            kind: "wallet",
+            listingName: product.name,
+            newBalance: walletPayment,
+          },
+        );
+
+        return res.json({
+          requiresPayment: false,
+          paidViaWallet: true,
+          monthKey,
+          newBalance: walletPayment,
+          productId: product.id,
+        });
+      }
+    }
+
+    // Step D: fall back to Paystack when the balance cannot cover the fee.
 
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!secretKey) {
@@ -226,6 +400,7 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
         authorizationUrl: paystackData.data.authorization_url,
         amountKobo: MONTHLY_FEE_KOBO,
         status: "pending",
+        paymentMethod: "paystack",
       },
       update: {
         firstProductId: product.id,
@@ -233,9 +408,20 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
         authorizationUrl: paystackData.data.authorization_url,
         amountKobo: MONTHLY_FEE_KOBO,
         status: "pending",
+        paymentMethod: "paystack",
         paidAt: null,
       },
     });
+
+    await notifySellerInChat(
+      { id: sellerId, name: product.seller.name },
+      monthKey,
+      {
+        kind: "low-balance",
+        listingName: product.name,
+        balance: product.seller.accountBalance ?? 0,
+      },
+    );
 
     res.json({
       requiresPayment: true,

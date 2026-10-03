@@ -158,23 +158,35 @@ export default function SellProduct() {
         },
       });
 
-      const fee = await apiRequest(
-  `/products/${product.id}/listing-fee/initialize`,
-  {
-    method: "POST",
-    token,
-  },
-);
+      const fee = await apiRequest(`/products/${product.id}/listing-fee/initialize`, {
+        method: "POST",
+        token,
+      });
 
-if (fee.requiresPayment) {
-  window.location.assign(fee.authorizationUrl);
-  return;
-}
+      if (fee.freeListing) {
+        toast.success(
+          fee.freeRemaining > 0
+            ? `Listing submitted for review. Free listing ${fee.freeUsed} of 5 used — ${fee.freeRemaining} left.`
+            : `Listing submitted for review. That was your 5th free listing — your next listing costs ₦1,000, taken from your seller balance.`,
+        );
+        navigate("/");
+        return;
+      }
 
-toast.success("Listing submitted for review. Your monthly fee is already paid.");
-navigate("/");
+      if (fee.paidViaWallet) {
+        toast.success(
+          `Listing submitted for review. ₦1,000 monthly fee deducted from your balance (₦${Number(fee.newBalance ?? 0).toLocaleString()} left).`,
+        );
+        navigate("/");
+        return;
+      }
 
-      toast.success(product.status === "approved" ? "Product listing created" : "Listing submitted for review");
+      if (fee.requiresPayment) {
+        window.location.assign(fee.authorizationUrl);
+        return;
+      }
+
+      toast.success("Listing submitted for review. Your monthly fee is already paid.");
       navigate("/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not submit your listing");

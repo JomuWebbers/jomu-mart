@@ -108,6 +108,15 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 
     const status = req.userRole === "admin" ? "approved" : "pending";
 
+    // Track lifetime listings so the free quota cannot be reset by deleting products.
+    // Admins bypass listing fees entirely, so they do not consume quota.
+    if (req.userRole !== "admin") {
+      await prisma.user.update({
+        where: { id: sellerId },
+        data: { freeListingsUsed: { increment: 1 } },
+      });
+    }
+
     const product = await prisma.product.create({
       data: {
         // name,
