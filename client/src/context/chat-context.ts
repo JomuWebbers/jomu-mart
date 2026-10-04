@@ -5,6 +5,8 @@ export type ChatContextType = {
   client: StreamChat | null
   channel: Channel | null
   connecting: boolean
+  error: string | null
+  retry: () => void
   unreadCount: number
   markChatRead: () => void
 }

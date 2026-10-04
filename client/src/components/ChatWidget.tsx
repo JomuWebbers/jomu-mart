@@ -13,7 +13,7 @@ import { useChat } from "../context/useChat";
 
 export default function ChatWidget() {
   const { user } = useAuth();
-  const { client, channel, connecting, unreadCount, markChatRead } = useChat();
+  const { client, channel, connecting, error, retry, unreadCount, markChatRead } = useChat();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -60,7 +60,19 @@ export default function ChatWidget() {
 
       {open && (
         <div className="fixed bottom-24 right-5 z-40 w-[90vw] max-w-sm h-[70vh] max-h-[520px] border-2 border-black bg-white shadow-xl flex flex-col overflow-hidden">
-          {connecting || !client || !channel ? (
+          {error && !channel ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center">
+              <p className="text-sm text-neutral-600">
+                Support chat is unavailable right now.
+              </p>
+              <button
+                onClick={retry}
+                className="border-2 border-black px-4 py-2 text-xs font-bold uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
+              >
+                Try again
+              </button>
+            </div>
+          ) : connecting || !client || !channel ? (
             <div className="flex-1 flex items-center justify-center text-sm text-neutral-400">
               Connecting to support…
             </div>

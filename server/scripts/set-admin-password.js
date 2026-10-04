@@ -3,7 +3,7 @@
  *
  * Run this yourself so the password is never typed into a chat transcript:
  *     cd server
- *     $env:ADMIN_EMAIL  = "NaijaMartAdmin@gmail.com"
+ *     $env:ADMIN_EMAIL  = "JomuMartAdmin@gmail.com"
  *     $env:ADMIN_PASSWORD = "<your password>"   # set it, then clear it below
  *     node scripts/set-admin-password.js
  *     Remove-Item Env:ADMIN_PASSWORD
@@ -25,7 +25,7 @@ function fail(message) {
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
 
-  if (!email) fail('ADMIN_EMAIL is not set (e.g. ADMIN_EMAIL="NaijaMartAdmin@gmail.com")');
+  if (!email) fail('ADMIN_EMAIL is not set (e.g. ADMIN_EMAIL="JomuMartAdmin@gmail.com")');
   if (!password) fail('ADMIN_PASSWORD is not set. Set it in this terminal, do not paste it into chat.');
 
   if (password.length < 12) fail('Use at least 12 characters.');

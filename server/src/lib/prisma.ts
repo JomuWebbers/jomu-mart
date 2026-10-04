@@ -3,12 +3,12 @@ import { withDbRetry, WARMUP_RETRY_DELAYS_MS } from "./dbRetry";
 
 declare global {
   // eslint-disable-next-line no-var
-  var __naijaMartPrisma: PrismaClient | undefined;
+  var __jomuMartPrisma: PrismaClient | undefined;
 }
 
 // One client for the whole process: a PrismaClient per controller file would
 // open its own pool, and the combined pools exhaust Neon.
-const client = globalThis.__naijaMartPrisma ?? new PrismaClient();
+const client = globalThis.__jomuMartPrisma ?? new PrismaClient();
 
 /**
  * Properties that must never be retried.
@@ -89,7 +89,7 @@ function withRetry<T extends object>(target: T, label: string): T {
 export const prisma = withRetry(client, "prisma");
 
 if (process.env.NODE_ENV !== "production") {
-  globalThis.__naijaMartPrisma = client;
+  globalThis.__jomuMartPrisma = client;
 }
 
 /** Warms the pool so the first real request does not pay the cold-start cost. */

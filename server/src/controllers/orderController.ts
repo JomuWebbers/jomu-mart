@@ -3,7 +3,7 @@ import { Response } from 'express'
 import prisma from '../lib/prisma'
 import type { AuthRequest } from '../middleware/authMiddleware'
 import { LGA_COORDINATES, STATE_WAREHOUSE } from '../data/lgaCoordinates'
-import { getStreamChatServer, streamUserId, streamDisplayName } from '../lib/stream'
+import { getStreamChatServer, streamUserId, ensureSupportChannel } from '../lib/stream'
 
 function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -276,28 +276,14 @@ if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
 
       if (customer && admin) {
         const server = getStreamChatServer();
-        const customerSid = streamUserId(customer.id);
-        const adminSid = streamUserId(admin.id);
 
-        await server.upsertUsers([
-          { id: customerSid, name: customer.name },
-          {
-            id: adminSid,
-            name: streamDisplayName(admin.role, admin.name),
-          },
-        ]);
-
-        const channel = server.channel(
-          "messaging",
-          `support-${customer.id}`,
-          {
-            members: [customerSid, adminSid],
-            created_by_id: adminSid,
-          },
-        );
-
-        // watch() gets or creates the support channel.
-        await channel.watch();
+        const channel = await ensureSupportChannel({
+          server,
+          userId: customer.id,
+          userName: customer.name,
+          adminId: admin.id,
+          adminName: admin.name,
+        });
 
         const frontendUrl =
           process.env.FRONTEND_URL || "http://localhost:5173";
@@ -305,7 +291,7 @@ if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
           `${frontendUrl}/track/${encodeURIComponent(order.id)}`;
 
         await channel.sendMessage({
-          user_id: adminSid,
+          user_id: streamUserId(admin.id),
           text:
             `Hi ${customer.name}, your Jomu Mart order has been placed.\n\n` +
             `Order ID: ${order.id}\n` +
@@ -523,22 +509,17 @@ export const payoutSeller = async (req: AuthRequest, res: Response) => {
       const admin = await prisma.user.findFirst({ where: { role: 'admin' } })
       if (admin) {
         const server = getStreamChatServer()
-        const sellerSid = streamUserId(seller.id)
-        const adminSid = streamUserId(admin.id)
 
-        await server.upsertUsers([
-          { id: sellerSid, name: seller.name },
-          { id: adminSid, name: streamDisplayName(admin.role, admin.name) },
-        ])
-
-        const channel = server.channel('messaging', `support-${seller.id}`, {
-          members: [sellerSid, adminSid],
-          created_by_id: adminSid,
+        const channel = await ensureSupportChannel({
+          server,
+          userId: seller.id,
+          userName: seller.name,
+          adminId: admin.id,
+          adminName: admin.name,
         })
-        await channel.create()
         await channel.sendMessage({
           text: 'Congratulations, your product has been sold and payment processing soon to be reflected on your dashboard for withdrawal.',
-          user_id: adminSid,
+          user_id: streamUserId(admin.id),
         })
       }
     } catch (chatError) {
