@@ -25,7 +25,7 @@ export default function Layout() {
 
   return (
     <div
-      className="bg-white text-black min-h-screen overflow-x-hidden"
+      className="bg-white text-black min-h-screen"
       style={{ fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif" }}
     >
       {/* Announcement Bar */}

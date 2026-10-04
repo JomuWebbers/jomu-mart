@@ -4,6 +4,18 @@
   --vermilion: #E63312;
 }
 
+/* Horizontal-overflow guard. This used to live on the Layout root as
+   `overflow-x-hidden`, which was the wrong element: any ancestor with a
+   non-visible overflow becomes a scroll container, and a scroll container
+   clips `position: fixed` descendants in some browsers. That is what made the
+   ChatWidget's fixed bottom-right button vanish on narrow viewports (reproduced
+   in Edge mobile view, absent in Chrome). Applying it to the document root
+   instead keeps the original intent - stop accidental sideways scroll - without
+   wrapping the app in a scroll container that swallows fixed elements. */
+html {
+  overflow-x: hidden;
+}
+
 
 
 
