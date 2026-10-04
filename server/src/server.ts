@@ -21,10 +21,19 @@ const PORT = process.env.PORT || 5000
 // of hardcoding a second copy that can silently drift out of date.
 const allowedOrigins = [
   'http://localhost:5173',
-  // Deployed client origin after the brand rename to Jomu Mart. The old
-  // naija-mart-five.vercel.app domain 301-redirects here, so it is deliberately
-  // absent: the browser's Origin header follows the redirect to this host.
+  // Deployed client origin after the brand rename to Jomu Mart.
   'https://jomu-mart-five.vercel.app',
+  // The pre-rename client origin, kept deliberately even though the app is now
+  // served from jomu-mart-five.vercel.app. Normally the browser follows the old
+  // domain's redirect and sends the new origin, so this entry goes unused - but
+  // Vercel does not guarantee pre-rename *.vercel.app URLs keep resolving or
+  // redirecting. If that redirect ever stops, a bookmarked or shared old link
+  // would send this exact Origin header, and omitting it would fail every API
+  // call from those pages. Allowing it costs nothing (an allowlist entry is not
+  // an open door - it still has to match exactly) and removes a dependency on
+  // undocumented platform behaviour.
+  // Safe to delete once the old domain is confirmed dead.
+  'https://naija-mart-five.vercel.app',
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim()] : []),
 ].filter(Boolean)
 
@@ -42,6 +51,9 @@ app.use(cors({
 }))
 app.use(express.json())
 
+app.get("/", (req, res) => {
+  res.send("Welcome to Jomu Mart Server!");
+});
 
 
 app.get('/health', (req, res) => {
