@@ -21,7 +21,10 @@ const PORT = process.env.PORT || 5000
 // of hardcoding a second copy that can silently drift out of date.
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://naija-mart-five.vercel.app',
+  // Deployed client origin after the brand rename to Jomu Mart. The old
+  // naija-mart-five.vercel.app domain 301-redirects here, so it is deliberately
+  // absent: the browser's Origin header follows the redirect to this host.
+  'https://jomu-mart-five.vercel.app',
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim()] : []),
 ].filter(Boolean)
 
@@ -57,7 +60,6 @@ app.use('/api/delivery-partners', deliveryPartnerRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/chat', streamRoutes)
 app.use('/api/users', userRoutes)
-// app.use(cors({ origin: ['https://naija-mart-five.vercel.app', 'http://localhost:5173'] }))
 
 
 if (process.env.NODE_ENV !== 'production') {
