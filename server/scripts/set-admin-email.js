@@ -30,10 +30,12 @@ function fail(message) {
 
   if (!newEmail) fail('ADMIN_NEW_EMAIL is not set (e.g. ADMIN_NEW_EMAIL="JomuMartAdmin@gmail.com")');
 
-  // Shape check only. Gmail lowercases local parts in practice, and an email
-  // is case-insensitive, but normalising here keeps the stored value tidy and
-  // avoids a confusing mismatch against what the login form sends.
-  const email = newEmail.trim().toLowerCase();
+  // Trim only. Deliberately NOT lowercasing: the login endpoint does an exact,
+  // case-sensitive findUnique({ where: { email } }) and does not normalise its
+  // input, so storing "JomuMartAdmin@gmail.com" is required for a user who types
+  // that exact address to match. Lowercasing here previously caused a 401 that
+  // looked like a wrong password.
+  const email = newEmail.trim();
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     fail(`"${newEmail}" does not look like a valid email address.`);
@@ -76,3 +78,7 @@ function fail(message) {
 })()
   .catch((error) => fail(error?.message ?? String(error)))
   .finally(() => prisma.$disconnect());
+
+
+
+ 

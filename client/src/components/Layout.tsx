@@ -218,6 +218,16 @@ export default function Layout() {
                     Admin Dashboard
                   </Link>
                 )}
+                {/* These two live inside the desktop account dropdown (guarded by
+                    role !== "admin"); they were never added to the mobile menu,
+                    which left sellers with no way to reach their balance or apply
+                    for trusted-vendor status on a phone. */}
+                {user.role !== "admin" && (
+                  <>
+                    <SellerWallet />
+                    <TrustedVendorRequest />
+                  </>
+                )}
                 <button
                   onClick={handleLogout}
                   className="w-full text-left p-3 text-[11px] uppercase font-bold tracking-wide text-red-600"
@@ -226,36 +236,46 @@ export default function Layout() {
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block p-3 text-[13px] font-bold"
-              >
-                Sign In ▾
-              </Link>
+              <>
+                {/* Desktop's account dropdown offers both Sign In and Register.
+                    Mobile only had Sign In, so a first-time visitor on a phone had
+                    no way to create an account at all. */}
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block p-3 text-[13px] font-bold hover:bg-neutral-100"
+                >
+                  Sign In ▾
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block p-3 text-[13px] font-bold hover:bg-neutral-100"
+                >
+                  Register
+                </Link>
+              </>
             )}
 
-            <Link
-              to="/my-orders"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex justify-between items-center p-3 text-[11px] tracking-[0.15em] uppercase font-semibold hover:bg-neutral-100"
-            >
-              <MicroLabel>Returns & Orders</MicroLabel>
-            </Link>
-            
-            <Link
-              to="/sell"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block p-3 text-[11px] tracking-[0.15em] uppercase font-semibold"
-            >
-              Sell on Jomu Mart
-            </Link>
-            {["Track Order", "Help Center"].map((s) => (
-              <div key={s} className="p-3">
-                <span className="text-[11px] tracking-[0.15em] uppercase font-semibold">
-                  {s}
-                </span>
-              </div>
+            {/* All three were previously a mix of <Link> wrapping a grey
+                MicroLabel (Returns & Orders) and a bare non-interactive <div>
+                (Track Order / Help Center) — so they looked like headings and did
+                nothing when tapped. Rendered as real links with the same
+                styling as the other rows in this panel. */}
+            {[
+              { label: "Returns & Orders", to: "/my-orders" },
+              { label: "Sell on Jomu Mart", to: "/sell" },
+              { label: "Track Order", to: "/track-order" },
+              { label: "Help Center", to: "/help" },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block p-3 text-[11px] tracking-[0.15em] uppercase font-semibold hover:bg-neutral-100"
+              >
+                {item.label}
+              </Link>
             ))}
           </div>
         )}
