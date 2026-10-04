@@ -36,7 +36,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 }
 
         const { agentId } = await apiRequest("/chat/support-agent", { token });
-        const streamUserId = `naijamart_${user.id}`;
+        const streamUserId = `jomumart_${user.id}`;
         const ch = chatClient.channel("messaging", `support-${user.id}`, {
           members: [streamUserId, agentId],
         });

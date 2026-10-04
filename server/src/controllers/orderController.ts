@@ -307,7 +307,7 @@ if (Math.abs(claimedDeliveryFee - serverDeliveryFee) > 1) {
         await channel.sendMessage({
           user_id: adminSid,
           text:
-            `Hi ${customer.name}, your Naija Mart order has been placed.\n\n` +
+            `Hi ${customer.name}, your Jomu Mart order has been placed.\n\n` +
             `Order ID: ${order.id}\n` +
             `Track your order: ${trackingUrl}\n\n` +
             `You can also find this order anytime under My Orders.`,

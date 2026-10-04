@@ -480,7 +480,7 @@ export default function Homepage() {
                 className="font-black uppercase tracking-tight mt-2"
                 style={{ fontSize: 32, letterSpacing: "-0.04em" }}
               >
-                Naija Mart 70
+                Jomu Mart 70
               </p>
             </div>
             <button className="w-full py-4 bg-black text-white text-[10px] tracking-[0.25em] uppercase font-black">
@@ -552,7 +552,7 @@ export default function Homepage() {
                 className="font-black uppercase leading-none block mb-3"
                 style={{ fontSize: 24, letterSpacing: "-0.05em" }}
               >
-                Naija Mart
+                Jomu Mart
               </span>
               <p className="text-[12px] text-neutral-400 leading-relaxed font-medium max-w-sm">
                 Nigeria's largest online marketplace. Fast delivery and buyer
@@ -620,7 +620,7 @@ export default function Homepage() {
           {/* Bottom — stacked on mobile */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <MicroLabel>
-              © 2026 Naija Mart Technologies Ltd. All Rights Reserved.
+              © 2026 Jomu Mart. All Rights Reserved.
             </MicroLabel>
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
               {[

@@ -22,7 +22,7 @@ export function getStreamChatServer() {
 }
 
 export function streamUserId(userId: string) {
-  return `naijamart_${userId}`;
+  return `jomumart_${userId}`;
 }
 
 export function streamDisplayName(role: string, name: string) {

@@ -120,7 +120,7 @@ async function notifySellerInChat(
     } else if (variant.kind === "wallet") {
       text =
         `Hi ${seller.name}, we deducted your ₦${MONTHLY_FEE_NAIRA.toLocaleString()} ` +
-        `Naija Mart monthly listing fee for ${monthKey} from your seller balance ` +
+        `Jomu Mart monthly listing fee for ${monthKey} from your seller balance ` +
         `(new balance ₦${variant.newBalance.toLocaleString()}). '${variant.listingName}' is now ` +
         `with our team for review. Further listings are free through ${monthEndLabel}.`;
     } else if (variant.kind === "low-balance") {
@@ -132,7 +132,7 @@ async function notifySellerInChat(
     } else {
       text =
         `Hi ${seller.name}, we confirmed your ₦${MONTHLY_FEE_NAIRA.toLocaleString()} ` +
-        `Naija Mart monthly listing fee for ${monthKey}. Your first listing is now ` +
+        `Jomu Mart monthly listing fee for ${monthKey}. Your first listing is now ` +
         `with our team for review. Additional listings are free through ${monthEndLabel}.`;
     }
     await channel.sendMessage({

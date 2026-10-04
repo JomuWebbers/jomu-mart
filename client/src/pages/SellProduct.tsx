@@ -203,7 +203,7 @@ export default function SellProduct() {
 
   if (!user) {
     return (
-      <PageShell title="Sell on Naija Mart" breadcrumb="SELLER CENTRE">
+      <PageShell title="Sell on Jomu Mart" breadcrumb="SELLER CENTRE">
         <div className="max-w-2xl border-2 border-black p-6 md:p-10">
           <p className="text-sm text-neutral-600">Sign in or create an account to submit a product listing.</p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -216,7 +216,7 @@ export default function SellProduct() {
   }
 
   return (
-    <PageShell title="Sell on Naija Mart" breadcrumb="SELLER CENTRE / NEW LISTING">
+    <PageShell title="Sell on Jomu Mart" breadcrumb="SELLER CENTRE / NEW LISTING">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center gap-3" aria-label={`Step ${step} of 2`}>
           {[1, 2].map((number) => (
@@ -319,14 +319,14 @@ export default function SellProduct() {
           <form onSubmit={handleSubmit} className="space-y-7 border-2 border-black p-5 md:p-8">
             <div>
               <h2 className="text-lg font-black uppercase tracking-tight">How will we collect and deliver it?</h2>
-              <p className="mt-1 text-xs text-neutral-500">Naija Mart coordinates delivery. Choose how the item gets from you to our fulfilment network.</p>
+              <p className="mt-1 text-xs text-neutral-500">Jomu Mart coordinates delivery. Choose how the item gets from you to our fulfilment network.</p>
             </div>
 
             <fieldset>
-              <legend className={`${labelClass} mb-3`}>Getting the item to Naija Mart</legend>
+              <legend className={`${labelClass} mb-3`}>Getting the item to Jomu Mart</legend>
               <div className="grid gap-3 md:grid-cols-2">
                 {([
-                  ["dropoff", "I will drop it off", "You bring the item to the Naija Mart warehouse for your state."],
+                  ["dropoff", "I will drop it off", "You bring the item to the Jomu Mart warehouse for your state."],
                   ["pickup", "Arrange a pickup", "We arrange collection from your address before the customer delivery."],
                 ] as const).map(([value, title, description]) => (
                   <label key={value} className={`cursor-pointer border-2 p-4 ${form.fulfillmentMethod === value ? "border-black bg-neutral-50" : "border-black/20"}`}>
@@ -383,7 +383,7 @@ export default function SellProduct() {
             </div>
 
             <div className="border-l-2 border-black bg-neutral-50 p-4 text-xs leading-5 text-neutral-600">
-              Your listing will be sent to the Naija Mart team for review. The listing-fee payment step will be added in the next phase; no payment is taken here.
+              Your listing will be sent to the Jomu Mart team for review. The listing-fee payment step will be added in the next phase; no payment is taken here.
             </div>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">

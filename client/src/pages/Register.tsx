@@ -37,7 +37,7 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-white text-black">
       <div className="w-full sm:max-w-md border-2 border-black p-6 sm:p-8">
         <span className="font-black uppercase leading-none block text-center mb-2 text-3xl tracking-tight">
-          Naija Mart
+          Jomu Mart
         </span>
         <p className="text-[10px] tracking-[0.2em] uppercase font-semibold text-neutral-400 text-center mb-8">
           Nigeria's Market

@@ -39,7 +39,7 @@ export default function Layout() {
               to="/sell"
               className="text-[10px] tracking-[0.18em] uppercase font-semibold text-neutral-400 hover:text-white transition-colors"
             >
-              Sell on Naija Mart
+              Sell on Jomu Mart
             </Link>
             <Link
               to="/track-order"
@@ -65,7 +65,7 @@ export default function Layout() {
               className="font-black uppercase leading-none"
               style={{ fontSize: 24, letterSpacing: "-0.05em" }}
             >
-              Naija Mart
+              Jomu Mart
             </span>
             <MicroLabel>Nigeria's Marketplace</MicroLabel>
           </Link>
@@ -248,7 +248,7 @@ export default function Layout() {
               onClick={() => setMobileMenuOpen(false)}
               className="block p-3 text-[11px] tracking-[0.15em] uppercase font-semibold"
             >
-              Sell on Naija Mart
+              Sell on Jomu Mart
             </Link>
             {["Track Order", "Help Center"].map((s) => (
               <div key={s} className="p-3">

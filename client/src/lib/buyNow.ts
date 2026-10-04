@@ -16,7 +16,7 @@ export type BuyNowItem = {
   qty: number;
 };
 
-export const BUY_NOW_STORAGE_KEY = "naija-mart:buy-now";
+export const BUY_NOW_STORAGE_KEY = "jomu-mart:buy-now";
 
 /** A mirrored Buy Now older than this is ignored (prevents week-old ghosts). */
 export const BUY_NOW_FRESH_MS = 30 * 60 * 1000;

@@ -23,13 +23,13 @@ export default function ChatWidget() {
     }
 
     window.addEventListener(
-      "naija-mart:open-support-chat",
+      "jomu-mart:open-support-chat",
       handleOpenSupportChat,
     );
 
     return () => {
       window.removeEventListener(
-        "naija-mart:open-support-chat",
+        "jomu-mart:open-support-chat",
         handleOpenSupportChat,
       );
     };
@@ -68,7 +68,7 @@ export default function ChatWidget() {
             <Chat client={client} theme="str-chat__theme-light">
               <Channel channel={channel}>
                 <Window>
-                  <ChannelHeader title="Naija Mart Support" />
+                  <ChannelHeader title="Jomu Mart Support" />
                   <MessageList />
                   <MessageComposer />
                 </Window>

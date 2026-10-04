@@ -10,7 +10,7 @@ require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
-const NEW_NAME = process.env.ADMIN_NAME || 'Naija Mart Support';
+const NEW_NAME = process.env.ADMIN_NAME || 'Jomu Mart Support';
 
 (async () => {
   const admins = await prisma.user.findMany({

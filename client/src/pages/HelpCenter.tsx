@@ -26,7 +26,7 @@ const FAQs = [
   {
     question: "How can I contact support?",
     answer:
-      "Customers who are signed in can message the Naija Mart support team using the support chat.",
+      "Customers who are signed in can message the Jomu Mart support team using the support chat.",
   },
 ];
 
@@ -34,7 +34,7 @@ export default function HelpCenter() {
   const { user } = useAuth();
 
   function openSupportChat() {
-    window.dispatchEvent(new Event("naija-mart:open-support-chat"));
+    window.dispatchEvent(new Event("jomu-mart:open-support-chat"));
   }
 
   return (
@@ -42,7 +42,7 @@ export default function HelpCenter() {
       <div className="mx-auto max-w-4xl space-y-10">
         <section className="border-2 border-black p-6 md:p-8">
           <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Naija Mart Support
+            Jomu Mart Support
           </p>
           <h2 className="mt-2 text-2xl font-black">How can we help?</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-600">

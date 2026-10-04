@@ -11,7 +11,7 @@
 //   try {
 //     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
 //       const stream = cloudinary.uploader.upload_stream(
-//         { folder: "naija-mart/products" },
+//         { folder: "jomu-mart/products" },
 //         (error, result) => {
 //           if (error || !result) return reject(error);
 //           resolve(result);
@@ -39,7 +39,7 @@ import { Response } from 'express'
 
 //     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
 //       const stream = cloudinary.uploader.upload_stream(
-//         { folder: 'naija-mart/products' },
+//         { folder: 'jomu-mart/products' },
 //         (error, result) => {
 //           if (error || !result) return reject(error)
 //           resolve(result)
@@ -69,7 +69,7 @@ export const uploadImage: RequestHandler = async (req, res) => {
   try {
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "naija-mart/products" },
+        { folder: "jomu-mart/products" },
         (error, result) => {
           if (error || !result) return reject(error);
           resolve(result);
