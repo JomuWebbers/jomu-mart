@@ -16,6 +16,22 @@ html {
   overflow-x: hidden;
 }
 
+/* ---- Support chat presentation -------------------------------------------
+ *
+ * stream-chat-react v14 renders the channel header's member avatars as
+ * `.str-chat__avatar-stack`, which deliberately overlaps each circle with a
+ * negative margin. In the compact customer widget the header is only a few
+ * hundred pixels wide, so a two-or-more person stack is squeezed against the
+ * title and the circles visibly collide and clip.
+ *
+ * The widget is a 1:1 support room whose header already reads "Jomu Mart
+ * Support", so the member stack adds nothing. Hiding it is the clean fix; the
+ * admin inbox keeps the default stack because its header is full width.
+ */
+.jm-support-chat .str-chat__avatar-stack {
+  display: none;
+}
+
 
 
 

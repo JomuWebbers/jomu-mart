@@ -5,6 +5,7 @@ import {
   Chat, Channel, Window, ChannelHeader, MessageList, MessageComposer,
 } from 'stream-chat-react'
 import { useChat } from '../../context/useChat'
+import { normalizeMessageAuthors } from '../../lib/chatIdentity'
 
 export default function AdminSupportInbox() {
   const { client, connecting } = useChat()
@@ -20,7 +21,15 @@ export default function AdminSupportInbox() {
         { type: 'messaging', members: { $in: [client.userID as string] } },
         { last_message_at: -1 }
       )
-      .then(setChannels)
+      .then((result) => {
+        // Messages written before the brand rename carry the old
+        // `naijamart_` author id. Left alone, the admin's own replies would be
+        // treated as somebody else's and aligned to the left.
+        result.forEach((ch) =>
+          normalizeMessageAuthors(ch.state.messages)
+        )
+        setChannels(result)
+      })
       .finally(() => setLoadingChannels(false))
   }, [client])
 
@@ -40,7 +49,20 @@ export default function AdminSupportInbox() {
           <p className="p-4 text-sm text-zinc-400">No conversations yet.</p>
         ) : (
           channels.map(ch => {
-            const otherMember = Object.values(ch.state.members).find(
+            // Pick the customer, never another copy of the admin.
+            //
+            // Taking the first member that isn't the current user was wrong:
+            // a room that still carried the pre-rename `naijamart_<adminId>`
+            // member resolved to THAT, so every conversation was titled
+            // "Support . Naija Mart Support" instead of the customer's name.
+            // Prefer the counterpart identity, and fall back to any non-admin
+            // member only if there is no counterpart.
+            const members = Object.values(ch.state.members);
+            const counterpart = members.find(
+              m => m.user?.id && m.user.id.replace(/^(jomumart_|naijamart_)/, '') !==
+                (client.userID || '').replace(/^(jomumart_|naijamart_)/, '')
+            )
+            const otherMember = counterpart ?? members.find(
               m => m.user?.id !== client.userID
             )
             const lastMessage = ch.state.messages[ch.state.messages.length - 1]

@@ -3,6 +3,7 @@ import { StreamChat, type Channel } from "stream-chat";
 import { ChatContext } from "./chat-context";
 import { useAuth } from "./useAuth";
 import { apiRequest } from "../lib/api";
+import { normalizeMessageAuthors } from "../lib/chatIdentity";
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user, token } = useAuth();
@@ -62,10 +63,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           return;
         }
         if (cancelled) return;
+        // Messages authored before the brand rename carry the old
+        // `naijamart_` id, which Stream would treat as somebody else and align
+        // to the left even though it is our own history.
+        normalizeMessageAuthors(ch.state.messages);
         setChannel(ch);
         setUnreadCount(ch.state.unreadCount || 0);
 
         ch.on("message.new", (event) => {
+          normalizeMessageAuthors([event]);
           if (event.user?.id !== streamUserId) {
             setUnreadCount((count) => count + 1);
           }

@@ -52,14 +52,16 @@ export default function ChatWidget() {
           <MessageCircleIcon className="size-6" />
         )}
         {!open && unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-bold flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-600 text-yellow text-[11px] font-bold flex items-center justify-center">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-40 w-[90vw] max-w-sm h-[70vh] max-h-[520px] border-2 border-black bg-white shadow-xl flex flex-col overflow-hidden">
+        <div
+          className="jm-support-chat fixed bottom-24 right-5 z-40 w-[90vw] max-w-sm h-[70vh] max-h-[520px] border-2 border-black bg-white shadow-xl flex flex-col overflow-hidden"
+        >
           {error && !channel ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center">
               <p className="text-sm text-neutral-600">
