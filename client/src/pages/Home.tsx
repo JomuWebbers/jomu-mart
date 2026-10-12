@@ -263,10 +263,7 @@ export default function Homepage() {
       : products.filter((p) => p.category === activeNav);
 
   return (
-    // <div
-    //   className="bg-white text-black min-h-screen overflow-x-hidden"
-    //   style={{ fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif" }}
-    // >
+   
 
     <>
       {/* ── Hero — stacked on mobile, side-by-side from md up ────────────── */}
@@ -406,7 +403,11 @@ export default function Homepage() {
         </div>
       </section>
 
+
+
+
       {/* ── Best Sellers — 2 cols mobile, 4 from sm up ───────────────────── */}
+      
       <section className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
