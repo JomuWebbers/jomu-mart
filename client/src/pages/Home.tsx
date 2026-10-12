@@ -4,13 +4,12 @@ import { Wire, MicroLabel } from "../components/wireframe-primitives";
 import { fmt, pct } from "../components/wireframe-helpers";
 import { Link } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import { CATEGORY_NAMES } from "../data/categories";
+
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-// const NAV_CATEGORIES = [
-//   'All', 'ELECTRONICS', 'Fashion', 'Home & Kitchen',
-//   'Computing', 'Phones & Tablets', 'Baby Products', 'Gaming', 'Sports & Fitness',
-// ]
+
 
 type Product = {
   id: string;
@@ -65,14 +64,18 @@ const NEW_ARRIVALS = [
   { id: 16, name: "DJI Mini 4 Pro Drone", price: 780_000, tag: "ELECTRONICS" },
 ];
 
-const SHOWCASE_CATS = [
-  { label: "ELECTRONICS", count: "4,200+" },
-  { label: "FASHION", count: "12,800+" },
-  { label: "HOME Furniture & Appliances", count: "6,400+" },
-  { label: "PHONES & TABLET", count: "2,100+" },
-  { label: "Vehicles", count: "1,800+" },
-  { label: "PROPERTY", count: "3,600+" },
-];
+// const SHOWCASE_CATS = [
+//   { label: "ELECTRONICS", count: "4,200+", category: "Electronics" },
+//   { label: "FASHION", count: "12,800+", category: "Fashion" },
+//   {
+//     label: "HOME Furniture & Appliances",
+//     count: "6,400+",
+//     category: "Home, Furniture & Appliances",
+//   },
+//   { label: "PHONES & TABLET", count: "2,100+", category: "Phones & Tablets" },
+//   { label: "Vehicles", count: "1,800+", category: null },
+//   { label: "PROPERTY", count: "3,600+", category: null },
+// ];
 
 // const SHOWCASE_CATS = [
 //   { label: 'Cars & Trucks',   sub: 'Buy · Sell · Hire'      },
@@ -245,7 +248,10 @@ function ArrivalCard({
 // ─── Homepage ──────────────────────────────────────────────────────────────
 
 export default function Homepage() {
-  const { activeNav } = useOutletContext<{ activeNav: string }>();
+  const { activeNav, setActiveNav } = useOutletContext<{
+    activeNav: string;
+    setActiveNav: (category: string) => void;
+  }>();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -262,8 +268,26 @@ export default function Homepage() {
       ? products
       : products.filter((p) => p.category === activeNav);
 
+  // what happens when a tile is clicked: filter + jump to the product grid
+  const selectCategory = (category: string) => {
+    setActiveNav(category);
+    const grid = document.getElementById("product-grid");
+    if (grid) {
+      grid.scrollIntoView({ behavior: "smooth" });
+    }
+
+  };
+
+  const categoryTiles = [
+    ...CATEGORY_NAMES.map((name) => ({
+      label: name,
+      count: loading ? null : products.filter((p) => p.category === name).length,
+      isViewAll: false
+    })),
+    {label: "View All", count: loading ? null : products.length, isViewAll: true },
+  ];
+
   return (
-   
 
     <>
       {/* ── Hero — stacked on mobile, side-by-side from md up ────────────── */}
@@ -342,21 +366,23 @@ export default function Homepage() {
               Category
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 border-l-2 border-t-2 border-black">
-            {SHOWCASE_CATS.map((sc) => (
-              <div
-                key={sc.label}
-                className="border-r-2 border-b-2 border-black p-4 cursor-pointer hover:bg-neutral-50"
-              >
-                <Wire h="h-16 sm:h-20" />
-                <div className="mt-3">
-                  <MicroLabel>{sc.label}</MicroLabel>
-                  <p className="text-[10px] tracking-widest uppercase text-neutral-300 font-medium mt-0.5">
-                    {sc.count} items
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 border-l-2 border-t-2 border-black">
+           {categoryTiles.map((sc) => (
+            <div
+              key={sc.label}
+              onClick={() => selectCategory(sc.isViewAll ? "All" : sc.label)}
+              className="border-r-2 border-b-2 border-black p-4 cursor-pointer uppercase text-neutral-300 font-medium mt-0.6">
+              
+              <Wire h="h-17 sm:h-20" />
+               <div className="mt-3">
+      <MicroLabel>{sc.label}</MicroLabel>
+      <p className="text-[10px] tracking-widest uppercase text-neutral-300 font-medium mt-0.5">
+        {sc.count === null ? "…" : `${sc.count} items`}
+      </p>
+    </div>
+
+           </div>
+             ))}
           </div>
         </div>
       </section>
@@ -403,12 +429,9 @@ export default function Homepage() {
         </div>
       </section>
 
-
-
-
       {/* ── Best Sellers — 2 cols mobile, 4 from sm up ───────────────────── */}
-      
-      <section className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
+
+      <section id="product-grid" className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <div>
@@ -620,9 +643,7 @@ export default function Homepage() {
 
           {/* Bottom — stacked on mobile */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <MicroLabel>
-              © 2026 Jomu Mart. All Rights Reserved.
-            </MicroLabel>
+            <MicroLabel>© 2026 Jomu Mart. All Rights Reserved.</MicroLabel>
             <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
               {[
                 "Privacy Policy",

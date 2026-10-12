@@ -300,8 +300,10 @@ export default function Layout() {
         </div>
       </nav>
 
-      <Outlet context={{ activeNav }} />
+      <Outlet context={{ activeNav, setActiveNav }} />
       <ChatWidget />
     </div>
   );
 }
+
+
