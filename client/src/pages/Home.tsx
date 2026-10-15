@@ -3,7 +3,7 @@ import { apiRequest } from "../lib/api";
 import { Wire, MicroLabel } from "../components/wireframe-primitives";
 import { fmt, pct } from "../components/wireframe-helpers";
 import { Link } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { CATEGORY_NAMES } from "../data/categories";
 
 
@@ -231,10 +231,16 @@ export default function Homepage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered =
-    activeNav === "All"
-      ? products
-      : products.filter((p) => p.category === activeNav);
+  const [searchParams] = useSearchParams();
+  const q = (searchParams.get("q") ?? "").trim().toLowerCase();
+
+  const filtered = products.filter(
+    (p) =>
+      (activeNav === "All" || p.category === activeNav) &&
+      (q === "" ||
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q))
+  );
 
   // what happens when a tile is clicked: filter + jump to the product grid
   const selectCategory = (category: string) => {
