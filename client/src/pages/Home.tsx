@@ -7,6 +7,7 @@ import { useOutletContext } from "react-router-dom";
 import { CATEGORY_NAMES } from "../data/categories";
 
 
+
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 
@@ -21,70 +22,7 @@ type Product = {
   stock: number;
 };
 
-const FLASH_DEALS = [
-  {
-    id: 9,
-    name: "AirPods Pro (3rd Gen)",
-    price: 320_000,
-    original: 420_000,
-    tag: "AUDIO",
-  },
-  {
-    id: 10,
-    name: "Canon EOS R50 Mirrorless Camera",
-    price: 680_000,
-    original: 890_000,
-    tag: "CAMERAS",
-  },
-  {
-    id: 11,
-    name: "Ninja AF101 Air Fryer 3.8L",
-    price: 57_000,
-    original: 82_000,
-    tag: "HOME & KITCHEN",
-  },
-  {
-    id: 12,
-    name: "JBL Charge 5 Bluetooth Speaker",
-    price: 98_000,
-    original: 135_000,
-    tag: "AUDIO",
-  },
-];
 
-const NEW_ARRIVALS = [
-  { id: 13, name: "Samsung Galaxy S24 Ultra", price: 1_150_000, tag: "PHONES" },
-  {
-    id: 14,
-    name: "Linen Blend Tailored Suit — Slate",
-    price: 78_000,
-    tag: "FASHION",
-  },
-  { id: 15, name: "Bosch Serie 6 Dishwasher", price: 520_000, tag: "HOME" },
-  { id: 16, name: "DJI Mini 4 Pro Drone", price: 780_000, tag: "ELECTRONICS" },
-];
-
-// const SHOWCASE_CATS = [
-//   { label: "ELECTRONICS", count: "4,200+", category: "Electronics" },
-//   { label: "FASHION", count: "12,800+", category: "Fashion" },
-//   {
-//     label: "HOME Furniture & Appliances",
-//     count: "6,400+",
-//     category: "Home, Furniture & Appliances",
-//   },
-//   { label: "PHONES & TABLET", count: "2,100+", category: "Phones & Tablets" },
-//   { label: "Vehicles", count: "1,800+", category: null },
-//   { label: "PROPERTY", count: "3,600+", category: null },
-// ];
-
-// const SHOWCASE_CATS = [
-//   { label: 'Cars & Trucks',   sub: 'Buy · Sell · Hire'      },
-//   { label: 'Property',        sub: 'Rent · Sale · Land'     },
-//   { label: 'Phones & Tablets',sub: 'New & Used'             },
-//   { label: 'ELECTRONICS',     sub: 'TVs · Audio · Cameras'  },
-//   { label: 'FASHION',         sub: 'Men · Women · Kids'     },
-//   { label: 'Home & Garden',   sub: 'Furniture · Appliances' },
-// ]
 
 const FOOTER_COLS = [
   {
@@ -195,19 +133,34 @@ function ProductCard({
 }
 
 function DealCard({
+  id,
   name,
   price,
   original,
   tag,
+  image,
 }: {
+  id: string;
   name: string;
   price: number;
   original: number;
   tag: string;
+  image?: string;
 }) {
+  const hasDiscount = original > price;
+
   return (
-    <div className="bg-white text-black border-t-2 border-white/40 group cursor-pointer">
-      <Wire h="h-28 sm:h-40" label="PRODUCT" />
+    <Link
+      to={`/products/${id}`}
+      className="bg-white text-black border-t-2 border-white/40 group cursor-pointer block"
+    >
+      {image ? (
+        <div className="h-28 sm:h-40 overflow-hidden bg-neutral-100">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <Wire h="h-28 sm:h-40" label="PRODUCT" />
+      )}
       <div className="p-3 space-y-1">
         <MicroLabel>{tag}</MicroLabel>
         <p className="text-[13px] font-semibold leading-snug line-clamp-2 mt-1">
@@ -215,33 +168,48 @@ function DealCard({
         </p>
         <div className="flex items-baseline gap-2 pt-1 flex-wrap">
           <span className="text-[14px] font-black">{fmt(price)}</span>
-          <span className="text-[9px] font-black bg-black text-white px-1.5 py-0.5">
-            -{pct(price, original)}%
-          </span>
+          {hasDiscount && (
+            <span className="text-[9px] font-black bg-black text-white px-1.5 py-0.5">
+              -{pct(price, original)}%
+            </span>
+          )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
 function ArrivalCard({
+  id,
   name,
   price,
   tag,
+  image,
 }: {
+  id: string;
   name: string;
   price: number;
   tag: string;
+  image?: string;
 }) {
   return (
-    <div className="border-t-2 border-black cursor-pointer">
-      <Wire h="h-32 sm:h-44" label="NEW" />
+    <Link
+      to={`/products/${id}`}
+      className="border-t-2 border-black group cursor-pointer block"
+    >
+      {image ? (
+        <div className="h-32 sm:h-44 overflow-hidden bg-neutral-100">
+          <img src={image} alt={name} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <Wire h="h-32 sm:h-44" label="NEW" />
+      )}
       <div className="p-3 space-y-1.5">
         <MicroLabel>{tag}</MicroLabel>
         <p className="text-[13px] font-semibold leading-snug mt-1">{name}</p>
         <span className="text-[15px] font-black block pt-1">{fmt(price)}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -281,14 +249,34 @@ export default function Homepage() {
   const categoryTiles = [
     ...CATEGORY_NAMES.map((name) => ({
       label: name,
-      count: loading ? null : products.filter((p) => p.category === name).length,
-      isViewAll: false
+      count: loading
+        ? null
+        : products.filter((p) => p.category === name).length,
+      isViewAll: false,
     })),
-    {label: "View All", count: loading ? null : products.length, isViewAll: true },
+    {
+      label: "View All",
+      count: loading ? null : products.length,
+      isViewAll: true,
+    },
   ];
 
-  return (
+  // Deals = approved products with a real markdown, deepest discount first, max 4
+  const flashDeals = products
+    .filter((p) => (p.originalPrice ?? 0) > p.price && (p.stock ?? 0) > 0)
+    .sort(
+      (a, b) =>
+        (b.originalPrice - b.price) / b.originalPrice -
+        (a.originalPrice - a.price) / a.originalPrice,
+    )
+    .slice(0, 4);
 
+  // New arrivals = newest approved products first (API already sorts createdAt
+  // desc), in stock only, max 4
+  const newArrivals = products.filter((p) => (p.stock ?? 0) > 0).slice(0, 4);
+
+  return (
+    
     <>
       {/* ── Hero — stacked on mobile, side-by-side from md up ────────────── */}
 
@@ -354,7 +342,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* ── Category Showcase — 2 cols mobile, 3 sm, 6 from md up ────────── */}
+      {/* ── Category Showcase — 2 cols mobile, 3 sm, 4 from md up ────────── */}
       <section className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline gap-4 mb-6">
@@ -367,22 +355,21 @@ export default function Homepage() {
             </h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 border-l-2 border-t-2 border-black">
-           {categoryTiles.map((sc) => (
-            <div
-              key={sc.label}
-              onClick={() => selectCategory(sc.isViewAll ? "All" : sc.label)}
-              className="border-r-2 border-b-2 border-black p-4 cursor-pointer uppercase text-neutral-300 font-medium mt-0.6">
-              
-              <Wire h="h-17 sm:h-20" />
-               <div className="mt-3">
-      <MicroLabel>{sc.label}</MicroLabel>
-      <p className="text-[10px] tracking-widest uppercase text-neutral-300 font-medium mt-0.5">
-        {sc.count === null ? "…" : `${sc.count} items`}
-      </p>
-    </div>
-
-           </div>
-             ))}
+            {categoryTiles.map((sc) => (
+              <div
+                key={sc.label}
+                onClick={() => selectCategory(sc.isViewAll ? "All" : sc.label)}
+                className="border-r-2 border-b-2 border-black p-4 cursor-pointer hover:bg-neutral-50"
+              >
+                <Wire h="h-17 sm:h-20" />
+                <div className="mt-3">
+                  <MicroLabel>{sc.label}</MicroLabel>
+                  <p className="text-[10px] tracking-widest uppercase text-neutral-300 font-medium mt-0.5">
+                    {sc.count === null ? "…" : `${sc.count} items`}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -416,22 +403,44 @@ export default function Homepage() {
                 </div>
               </div>
             </div>
-            <button className="text-[10px] tracking-[0.2em] uppercase font-black border border-white px-6 py-3 hover:bg-white hover:text-black transition-colors self-start sm:self-auto">
+            <button
+              onClick={() => selectCategory("All")}
+              className="text-[10px] tracking-[0.2em] uppercase font-black border border-white px-6 py-3 hover:bg-white hover:text-black transition-colors self-start sm:self-auto"
+            >
               All Deals
             </button>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {FLASH_DEALS.map((d) => (
-              <DealCard key={d.id} {...d} />
-            ))}
+            {flashDeals.length === 0 ? (
+              <p className="col-span-full text-center text-white/60 py-10">
+                {loading
+                  ? "Loading deals…"
+                  : "No active deals right now — new discounts drop every 24 hours."}
+              </p>
+            ) : (
+              flashDeals.map((d) => (
+                <DealCard
+                  key={d.id}
+                  id={d.id}
+                  name={d.name}
+                  price={d.price}
+                  original={d.originalPrice}
+                  tag={d.category}
+                  image={d.image}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>
 
       {/* ── Best Sellers — 2 cols mobile, 4 from sm up ───────────────────── */}
 
-      <section id="product-grid" className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
+      <section
+        id="product-grid"
+        className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15"
+      >
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <div>
@@ -445,7 +454,10 @@ export default function Homepage() {
                 Best Sellers
               </h2>
             </div>
-            <button className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5">
+            <button
+              onClick={() => selectCategory("All")}
+              className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5"
+            >
               View All
             </button>
           </div>
@@ -524,14 +536,32 @@ export default function Homepage() {
             >
               New Arrivals
             </h2>
-            <button className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5">
+            <button
+              onClick={() => selectCategory("All")}
+              className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5"
+            >
               View All New
             </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {NEW_ARRIVALS.map((p) => (
-              <ArrivalCard key={p.id} {...p} />
-            ))}
+            {newArrivals.length === 0 ? (
+              <p className="col-span-full text-center text-neutral-400 py-10">
+                {loading
+                  ? "Loading new arrivals…"
+                  : "No new arrivals yet — check back soon."}
+              </p>
+            ) : (
+              newArrivals.map((p) => (
+                <ArrivalCard
+                  key={p.id}
+                  id={p.id}
+                  name={p.name}
+                  price={p.price}
+                  tag={p.category}
+                  image={p.image}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>

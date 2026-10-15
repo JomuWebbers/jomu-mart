@@ -4,3 +4,7 @@ node_modules/
 dist/
 build/
 .DS_Store
+
+# Design working docs — not shipped with the app
+wireframes/
+
