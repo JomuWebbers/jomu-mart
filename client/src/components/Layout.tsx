@@ -16,7 +16,6 @@ export default function Layout() {
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [accountOpen, setAccountOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
 
@@ -32,7 +31,6 @@ export default function Layout() {
 
   const handleLogout = () => {
     logout();
-    setAccountOpen(false);
     navigate("/");
   };
 
@@ -93,20 +91,20 @@ export default function Layout() {
 
           <Link
             to="/sell"
-            className="hidden lg:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold hover:opacity-70"
+            className="hidden xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold hover:opacity-70"
           >
             🏷 Sell on Jomu Mart
           </Link>
 
           <span
             title="Coming soon"
-            className="hidden lg:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold opacity-50 cursor-not-allowed select-none"
+            className="hidden 2xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold opacity-50 cursor-not-allowed select-none"
           >
             🏪 Jomu Mart Outlets
           </span>
 
           <form
-            className="hidden lg:flex flex-1 border-2 border-black"
+            className="hidden lg:flex flex-1 min-w-0 border-2 border-black"
             onSubmit={(e) => {
               e.preventDefault();
               navigate(
@@ -118,7 +116,7 @@ export default function Layout() {
             <input
               type="text"
               placeholder="Search products, brands and categories…"
-              className="flex-1 px-4 py-2.5 text-sm outline-none bg-transparent"
+              className="flex-1 min-w-0 px-4 py-2.5 text-sm outline-none bg-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -127,7 +125,7 @@ export default function Layout() {
             </button>
           </form>
 
-            <div className="relative group hidden lg:block shrink-0">
+            <div className="relative group hidden xl:block shrink-0">
               <span className="cursor-pointer text-[11px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5">
                 ▦ Download App ▾
               </span>
@@ -145,7 +143,7 @@ export default function Layout() {
               </div>
             </div>
 
-            <div className="relative group hidden lg:block shrink-0">
+  <div className="relative group hidden lg:block shrink-0">
   <span className="cursor-pointer text-[11px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5">
     ( ? ) Help ▾
   </span>
@@ -156,7 +154,6 @@ export default function Layout() {
           key={link.to}
           to={link.to}
           className="block px-4 py-2 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-          onClick={() => setAccountOpen(false)}
         >
           {link.label}
         </Link>
@@ -169,15 +166,13 @@ export default function Layout() {
 
 
           <div className="hidden lg:flex items-center gap-6 shrink-0 whitespace-nowrap">
-            <div className="relative">
-              <button
-                onClick={() => setAccountOpen((o) => !o)}
-                className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
-              >
+            {/* Account — opens on hover, same pattern as Help / Download App */}
+            <div className="relative group/account">
+              <span className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer">
                 👤 {user ? user.name.split(" ")[0] : "Login / Sign Up"} ▾
-              </button>
-              {accountOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white border-2 border-black z-50">
+              </span>
+              <div className="absolute right-0 top-full pt-3 invisible opacity-0 group-hover/account:visible group-hover/account:opacity-100 transition-opacity z-50">
+                <div className="w-64 bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)]">
                   {user ? (
                     <>
                       <div className="px-4 py-3 border-b border-black/10">
@@ -196,7 +191,6 @@ export default function Layout() {
                       {user.role === "admin" && (
                         <Link
                           to="/admin"
-                          onClick={() => setAccountOpen(false)}
                           className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                         >
                           Admin Dashboard
@@ -213,35 +207,30 @@ export default function Layout() {
                     <>
                       <Link
                         to="/login"
-                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Login / Signup
                       </Link>
                       <Link
                         to="/login"
-                        onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         My Account
                       </Link>
                       <Link
                         to="/my-orders"
-                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         My Orders
                       </Link>
                       <Link
                         to="#"
-                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Saved Items
                       </Link>
-                      <Link 
+                      <Link
                         to="/track-order"
-                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50"
                       >
                         Track My Order
@@ -249,14 +238,8 @@ export default function Layout() {
                     </>
                   )}
                 </div>
-              )}
+              </div>
             </div>
-            <Link
-              to="/my-orders"
-              className="text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
-            >
-              My Orders
-            </Link>
 
             <Link
               to="/cart"
