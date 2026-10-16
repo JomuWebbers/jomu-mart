@@ -80,7 +80,7 @@ export default function Layout() {
         </div>
 
         {/* Desktop row */}
-        <div className="hidden lg:flex max-w-screen-2xl mx-auto items-center justify-between lg:justify-start gap-4 lg:gap-10">
+        <div className="hidden lg:flex max-w-screen-2xl mx-auto items-center justify-between lg:justify-start gap-4 lg:gap-6">
           <Link to="/" className="shrink-0 flex flex-col">
             <span
               className="font-black uppercase leading-none"
@@ -168,16 +168,13 @@ export default function Layout() {
 
 
 
-          <div className="hidden lg:flex items-center gap-8 shrink-0">
+          <div className="hidden lg:flex items-center gap-6 shrink-0 whitespace-nowrap">
             <div className="relative">
               <button
                 onClick={() => setAccountOpen((o) => !o)}
-                className="flex flex-col items-start"
+                className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
               >
-                <MicroLabel>Account</MicroLabel>
-                <span className="text-[13px] font-bold mt-0.5">
-                  {user ? user.name.split(" ")[0] : "Login / Sign Up"} ▾
-                </span>
+                👤 {user ? user.name.split(" ")[0] : "Login / Sign Up"} ▾
               </button>
               {accountOpen && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white border-2 border-black z-50">
@@ -254,16 +251,18 @@ export default function Layout() {
                 </div>
               )}
             </div>
-             <Link to="/my-orders" className="flex flex-col items-start">
-              <MicroLabel>Returns</MicroLabel>
-              <span className="text-[13px] font-bold mt-0.5">& Orders</span>
+            <Link
+              to="/my-orders"
+              className="text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
+            >
+              My Orders
             </Link>
 
-            <Link to="/cart" className="flex flex-col items-start relative">
-              <MicroLabel>Shopping</MicroLabel>
-              <span className="text-[13px] font-bold mt-0.5">
-                Cart ({totalItems})
-              </span>
+            <Link
+              to="/cart"
+              className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
+            >
+              🛒 Cart ({totalItems})
             </Link>
           </div>
 
