@@ -16,6 +16,7 @@ export default function Layout() {
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [accountOpen, setAccountOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
 
@@ -168,10 +169,24 @@ export default function Layout() {
           <div className="hidden lg:flex items-center gap-6 shrink-0 whitespace-nowrap">
             {/* Account — opens on hover, same pattern as Help / Download App */}
             <div className="relative group/account">
-              <span className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer">
+              <span
+                className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer"
+                role="button"
+                aria-expanded={accountOpen}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAccountOpen((o) => !o);
+                }}
+              >
                 👤 {user ? user.name.split(" ")[0] : "Login / Sign Up"} ▾
               </span>
-              <div className="absolute right-0 top-full pt-3 invisible opacity-0 group-hover/account:visible group-hover/account:opacity-100 transition-opacity z-50">
+              <div
+                className={`absolute right-0 top-full pt-3 z-50 transition-opacity ${
+                  accountOpen
+                    ? "visible opacity-100"
+                    : "invisible opacity-0 group-hover/account:visible group-hover/account:opacity-100"
+                }`}
+              >
                 <div className="w-64 bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)]">
                   {user ? (
                     <>
@@ -197,7 +212,10 @@ export default function Layout() {
                         </Link>
                       )}
                       <button
-                        onClick={handleLogout}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLogout();
+                        }}
                         className="w-full text-left px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 text-red-600"
                       >
                         Sign Out
