@@ -252,7 +252,7 @@ export default function Checkout() {
             try {
               await apiRequest(`/orders/${order.id}/verify-payment`, {
                 method: "PATCH",
-                token,
+                token: token ?? undefined,
                 body: { reference: paidRef },
               });
               if (activeBuyNowItem) {
