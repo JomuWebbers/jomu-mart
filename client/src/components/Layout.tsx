@@ -196,31 +196,60 @@ export default function Layout() {
                           {user.email}
                         </p>
                       </div>
-                      {user.role !== "admin" && (
-                        <>
-                          <SellerWallet />
-                          <TrustedVendorRequest />
-                        </>
-                      )}
-
-                      {user.role === "admin" && (
-                        <Link
-                          to="/admin"
-                          className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                        >
-                          Admin Dashboard
-                        </Link>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLogout();
-                        }}
-                        className="w-full text-left px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 text-red-600"
+                      <div className="border-b border-black/10 px-4 py-2">
+                      <p className="text-[10px] tracking-[0.2em] uppercase font-bold text-neutral-500 mb-2">
+                        Account
+                      </p>
+                      <Link
+                        to="/my-account"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
-                        Sign Out
-                      </button>
-                    </>
+                        My Account
+                      </Link>
+                      <Link
+                        to="/my-orders"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                      >
+                        My Orders
+                      </Link>
+                      <Link
+                        to="#"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10 opacity-50"
+                      >
+                        Saved Items
+                      </Link>
+                      <Link
+                        to="/track-order"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                      >
+                        Track My Order
+                      </Link>
+                    </div>
+                    {user.role !== "admin" && (
+                      <>
+                        <SellerWallet />
+                        <TrustedVendorRequest />
+                      </>
+                    )}
+
+                    {user.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 text-red-600"
+                    >
+                      Sign Out
+                    </button>
+                  </>
                   ) : (
                     <>
                       <Link
