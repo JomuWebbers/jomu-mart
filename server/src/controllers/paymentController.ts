@@ -2,6 +2,7 @@
 import { Response } from 'express'
 import prisma from '../lib/prisma'
 import type { AuthRequest } from '../middleware/authMiddleware'
+import { getStreamChatServer, streamUserId, ensureSupportChannel } from '../lib/stream'
 
 export const verifyPayment = async (req: AuthRequest, res: Response) => {
   try {
@@ -46,8 +47,35 @@ export const verifyPayment = async (req: AuthRequest, res: Response) => {
       data: { isPaid: true },
     })
 
+    // Notify the customer in their support chat that payment was confirmed
+    try {
+      const customer = await prisma.user.findUnique({ where: { id: order.userId } })
+      const admin = await prisma.user.findFirst({ where: { role: 'admin' } })
+
+      if (customer && admin) {
+        const server = getStreamChatServer()
+        const channel = await ensureSupportChannel({
+          server,
+          userId: customer.id,
+          userName: customer.name,
+          adminId: admin.id,
+          adminName: admin.name,
+        })
+
+        await channel.sendMessage({
+          user_id: streamUserId(admin.id),
+          text: `✅ Payment confirmed for Order #${order.id} — ₦${order.total}. Your items are being prepared.`,
+        })
+      }
+    } catch (chatError) {
+      // A chat notification failure must not undo a successful payment
+      console.error('Payment confirmation chat failed:', chatError)
+    }
+
     res.json(updated)
-  } catch (error) {
+  }
+  
+  catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Failed to verify payment' })
   }
