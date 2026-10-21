@@ -23,25 +23,20 @@ import { STATES, CITIES_BY_STATE } from "../data/nigeriaLocations";
 // inline popup, verify-payment has no caller), so card orders would sit
 // isPaid=false forever. Hide the option until Phase J wires it (option B).
 // Listing-fee card payments via Paystack redirect are unaffected.
-const PAYMENT_METHODS = ["Bank Transfer", "Pay on Delivery"];
+const PAYMENT_METHODS = ["Bank Transfer", "Pay on Delivery", "Card (Paystack)"];
 
 export default function Checkout() {
   const { items, clearCart, removeFromCart, updateQty } = useCart();
   const { token, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  
 
-  // ── Buy Now context resolution (Phase I, step B) ─────────────────────────
-  // Primary source: location.state from ProductDetail. Fallback: the
-  // sessionStorage mirror, which survives a page refresh. There is NO silent
-  // fallback to full-cart checkout — a stale mirror resolves to an explicit
-  // "expired" state instead.
+ 
   const stateBuyNowItem = (
     location.state as { buyNowItem?: BuyNowItem } | null
   )?.buyNowItem;
-  // Read the mirror on every navigation, not just on mount: "Cancel Buy
-  // Now" replaces the location (new location.key) after clearing storage, so
-  // the re-read must observe the cleared mirror and resolve to CART mode.
+ 
   const mirroredBuyNowItem = useMemo(
     () => readBuyNow(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -231,6 +226,80 @@ export default function Checkout() {
         },
       });
 
+      // ── Phase J: Card (Paystack) — open inline popup, verify on success ──
+      if (payment === "Card (Paystack)") {
+        const reference = order.id;
+        type PaystackOptions = {
+          key: string;
+          email: string;
+          amount: number;
+          ref: string;
+          onSuccess: (reference: string) => void;
+          onClose: () => void;
+        };
+        type PaystackHandler = { openIframe: () => void };
+        const paystackWindow = window as unknown as {
+          PaystackPop?: {
+            setup: (options: PaystackOptions) => PaystackHandler | null;
+          };
+        };
+        const handler = paystackWindow.PaystackPop?.setup({
+          key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+          email: user?.email || "",
+          amount: Math.round(order.total * 100), // kobo
+          ref: reference,
+          onSuccess: async (paidRef: string) => {
+            try {
+              await apiRequest(`/orders/${order.id}/verify-payment`, {
+                method: "PATCH",
+                token,
+                body: { reference: paidRef },
+              });
+              if (activeBuyNowItem) {
+                const cartLine = items.find(
+                  (item) => item.id === activeBuyNowItem.id,
+                );
+                const remaining =
+                  (cartLine?.qty ?? 0) - activeBuyNowItem.qty;
+                if (remaining > 0) {
+                  updateQty(activeBuyNowItem.id, remaining);
+                } else {
+                  removeFromCart(activeBuyNowItem.id);
+                }
+                clearBuyNow();
+              } else {
+                clearCart();
+              }
+              toast.success("Payment confirmed!");
+              navigate(`/orders/${order.id}?paid=true`);
+            } catch {
+              toast.error(
+                "Payment could not be verified — pay from My Orders.",
+              );
+              navigate(`/orders/${order.id}?paid=false`);
+            }
+          },
+          onClose: () => {
+            toast.error(
+              "Payment cancelled — your order is unpaid. Pay from My Orders.",
+            );
+            navigate(`/orders/${order.id}?paid=false`);
+          },
+        });
+
+        if (handler) {
+          handler.openIframe();
+        } else {
+          toast.error(
+            "Paystack failed to load. Try Bank Transfer instead.",
+          );
+          navigate(`/orders/${order.id}?paid=false`);
+        }
+        // Cart is cleared by the verify callback (or left intact on cancel).
+        return;
+      }
+
+      // ── Bank Transfer / Pay on Delivery ──
       if (activeBuyNowItem) {
         // Buy Now checks out just that item and leaves the rest of the cart
         // intact. Subtract the purchased qty so a same-item remainder stays

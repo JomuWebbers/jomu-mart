@@ -366,3 +366,47 @@ export default function Layout() {
 }
 
 
+
+// ## Phase 2 — Category listing & search page (PLP) — *first new page*
+
+// - New route `/products?category=X&q=Y` + page from `02-category-listing.html`
+// - Backend: extend `getProducts` with `q` (name search), `minPrice/maxPrice`, `sort`, `page`
+// - Left filter rail (subcategory tree from `CATEGORIES`, price, rating, discount-only), sort bar, grid reusing `ProductCard` + add-to-cart, pagination
+// - Point at it: mega menu subs, mobile drawer categories, header search, homepage "See All"/View All buttons, category tiles
+
+// ✅ Validate: every entry path lands correctly; filters + pagination against real data.
+
+// ## Phase 3 — Homepage body → WF-01
+
+// - __3-column hero:__ category sidebar (links to PLP) · banner carousel placeholder (static image slides — no auto-play JS needed yet) · 2 promo tiles
+// - Horizontal-scroll __category rows__ ("Top Deals in Phones…") derived from `products` by category
+// - Keep your existing Phase 1–4 logic (flash sale, new arrivals, best sellers, tiles)
+// - Service/trust strip + footer columns (mostly exists)
+
+// ## Phase 4 — Product page upgrade (03)
+
+// - __Gallery__ from the `images[]` column your schema already has (currently underused)
+// - __Buy box:__ delivery info from `deliveryDays`/`deliveryFeeAmount` (already in schema), qty stepper, Add to Cart + Buy Now
+// - __Tabs:__ description · specs · __reviews__ (`Review` model exists — surface it)
+// - __Related products:__ same-category slice
+
+// ## Phase 5 — Cart & checkout alignment (04/05)
+
+// - Cart: order-summary rail layout + "customers also bought"
+// - Checkout: restyle existing flow into the 3-step visual (address → delivery → payment already exist in your logic)
+
+// ## Phase 6 — New account features *(first schema changes)*
+
+// Priority order: __Saved Items__ (Wishlist model + migration + heart buttons sitewide) → __My Account page__ (profile + addresses — `Address` model exists) → __Pending Reviews__ (delivered orders awaiting review) → Help content sections (Return Policy) → Outlets *(discussion first, as agreed)*
+
+// ## Phase 7 — Hi-fi visual pass
+
+// Apply the Phase 0 direction (tokens: one accent color, typography, density) across every page; responsive QA at 2/3/4-col breakpoints; final `tsc`/lint/build sweep.
+
+// ---
+
+// __Dependency note:__ Phases 1→2 are sequential (header search needs the PLP). Phases 3–5 can reorder freely. Phase 6 can be sliced per feature. No schema changes until Phase 6 — everything before it uses existing models.
+
+
+
+
