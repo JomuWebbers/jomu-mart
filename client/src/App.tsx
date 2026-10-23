@@ -23,6 +23,7 @@ import ListingFeeReturn from "./pages/ListingFeeReturn";
 import TrackOrderLookup from "./pages/TrackOrderLookup";
 import HelpCenter from "./pages/HelpCenter";
 import MyOrders from "./pages/MyOrders";
+import MyAccount from "./pages/MyAccount";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path="/sell" element={<SellProduct />} />
         <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
         <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/my-account" element={<MyAccount />} />
         <Route path="/returns-and-orders" element={<MyOrders />} />
       </Route>
 
