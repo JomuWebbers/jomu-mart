@@ -6,6 +6,13 @@ import { useAuth } from "../context/useAuth";
 import { PageShell } from "../components/wireframe-primitives";
 import { STATES } from "../data/nigeriaLocations";
 import toast from "react-hot-toast";
+import {
+  UserIcon,
+  ShoppingBagIcon,
+  WalletIcon,
+  TicketIcon,
+  UserXIcon,
+} from "lucide-react";
 
 type User = {
   id: string;
@@ -59,6 +66,7 @@ export default function MyAccount() {
   const [tab, setTab] = useState<Tab>("account-information");
   const [userData, setUserData] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
   const [saving, setSaving] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -88,6 +96,21 @@ export default function MyAccount() {
     }
   }, [token]);
 
+  const loadPendingRatingsCount = useCallback(async () => {
+    try {
+      const data = await apiRequest("/ratings/pending-count", {
+        token: token ?? undefined,
+      });
+      if (typeof data === "number") {
+        setPendingRatingsCount(data);
+      } else if (data && typeof data.count === "number") {
+        setPendingRatingsCount(data.count);
+      }
+    } catch {
+      // Silent fail — badge stays at 0 until backend endpoint exists
+    }
+  }, [token]);
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -96,7 +119,8 @@ export default function MyAccount() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadUser();
     loadAddresses();
-  }, [token, navigate, loadUser, loadAddresses]);
+    loadPendingRatingsCount();
+  }, [token, navigate, loadUser, loadAddresses, loadPendingRatingsCount]);
 
   const handleSaveProfile = async () => {
     if (!token || !userData) return;
@@ -191,12 +215,35 @@ export default function MyAccount() {
   const navItems = [
     {
       section: "My Profile",
-      items: ["account-information", "delivery-address"],
+      icon: UserIcon,
+      items: [
+        { id: "account-information", label: "Account Information" },
+        { id: "delivery-address", label: "Delivery Address" },
+      ],
     },
-    { section: "My Orders", items: ["order-history", "pending-ratings"] },
-    { section: "My Wallet", items: ["wallet"] },
-    { section: "Voucher", items: ["voucher"] },
-    { section: "Delete Account", items: ["delete-account"] },
+    {
+      section: "My Orders",
+      icon: ShoppingBagIcon,
+      items: [
+        { id: "order-history", label: "Order History" },
+        { id: "pending-ratings", label: "Pending Ratings", badge: pendingRatingsCount },
+      ],
+    },
+    {
+      section: "My Wallet",
+      icon: WalletIcon,
+      items: [{ id: "wallet", label: "Wallet" }],
+    },
+    {
+      section: "Voucher",
+      icon: TicketIcon,
+      items: [{ id: "voucher", label: "Voucher" }],
+    },
+    {
+      section: "Delete Account",
+      icon: UserXIcon,
+      items: [{ id: "delete-account", label: "Delete Account" }],
+    },
   ];
 
   return (
@@ -208,28 +255,36 @@ export default function MyAccount() {
             <div className="p-4">
               <h2 className="text-lg font-bold">My Account</h2>
               <p className="text-sm text-gray-500">{authUser?.email || ""}</p>
-              <nav className="mt-6 space-y-1">
+              <nav className="mt-6 space-y-4">
                 {navItems.map((group) => (
-                  <React.Fragment key={group.section}>
-                    <h3 className="text-xs font-semibold text-gray-400 uppercase mb-3 ml-2">
-                      {group.section}
-                    </h3>
+                  <div key={group.section} className="mb-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <group.icon className="w-5 h-5 text-gray-600" />
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        {group.section}
+                      </h3>
+                    </div>
                     {group.items.map((item) => (
-                      <React.Fragment key={item}>
-                        <button key={item} onClick={() => setTab(item as Tab)}>
-                          {item.replace(/([a-z])([A-Z])/g, "$1 $2")}
-                        </button>
-                      </React.Fragment>
+                      <button
+                        key={item.id}
+                        onClick={() => setTab(item.id as Tab)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-left ${
+                          tab === item.id
+                            ? "bg-black text-white"
+                            : "text-gray-600 hover:bg-neutral-100 hover:text-gray-900"
+                        }`}
+                      >
+                        {item.label}
+                        {item.id === "pending-ratings" && (
+                          <span className="ml-auto px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
+                            {item.badge ?? 0}
+                          </span>
+                        )}
+                      </button>
                     ))}
-                  </React.Fragment>
+                  </div>
                 ))}
               </nav>
-              <button
-                onClick={() => setTab("delete-account")}
-                className="mt-auto pt-4 text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded"
-              >
-                Delete Account
-              </button>
             </div>
           </aside>
 
