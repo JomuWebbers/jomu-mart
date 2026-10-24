@@ -23,6 +23,7 @@ import ListingFeeReturn from "./pages/ListingFeeReturn";
 import TrackOrderLookup from "./pages/TrackOrderLookup";
 import HelpCenter from "./pages/HelpCenter";
 import PendingReviews from "./pages/PendingReviews";
+import SavedItems from "./pages/SavedItems";
 
 function App() {
   return (
