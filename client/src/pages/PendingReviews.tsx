@@ -1,6 +1,31 @@
-type Tab =
-  | "pending-ratings"
-  | "order-history";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { PageShell } from "../components/wireframe-primitives";
+import { fmt } from "../components/wireframe-helpers";
+import type { User } from "../types/user.types";
+import type { Order } from "../types/order.types";
+
+const formatDateTime = (value: string) =>
+  new Intl.DateTimeFormat("en-NG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+
+type Tab = "pending-ratings" | "order-history";
+
+async function apiRequest(path: string, options: { token?: string } = {}) {
+  const response = await fetch(path, {
+    headers: options.token
+      ? { Authorization: `Bearer ${options.token}` }
+      : undefined,
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw { response: { data } };
+  }
+  return data;
+}
 
 const navItems = [
   {
@@ -26,33 +51,44 @@ function OrdersSection() {
 
 function PendingRatingsSection({
   orders,
+  pendingRatingsCount,
 }: {
   orders: Order[];
   pendingRatingsCount: number;
 }) {
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold">Pending Ratings {pendingRatingsCount > 0 && (
-        <span className="ml-auto px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
-          {pendingRatingsCount}
-        </span>
-      )}</h2>
+      <h2 className="text-lg font-bold">
+        Pending Ratings{" "}
+        {pendingRatingsCount > 0 && (
+          <span className="ml-auto px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
+            {pendingRatingsCount}
+          </span>
+        )}
+      </h2>
       {orders.length === 0 ? (
         <p className="text-gray-500">No delivered orders found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white p-4 border border-gray-300 rounded">
+            <div
+              key={order.id}
+              className="bg-white p-4 border border-gray-300 rounded"
+            >
               <h3 className="text-sm font-medium">
                 {fmt(order.total)} · {formatDateTime(order.createdAt)}
               </h3>
               <p className="text-sm text-gray-500">
-                {order.items.map((item) => `${itemLabel(item)} × ${item.qty ?? 1}`).join(", ")}
+                {order.items
+                  .map((item) => `${itemLabel(item)} × ${item.qty ?? 1}`)
+                  .join(", ")}
               </p>
               <button
                 className="mt-2 text-blue-600 hover:text-blue-800"
                 onClick={() => {
-                  toast.info("Submit rating for this order (not implemented yet)")
+                  toast.info(
+                    "Submit rating for this order (not implemented yet)",
+                  );
                 }}
               >
                 Submit Rating
@@ -78,8 +114,8 @@ export default function PendingReviews() {
       setUserData(data);
     } catch (err: unknown) {
       toast.error(
-        (err as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || "Failed to load profile"
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Failed to load profile",
       );
     }
   }, [token]);
@@ -119,9 +155,7 @@ export default function PendingReviews() {
           <aside className="w-64 border-r border-black bg-white hidden md:flex flex-col">
             <div className="p-4">
               <h2 className="text-lg font-bold">My Account</h2>
-              <p className="text-sm text-gray-500">
-                {authUser?.email || ""}
-              </p>
+              <p className="text-sm text-gray-500">{authUser?.email || ""}</p>
               <nav className="mt-6 space-y-4">
                 {navItems.map((group) => (
                   <div key={group.section} className="mb-4">
@@ -135,7 +169,9 @@ export default function PendingReviews() {
                         key={item.id}
                         onClick={() => setTab(item.id as Tab)}
                         className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-left ${
-                          tab === item.id ? "bg-black text-white" : "text-gray-600 hover:bg-neutral-100 hover:text-gray-900"
+                          tab === item.id
+                            ? "bg-black text-white"
+                            : "text-gray-600 hover:bg-neutral-100 hover:text-gray-900"
                         }`}
                       >
                         {item.label}
