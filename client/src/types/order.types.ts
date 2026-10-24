@@ -13,5 +13,5 @@ export type Order = {
   createdAt: string
   items: OrderItem[]
   statusHistory?: { status: string; at: string }[]
-  returnRequests?: any[]
+  returnRequests?: { id: string; status: string }[]
 }

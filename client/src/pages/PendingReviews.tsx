@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { PageShell } from "../components/wireframe-primitives";
 import { fmt } from "../components/wireframe-helpers";
+import { useAuth } from "../context/useAuth";
 import type { User } from "../types/user.types";
 import type { Order } from "../types/order.types";
+
+const itemLabel = (item: { name?: string }) => item.name || "Item";
 
 const formatDateTime = (value: string) =>
   new Intl.DateTimeFormat("en-NG", {
@@ -86,9 +89,7 @@ function PendingRatingsSection({
               <button
                 className="mt-2 text-blue-600 hover:text-blue-800"
                 onClick={() => {
-                  toast.info(
-                    "Submit rating for this order (not implemented yet)",
-                  );
+                  toast("Submit rating for this order (not implemented yet)");
                 }}
               >
                 Submit Rating
@@ -105,13 +106,11 @@ export default function PendingReviews() {
   const { user: authUser, token } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("pending-ratings");
-  const [userData, setUserData] = useState<User | null>(null);
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
 
   const loadUser = useCallback(async () => {
     try {
       const data = await apiRequest("/users/me", { token: token ?? undefined });
-      setUserData(data);
     } catch (err: unknown) {
       toast.error(
         (err as { response?: { data?: { message?: string } } })?.response?.data
