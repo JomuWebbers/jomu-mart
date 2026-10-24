@@ -141,7 +141,10 @@ function AccountInformation({
               type="text"
               value={user?.name || ""}
               onChange={(e) =>
-                setUserData((prev) => ({ ...prev, name: e.target.value }))
+                setUserData((prev: User | null) => ({
+                  ...prev,
+                  name: e.target.value,
+                } as User))
               }
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
             />
@@ -154,10 +157,12 @@ function AccountInformation({
               type="tel"
               value={user?.phone || ""}
               onChange={(e) =>
-                setUserData((prev) => ({ ...prev, phone: e.target.value }))
+                setUserData((prev: User | null) => ({
+                  ...prev,
+                  phone: e.target.value,
+                } as User))
               }
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
-            />
           </div>
         </div>
         <button
