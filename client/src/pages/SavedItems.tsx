@@ -29,7 +29,14 @@ type SavedItem = {
   image?: string;
 };
 
-type Tab = "account-information" | "order-history" | "pending-ratings" | "wallet" | "voucher" | "saved-items" | "delete-account";
+type Tab =
+  | "account-information"
+  | "order-history"
+  | "pending-ratings"
+  | "wallet"
+  | "voucher"
+  | "saved-items"
+  | "delete-account";
 
 const navItems = [
   {
@@ -141,10 +148,13 @@ function AccountInformation({
               type="text"
               value={user?.name || ""}
               onChange={(e) =>
-                setUserData((prev: User | null) => ({
-                  ...prev,
-                  name: e.target.value,
-                } as User))
+                setUserData(
+                  (prev: User | null) =>
+                    ({
+                      ...prev,
+                      name: e.target.value,
+                    }) as User,
+                )
               }
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
             />
@@ -157,12 +167,16 @@ function AccountInformation({
               type="tel"
               value={user?.phone || ""}
               onChange={(e) =>
-                setUserData((prev: User | null) => ({
-                  ...prev,
-                  phone: e.target.value,
-                } as User))
+                setUserData(
+                  (prev: User | null) =>
+                    ({
+                      ...prev,
+                      phone: e.target.value,
+                    }) as User,
+                )
               }
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-black"
+            />
           </div>
         </div>
         <button
@@ -224,7 +238,7 @@ export default function SavedItems() {
   }, [token]);
 
   const handleSaveProfile = useCallback(async () => {
-    toast.info("Profile save not yet implemented");
+    toast("Profile save not yet implemented", { icon: "ℹ️" });
   }, []);
 
   useEffect(() => {
