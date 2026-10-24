@@ -11,7 +11,7 @@ const navItems = [
       { id: "order-history", label: "Order History" },
     ],
   },
-};
+];
 
 function OrdersSection() {
   return (
