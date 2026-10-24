@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 import { PageShell } from "../components/wireframe-primitives";
 import { fmt } from "../components/wireframe-helpers";
 import { useAuth } from "../context/useAuth";
-import type { User } from "../types/user.types";
 import type { Order } from "../types/order.types";
 
 const itemLabel = (item: { name?: string }) => item.name || "Item";
@@ -110,7 +109,7 @@ export default function PendingReviews() {
 
   const loadUser = useCallback(async () => {
     try {
-      const data = await apiRequest("/users/me", { token: token ?? undefined });
+      await apiRequest("/users/me", { token: token ?? undefined });
     } catch (err: unknown) {
       toast.error(
         (err as { response?: { data?: { message?: string } } })?.response?.data
