@@ -124,6 +124,17 @@ export default function HelpCenter() {
             chat.
           </p>
         </section>
+<section id="return-policy" className="scroll-mt-8 border-2 border-black p-6">
+          <h2 className="font-black uppercase">Return Policy</h2>
+          <p className="mt-2 text-sm leading-6 text-neutral-600">
+            You may return most items within {RETURN_WINDOW_DAYS} days of delivery for a full refund, provided they are in their original condition and packaging. Some items are marked as final sale and non-returnable. To start a return, go to your order details and select "Return item."
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+            <li>Items must be returned within {RETURN_WINDOW_DAYS} days of delivery</li>
+            <li>Refunds are processed to your original payment method within 5-7 business days</li>
+            <li>Return shipping costs are the customer's responsibility unless the return is due to a defective or incorrect item</li>
+          </ul>
+        </section>
       </div>
     </PageShell>
   );
