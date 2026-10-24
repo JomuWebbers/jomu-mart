@@ -8,6 +8,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderTracking from "./pages/OrderTracking";
+import MyOrders from "./pages/MyOrders";
+import MyAccount from "./pages/MyAccount";
 import AdminRoute from "./components/AdminRoutes";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";

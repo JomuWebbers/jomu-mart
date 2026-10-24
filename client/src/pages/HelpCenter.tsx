@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { PageShell } from "../components/wireframe-primitives";
 import { useAuth } from "../context/useAuth";
 
+const RETURN_WINDOW_DAYS = 7;
+
 const FAQs = [
   {
     question: "How do I track an order?",

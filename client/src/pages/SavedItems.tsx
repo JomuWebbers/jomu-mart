@@ -1,3 +1,36 @@
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import {
+  HeartIcon,
+  ShoppingBagIcon,
+  TicketIcon,
+  UserIcon,
+  UserXIcon,
+  WalletIcon,
+} from "lucide-react";
+import { PageShell } from "../components/wireframe-primitives";
+import { apiRequest } from "../lib/api";
+import { useAuth } from "../context/useAuth";
+import type { User } from "../types/user.types";
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
+type SavedItem = {
+  id: string;
+  name: string;
+  price?: number;
+  image?: string;
+};
+
+type Tab = "account-information" | "order-history" | "pending-ratings" | "wallet" | "voucher" | "saved-items" | "delete-account";
+
 const navItems = [
   {
     section: "My Profile",
@@ -303,7 +336,7 @@ function SavedItemsContent({ savedItems }: { savedItems: SavedItem[] }) {
                 className="mt-2 text-blue-600 hover:text-blue-800"
                 onClick={() => {
                   // Remove from wishlist - would call API
-                  toast.info("Remove from wishlist (not implemented yet)");
+                  toast("Remove from wishlist (not implemented yet)");
                 }}
               >
                 Remove
