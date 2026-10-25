@@ -463,15 +463,15 @@ function AccountInformation({
     await onSave(name, form.phone);
   };
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
       <div className="border-b border-neutral-200 pb-4">
         <h2 className="text-xl font-bold text-neutral-950">Account Information</h2>
         <p className="mt-1 text-sm text-neutral-600">
           Update your personal details and how we reach you.
         </p>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
+      <div className="space-y-5">
+        <div className="space-y-1.5">
           <label htmlFor="profile-first-name" className="block text-sm font-medium text-neutral-700">
             First Name
           </label>
@@ -480,11 +480,11 @@ function AccountInformation({
             name="firstName"
             value={form.firstName}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             required
           />
         </div>
-        <div>
+        <div className="space-y-1.5">
           <label htmlFor="profile-last-name" className="block text-sm font-medium text-neutral-700">
             Last Name
           </label>
@@ -493,12 +493,12 @@ function AccountInformation({
             name="lastName"
             value={form.lastName}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             required
           />
         </div>
       </div>
-      <div>
+      <div className="space-y-1.5">
         <label htmlFor="profile-email" className="block text-sm font-medium text-neutral-700">Email</label>
         <input
           id="profile-email"
@@ -506,21 +506,21 @@ function AccountInformation({
           value={form.email}
           readOnly
           aria-describedby="profile-email-help"
-          className="mt-1 block w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-neutral-600"
+          className="block w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-neutral-600"
           type="email"
         />
-        <p id="profile-email-help" className="mt-1 text-xs text-neutral-500">
+        <p id="profile-email-help" className="text-xs text-neutral-500">
           Email address cannot be changed here.
         </p>
       </div>
-      <div>
+      <div className="space-y-1.5">
         <label htmlFor="profile-phone" className="block text-sm font-medium text-neutral-700">Phone</label>
         <input
           id="profile-phone"
           name="phone"
           value={form.phone}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+          className="block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
           type="tel"
         />
       </div>
