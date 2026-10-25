@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { MicroLabel } from "./wireframe-primitives";
 import { useCart } from "../context/useCart";
@@ -13,6 +13,10 @@ import { useSavedItems } from "../context/useSavedItems";
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const accountContainerRef = useRef<HTMLDivElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
+  const accountMenuId = "customer-account-menu";
   const [activeNav, setActiveNav] = useState("All");
   const { totalItems } = useCart();
   const { savedCount } = useSavedItems();
@@ -20,6 +24,36 @@ export default function Layout() {
   const navigate = useNavigate();
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const returnFocusToMobileMenu = useCallback(
+    () => mobileMenuButtonRef.current?.focus(),
+    [],
+  );
+
+  useEffect(() => {
+    if (!accountOpen) return;
+
+    const closeWhenOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !accountContainerRef.current?.contains(event.target)
+      ) {
+        setAccountOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setAccountOpen(false);
+        accountButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeWhenOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeWhenOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [accountOpen]);
 
 
   const HELP_LINKS = [
@@ -56,6 +90,7 @@ export default function Layout() {
         {/* Mobile header row — WF-06: ☰ · logo · account · cart */}
         <div className="lg:hidden max-w-screen-2xl mx-auto flex items-center gap-3">
           <button
+            ref={mobileMenuButtonRef}
             onClick={() => setMobileMenuOpen(true)}
             className="w-9 h-9 border border-black flex flex-col items-center justify-center gap-1 hover:border-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
             aria-label="Menu"
@@ -130,10 +165,13 @@ export default function Layout() {
           </form>
 
             <div className="relative group hidden xl:block shrink-0">
-              <span className="cursor-pointer text-[11px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5">
+              <button
+                type="button"
+                className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+              >
                 ▦ Download App ▾
-              </span>
-              <div className="absolute right-0 top-full pt-3 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity z-50">
+              </button>
+              <div className="invisible absolute right-0 top-full z-50 pt-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                 <div className="bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] w-[250px] p-4">
                   <p className="text-[10px] tracking-[0.2em] uppercase font-bold mb-2">
                     Scan QR to download
@@ -148,10 +186,13 @@ export default function Layout() {
             </div>
 
   <div className="relative group hidden lg:block shrink-0">
-  <span className="cursor-pointer text-[11px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5">
+  <button
+    type="button"
+    className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+  >
     ( ? ) Help ▾
-  </span>
-  <div className="absolute right-0 top-full pt-3 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity z-50">
+  </button>
+  <div className="invisible absolute right-0 top-full z-50 pt-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
     <div className="bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] min-w-[250px] py-1">
       {HELP_LINKS.map((link) => (
         <Link
@@ -171,12 +212,14 @@ export default function Layout() {
 
           <div className="hidden lg:flex items-center gap-6 shrink-0 whitespace-nowrap">
             {/* Account — opens on hover, same pattern as Help / Download App */}
-            <div className="relative group/account">
+            <div ref={accountContainerRef} className="relative group/account">
               <button
+                ref={accountButtonRef}
                 type="button"
                 className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63312]"
                 aria-expanded={accountOpen}
                 aria-haspopup="true"
+                aria-controls={accountMenuId}
                 onClick={(e) => {
                   e.stopPropagation();
                   setAccountOpen((o) => !o);
@@ -191,7 +234,10 @@ export default function Layout() {
                     : "invisible opacity-0 group-hover/account:visible group-hover/account:opacity-100"
                 }`}
               >
-                <div className="w-80 max-w-[calc(100vw-2rem)] overflow-hidden border-2 border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.15)]">
+                <div
+                  id={accountMenuId}
+                  className="max-h-[calc(100vh-6rem)] w-80 max-w-[calc(100vw-2rem)] overflow-x-hidden overflow-y-auto border-2 border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.15)]"
+                >
                   {user ? (
                     <>
                       <div className="px-4 py-3 border-b border-black/10">
@@ -206,18 +252,21 @@ export default function Layout() {
                         </p>
                         <Link
                           to="/my-account"
+                          onClick={() => setAccountOpen(false)}
                           className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
                           My Account
                         </Link>
                         <Link
                           to="/my-orders"
+                          onClick={() => setAccountOpen(false)}
                           className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
                           My Orders
                         </Link>
                         <Link
                           to="/saved-items"
+                          onClick={() => setAccountOpen(false)}
                           className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
                           <span className="flex items-center justify-between">
@@ -231,6 +280,7 @@ export default function Layout() {
                         </Link>
                         <Link
                           to="/track-order"
+                          onClick={() => setAccountOpen(false)}
                           className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
                           Track My Order
@@ -246,6 +296,7 @@ export default function Layout() {
                       {user.role === "admin" && (
                         <Link
                           to="/admin"
+                          onClick={() => setAccountOpen(false)}
                           className="block w-full border-t border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
                           Admin Dashboard
@@ -256,6 +307,7 @@ export default function Layout() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
+                            setAccountOpen(false);
                             handleLogout();
                           }}
                           className="block w-full box-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-red-600 hover:bg-neutral-50"
@@ -268,30 +320,35 @@ export default function Layout() {
                     <>
                       <Link
                         to="/login"
+                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Login / Signup
                       </Link>
                       <Link
                         to="/login"
+                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         My Account
                       </Link>
                       <Link
                         to="/my-orders"
+                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         My Orders
                       </Link>
                       <Link
                         to="/saved-items"
+                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Saved Items
                       </Link>
                       <Link
                         to="/track-order"
+                        onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50"
                       >
                         Track My Order
@@ -341,23 +398,32 @@ export default function Layout() {
         <div className="max-w-screen-2xl mx-auto flex items-center">
           {/* All Categories mega menu (desktop only) */}
           <div className="relative group/cat-trigger hidden lg:block shrink-0">
-            <button className="px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-r border-black/10">
+            <button
+              type="button"
+              className="border-r border-black/10 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+            >
               ☰ All Categories ▾
             </button>
-            <div className="absolute left-0 top-full invisible opacity-0 group-hover/cat-trigger:visible group-hover/cat-trigger:opacity-100 z-50">
+            <div className="invisible absolute left-0 top-full z-50 opacity-0 group-hover/cat-trigger:visible group-hover/cat-trigger:opacity-100 group-focus-within/cat-trigger:visible group-focus-within/cat-trigger:opacity-100">
               <div className="w-[260px] bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] py-2">
                 {CATEGORY_NAMES.map((cat) => (
                   <div
                     key={cat}
-                    className="group/cat relative flex justify-between px-4 py-2.5 text-[12px] font-semibold cursor-pointer hover:bg-neutral-50"
+                    className="group/cat relative"
                   >
-                    {cat} <span>▸</span>
-                    <div className="hidden group-hover/cat:block absolute left-full top-[-8px] bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] w-[280px] p-4 z-50">
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-[12px] font-semibold hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+                    >
+                      {cat} <span aria-hidden="true">▸</span>
+                    </button>
+                    <div className="invisible absolute left-full top-[-8px] z-50 w-[280px] border-2 border-black bg-white p-4 opacity-0 shadow-[6px_6px_0_rgba(0,0,0,0.15)] group-hover/cat:visible group-hover/cat:opacity-100 group-focus-within/cat:visible group-focus-within/cat:opacity-100">
                       {CATEGORIES[cat].map((sub) => (
                         <button
                           key={sub}
+                          type="button"
                           onClick={() => setActiveNav(cat)}
-                          className="block w-full text-left py-2 text-[12px] font-medium hover:font-bold"
+                          className="block w-full py-2 text-left text-[12px] font-medium hover:font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
                         >
                           {sub}
                         </button>
@@ -371,7 +437,9 @@ export default function Layout() {
 
           {/* Mobile: Home tab resets the filter */}
           <button
+            type="button"
             onClick={() => setActiveNav("All")}
+            aria-pressed={activeNav === "All"}
             className={`lg:hidden shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 ${
               activeNav === "All"
                 ? "border-[#E63312] text-[#E63312]"
@@ -386,7 +454,9 @@ export default function Layout() {
             {CATEGORY_NAMES.map((cat) => (
               <button
                 key={cat}
+                type="button"
                 onClick={() => setActiveNav(cat)}
+                aria-pressed={activeNav === cat}
                 className={`shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 whitespace-nowrap ${
                   activeNav === cat
                     ? "border-[#E63312] text-[#E63312]"
@@ -399,8 +469,14 @@ export default function Layout() {
           </div>
         </div>
       </nav>
-      <MobileDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}
-  onCategory={setActiveNav} onSignOut={handleLogout} user={user} />
+      <MobileDrawer
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        returnFocus={returnFocusToMobileMenu}
+        onCategory={setActiveNav}
+        onSignOut={handleLogout}
+        user={user}
+      />
 
       <Outlet context={{ activeNav, setActiveNav }} />
       <ChatWidget />

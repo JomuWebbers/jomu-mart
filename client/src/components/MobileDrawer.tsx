@@ -1,3 +1,4 @@
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import { Link } from "react-router-dom";
 import { CATEGORY_NAMES } from "../data/categories";
 import SellerWallet from "./SellerWallet";
@@ -6,6 +7,7 @@ import TrustedVendorRequest from "./TrustedVendorRequest";
 type Props = {
   open: boolean;
   onClose: () => void;
+  returnFocus: () => void;
   onCategory: (cat: string) => void;
   onSignOut: () => void;
   user: { name: string; email: string; role: string } | null;
@@ -33,10 +35,49 @@ const UTILITY_LINKS: { label: string; to: string; soon?: boolean }[] = [
 export default function MobileDrawer({
   open,
   onClose,
+  returnFocus,
   onCategory,
   onSignOut,
   user,
 }: Props) {
+  const drawerRef = useRef<HTMLElement>(null);
+  const wasOpen = useRef(open);
+
+  useEffect(() => {
+    if (open) {
+      drawerRef.current
+        ?.querySelector<HTMLButtonElement>('button[aria-label="Close menu"]')
+        ?.focus();
+    } else if (wasOpen.current) {
+      returnFocus();
+    }
+    wasOpen.current = open;
+  }, [open, returnFocus]);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusable?.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -49,10 +90,16 @@ export default function MobileDrawer({
       )}
       {/* Drawer — slides from the left (WF-06 frame B) */}
       <aside
+        ref={drawerRef}
         className={`fixed top-0 left-0 bottom-0 w-[85%] max-w-[330px] bg-white z-50 lg:hidden overflow-y-auto transform transition-transform duration-200 ease-out ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
+        role={open ? "dialog" : undefined}
+        aria-modal={open ? "true" : undefined}
+        aria-label={open ? "Navigation menu" : undefined}
         aria-hidden={!open}
+        inert={!open}
+        onKeyDown={handleKeyDown}
       >
         {/* Header: logo + close */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-black/15">
