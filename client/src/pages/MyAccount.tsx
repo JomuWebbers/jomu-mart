@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 import { useAuth } from "../context/useAuth";
 import { PageShell } from "../components/wireframe-primitives";
@@ -66,7 +66,13 @@ const EMPTY_ADDRESS: Address = {
 export default function MyAccount() {
   const { user: authUser, token } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("account-information");
+  const [searchParams] = useSearchParams();
+  const initialSection = searchParams.get("section");
+  const [tab, setTab] = useState<Tab>(
+    initialSection === "pending-ratings" || initialSection === "order-history"
+      ? initialSection
+      : "account-information",
+  );
   const [userData, setUserData] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
@@ -344,7 +350,9 @@ export default function MyAccount() {
               />
             )}
             {tab === "order-history" && <OrdersSection />}
-            {tab === "pending-ratings" && <OrdersSection />}
+            {tab === "pending-ratings" && (
+              <PendingRatingsSection count={pendingRatingsCount} />
+            )}
             {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
             {tab === "trusted-vendor" && (
@@ -636,6 +644,26 @@ function OrdersSection() {
       <h2 className="text-lg font-bold">Order History</h2>
       <div className="bg-white p-4 border border-gray-300 rounded">
         <p className="text-gray-500">No orders found.</p>
+      </div>
+    </div>
+  );
+}
+
+function PendingRatingsSection({ count }: { count: number }) {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-lg font-bold flex items-center gap-2">
+        Pending Ratings
+        <span className="px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
+          {count}
+        </span>
+      </h2>
+      <div className="bg-white p-4 border border-gray-300 rounded">
+        <p className="text-gray-500">
+          {count === 0
+            ? "You do not have product for review."
+            : "Your products awaiting review will appear here."}
+        </p>
       </div>
     </div>
   );

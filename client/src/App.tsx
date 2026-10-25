@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -24,7 +24,6 @@ import AdminReturns from "./pages/admin/AdminReturns";
 import ListingFeeReturn from "./pages/ListingFeeReturn";
 import TrackOrderLookup from "./pages/TrackOrderLookup";
 import HelpCenter from "./pages/HelpCenter";
-import PendingReviews from "./pages/PendingReviews";
 import SavedItems from "./pages/SavedItems";
 
 function App() {
@@ -43,7 +42,10 @@ function App() {
         <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/my-account" element={<MyAccount />} />
-        <Route path="/pending-ratings" element={<PendingReviews />} />
+        <Route
+          path="/pending-ratings"
+          element={<Navigate to="/my-account?section=pending-ratings" replace />}
+        />
         <Route path="/saved-items" element={<SavedItems />} />
         <Route path="/returns-and-orders" element={<MyOrders />} />
       </Route>
