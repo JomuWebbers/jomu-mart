@@ -23,8 +23,8 @@ const CAT_ICONS: Record<string, string> = {
 
 const UTILITY_LINKS: { label: string; to: string; soon?: boolean }[] = [
   { label: "My Orders", to: "/my-orders" },
-  { label: "Pending Reviews", to: "#", soon: true },
-  { label: "Saved Items", to: "#", soon: true },
+  { label: "Pending Reviews", to: "/pending-ratings" },
+  { label: "Saved Items", to: "/saved-items" },
   { label: "Track Orders", to: "/track-order" },
   { label: "Sell on Jomu Mart", to: "/sell" },
   { label: "Jomu Mart Outlets", to: "#", soon: true },
@@ -55,7 +55,7 @@ export default function MobileDrawer({
         aria-hidden={!open}
       >
         {/* Header: logo + close */}
-        <div className="flex items-center justify-between px-4 py-3 border-b-2 border-black">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-black/15">
           <Link
             to="/"
             onClick={onClose}
@@ -67,7 +67,7 @@ export default function MobileDrawer({
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="w-8 h-8 border-2 border-black flex items-center justify-center text-lg leading-none"
+            className="w-9 h-9 border border-black flex items-center justify-center text-lg leading-none hover:border-[#E63312] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
           >
             ✕
           </button>
@@ -82,7 +82,7 @@ export default function MobileDrawer({
           Need Help? <span>›</span>
         </Link>
         <Link
-          to={user ? "/my-orders" : "/login"}
+          to={user ? "/my-account" : "/login"}
           onClick={onClose}
           className="flex items-center justify-between px-4 py-4 text-[15px] font-bold border-b border-black/5"
         >
@@ -144,7 +144,7 @@ export default function MobileDrawer({
             key={item.label}
             to={item.to}
             onClick={onClose}
-            className={`block px-4 py-3.5 text-[13px] font-semibold border-b border-black/5 hover:bg-neutral-50 ${
+            className={`block px-4 py-3.5 text-[13px] font-semibold border-b border-black/5 hover:bg-neutral-50 hover:text-[#E63312] ${
               item.soon ? "opacity-50" : ""
             }`}
           >
@@ -182,6 +182,4 @@ export default function MobileDrawer({
     </>
   );
 }
-
-
 

@@ -46,19 +46,20 @@ export default function Layout() {
       <div className="bg-black text-white py-2 px-4 md:px-8">
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
           <span className="text-[9px] md:text-[10px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-semibold">
-            Free delivery on orders above ₦50,000
+            <span className="text-[#E63312]">●</span> Free delivery on orders above ₦50,000
           </span>
         </div>
       </div>
 
       {/* Header */}
-      <header className="border-b-2 border-black px-4 md:px-8 py-4 md:py-5">
+      <header className="border-b border-black/15 bg-white px-4 md:px-8 py-4 md:py-5">
         {/* Mobile header row — WF-06: ☰ · logo · account · cart */}
         <div className="lg:hidden max-w-screen-2xl mx-auto flex items-center gap-3">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="w-8 h-8 border-2 border-black flex flex-col items-center justify-center gap-1"
+            className="w-9 h-9 border border-black flex flex-col items-center justify-center gap-1 hover:border-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
             aria-label="Menu"
+            aria-expanded={mobileMenuOpen}
           >
             <span className="w-4 h-0.5 bg-black" />
             <span className="w-4 h-0.5 bg-black" />
@@ -72,11 +73,11 @@ export default function Layout() {
             Jomu Mart
           </Link>
           <span className="flex-1" />
-          <Link to={user ? "/my-orders" : "/login"} className="text-[13px] font-bold">
-            {user ? "👤" : "👤 Login"}
+          <Link to={user ? "/my-account" : "/login"} className="text-[13px] font-bold hover:text-[#E63312]">
+            {user ? "👤 Account" : "👤 Login"}
           </Link>
-          <Link to="/cart" className="text-[13px] font-bold">
-            🛒 ({totalItems})
+          <Link to="/cart" className="text-[13px] font-bold hover:text-[#E63312]">
+            🛒 <span className="text-[#E63312]">{totalItems}</span>
           </Link>
         </div>
 
@@ -107,7 +108,7 @@ export default function Layout() {
           </span>
 
           <form
-            className="hidden lg:flex flex-1 min-w-0 border-2 border-black"
+            className="hidden lg:flex flex-1 min-w-0 border border-black focus-within:border-[#E63312]"
             onSubmit={(e) => {
               e.preventDefault();
               navigate(
@@ -123,7 +124,7 @@ export default function Layout() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button type="submit" className="px-6 py-2.5 bg-black text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0">
+            <button type="submit" className="px-6 py-2.5 bg-[#E63312] text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0 hover:bg-black transition-colors">
               Search
             </button>
           </form>
@@ -171,17 +172,18 @@ export default function Layout() {
           <div className="hidden lg:flex items-center gap-6 shrink-0 whitespace-nowrap">
             {/* Account — opens on hover, same pattern as Help / Download App */}
             <div className="relative group/account">
-              <span
-                className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer"
-                role="button"
+              <button
+                type="button"
+                className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63312]"
                 aria-expanded={accountOpen}
+                aria-haspopup="true"
                 onClick={(e) => {
                   e.stopPropagation();
                   setAccountOpen((o) => !o);
                 }}
               >
                 👤 {user ? user.name.split(" ")[0] : "Login / Sign Up"} ▾
-              </span>
+              </button>
               <div
                 className={`absolute right-0 top-full pt-3 z-50 transition-opacity ${
                   accountOpen
@@ -221,7 +223,7 @@ export default function Layout() {
                         <span className="flex items-center justify-between">
                           Saved Items
                           {savedCount !== null && savedCount > 0 && (
-                            <span className="bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            <span className="bg-[#E63312] text-white text-[10px] font-bold min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full">
                               {savedCount}
                             </span>
                           )}
@@ -299,15 +301,15 @@ export default function Layout() {
 
             <Link
               to="/cart"
-              className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:opacity-70"
+              className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:text-[#E63312]"
             >
-              🛒 Cart ({totalItems})
+              🛒 Cart <span className="text-[#E63312]">({totalItems})</span>
             </Link>
           </div>
 
         </div>
 
-        <div className="lg:hidden max-w-screen-2xl mx-auto mt-3 flex border-2 border-black">
+        <div className="lg:hidden max-w-screen-2xl mx-auto mt-3 flex border border-black focus-within:border-[#E63312]">
             <form
               className="flex flex-1"
               onSubmit={(e) => {
@@ -322,7 +324,7 @@ export default function Layout() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button type="submit" className="px-4 py-2 bg-black text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0">
+          <button type="submit" className="px-4 py-2 bg-[#E63312] text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0 hover:bg-black transition-colors">
             Go
           </button>
           </form>
@@ -332,7 +334,7 @@ export default function Layout() {
       </header>
 
       {/* Category Nav — desktop: mega menu + quick links · mobile: Home + tabs */}
-      <nav className="border-b border-black/15 bg-neutral-50 px-4 md:px-8">
+      <nav aria-label="Product categories" className="border-b border-black/15 bg-neutral-50 px-4 md:px-8">
         <div className="max-w-screen-2xl mx-auto flex items-center">
           {/* All Categories mega menu (desktop only) */}
           <div className="relative group/cat-trigger hidden lg:block shrink-0">
@@ -369,7 +371,7 @@ export default function Layout() {
             onClick={() => setActiveNav("All")}
             className={`lg:hidden shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 ${
               activeNav === "All"
-                ? "border-black text-black"
+                ? "border-[#E63312] text-[#E63312]"
                 : "border-transparent text-neutral-500"
             }`}
           >
@@ -384,7 +386,7 @@ export default function Layout() {
                 onClick={() => setActiveNav(cat)}
                 className={`shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 whitespace-nowrap ${
                   activeNav === cat
-                    ? "border-black text-black"
+                    ? "border-[#E63312] text-[#E63312]"
                     : "border-transparent text-neutral-500 hover:text-black"
                 }`}
               >
@@ -444,6 +446,4 @@ export default function Layout() {
 // ---
 
 // __Dependency note:__ Phases 1→2 are sequential (header search needs the PLP). Phases 3–5 can reorder freely. Phase 6 can be sliced per feature. No schema changes until Phase 6 — everything before it uses existing models.
-
-
 
