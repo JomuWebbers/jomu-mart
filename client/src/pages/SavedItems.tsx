@@ -37,14 +37,16 @@ export default function SavedItems() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  if (!token) {
+  const [savedItems, setSavedItems] = useState<SavedItem[]>(MOCK_SAVED_ITEMS);
+  const [liked, setLiked] = useState<Record<string, boolean>>(INITIAL_LIKED);
+
+    if (!token) {
     navigate("/login");
     return null;
   }
 
-  const [savedItems, setSavedItems] = useState<SavedItem[]>(MOCK_SAVED_ITEMS);
-  const [liked, setLiked] = useState<Record<string, boolean>>(INITIAL_LIKED);
 
+  
   const handleAddToCart = (item: SavedItem) =>
     toast.success(`${item.name} added to cart`);
   const handleRemove = (item: SavedItem) => {
