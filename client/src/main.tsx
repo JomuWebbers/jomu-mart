@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { CartProvider } from './context/CartContext.tsx'
+import { SavedItemsProvider } from './context/SavedItemsContext.tsx'
 import { ChatProvider } from './context/ChatContext.tsx'
 
 import 'stream-chat-react/dist/css/index.css'
@@ -16,16 +17,17 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <AuthProvider>
        <CartProvider>
-        <ChatProvider>
-          <App />
-        </ChatProvider>
+        <SavedItemsProvider>
+          <ChatProvider>
+            <App />
+          </ChatProvider>
+        </SavedItemsProvider>
       </CartProvider>
       </AuthProvider>
       <Toaster position="top-center" />
     </BrowserRouter>
   </StrictMode>,
 )
-
 
 
 

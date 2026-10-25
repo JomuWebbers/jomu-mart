@@ -9,11 +9,13 @@ import { CATEGORIES, CATEGORY_NAMES } from "../data/categories";
 import SellerWallet from "./SellerWallet";
 import TrustedVendorRequest from "./TrustedVendorRequest";
 import MobileDrawer from "./MobileDrawer";
+import { useSavedItems } from "../context/useSavedItems";
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("All");
   const { totalItems } = useCart();
+  const { savedCount } = useSavedItems();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [accountOpen, setAccountOpen] = useState(false);
@@ -218,9 +220,11 @@ export default function Layout() {
                       >
                         <span className="flex items-center justify-between">
                           Saved Items
-                          <span className="bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                            0
-                          </span>
+                          {savedCount !== null && savedCount > 0 && (
+                            <span className="bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                              {savedCount}
+                            </span>
+                          )}
                         </span>
                       </Link>
                       <Link
@@ -440,7 +444,6 @@ export default function Layout() {
 // ---
 
 // __Dependency note:__ Phases 1→2 are sequential (header search needs the PLP). Phases 3–5 can reorder freely. Phase 6 can be sliced per feature. No schema changes until Phase 6 — everything before it uses existing models.
-
 
 
 

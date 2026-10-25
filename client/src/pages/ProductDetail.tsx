@@ -8,6 +8,7 @@ import { apiRequest } from "../lib/api";
 import { saveBuyNow } from "../lib/buyNow";
 import { useAuth } from "../context/useAuth";
 import { useCart } from "../context/useCart";
+import { useSavedItems } from "../context/useSavedItems";
 
 type Product = {
   id: string;
@@ -52,6 +53,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const { addToCart } = useCart();
+  const { markSavedItem } = useSavedItems();
   const [productData, setProductData] = useState<Product | null>(null);
   const [loadedId, setLoadedId] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState("");
@@ -293,6 +295,7 @@ export default function ProductDetail() {
         token,
       });
       setSavedStatus({ productId: product.id, token, saved: !isSaved });
+      markSavedItem(product.id, !isSaved);
       toast.success(
         isSaved ? "Removed from saved items" : "Added to saved items",
       );

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Heart } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import { useCart } from "../context/useCart";
+import { useSavedItems } from "../context/useSavedItems";
 import { apiRequest } from "../lib/api";
 
 type SavedItem = {
@@ -17,6 +18,7 @@ type SavedItem = {
 export default function SavedItems() {
   const { token } = useAuth();
   const { addToCart } = useCart();
+  const { markSavedItem } = useSavedItems();
 
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,6 +89,7 @@ export default function SavedItems() {
         token,
       });
       setSavedItems((prev) => prev.filter((saved) => saved.id !== item.id));
+      markSavedItem(item.id, false);
       toast.success(`${item.name} removed from saved items`);
     } catch (removeError) {
       toast.error(
