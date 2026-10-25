@@ -191,7 +191,7 @@ export default function Layout() {
                     : "invisible opacity-0 group-hover/account:visible group-hover/account:opacity-100"
                 }`}
               >
-                <div className="w-64 bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)]">
+                <div className="w-80 max-w-[calc(100vw-2rem)] overflow-hidden border-2 border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.15)]">
                   {user ? (
                     <>
                       <div className="px-4 py-3 border-b border-black/10">
@@ -200,67 +200,70 @@ export default function Layout() {
                           {user.email}
                         </p>
                       </div>
-                      <div className="border-b border-black/10 px-4 py-2">
-                      <p className="text-[10px] tracking-[0.2em] uppercase font-bold text-neutral-500 mb-2">
-                        Account
-                      </p>
-                      <Link
-                        to="/my-account"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                      >
-                        My Account
-                      </Link>
-                      <Link
-                        to="/my-orders"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                      >
-                        My Orders
-                      </Link>
-                      <Link
-                        to="/saved-items"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                      >
-                        <span className="flex items-center justify-between">
-                          Saved Items
-                          {savedCount !== null && savedCount > 0 && (
-                            <span className="bg-[#E63312] text-white text-[10px] font-bold min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full">
-                              {savedCount}
-                            </span>
-                          )}
-                        </span>
-                      </Link>
-                      <Link
-                        to="/track-order"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                      >
-                        Track My Order
-                      </Link>
-                    </div>
-                    {user.role !== "admin" && (
-                      <>
-                        <SellerWallet />
-                        <TrustedVendorRequest />
-                      </>
-                    )}
+                      <div className="border-b border-black/10 py-2">
+                        <p className="mb-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
+                          Account
+                        </p>
+                        <Link
+                          to="/my-account"
+                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        >
+                          My Account
+                        </Link>
+                        <Link
+                          to="/my-orders"
+                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        >
+                          My Orders
+                        </Link>
+                        <Link
+                          to="/saved-items"
+                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        >
+                          <span className="flex items-center justify-between">
+                            Saved Items
+                            {savedCount !== null && savedCount > 0 && (
+                              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E63312] px-1.5 text-[10px] font-bold text-white">
+                                {savedCount}
+                              </span>
+                            )}
+                          </span>
+                        </Link>
+                        <Link
+                          to="/track-order"
+                          className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        >
+                          Track My Order
+                        </Link>
+                      </div>
+                      {user.role !== "admin" && (
+                        <>
+                          <SellerWallet />
+                          <TrustedVendorRequest />
+                        </>
+                      )}
 
-                    {user.role === "admin" && (
-                      <Link
-                        to="/admin"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLogout();
-                      }}
-                      className="w-full text-left px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 text-red-600"
-                    >
-                      Sign Out
-                    </button>
-                  </>
+                      {user.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          className="block w-full border-t border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <div className="border-t border-black/10">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLogout();
+                          }}
+                          className="block w-full box-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-red-600 hover:bg-neutral-50"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </>
                   ) : (
                     <>
                       <Link
@@ -446,4 +449,3 @@ export default function Layout() {
 // ---
 
 // __Dependency note:__ Phases 1→2 are sequential (header search needs the PLP). Phases 3–5 can reorder freely. Phase 6 can be sliced per feature. No schema changes until Phase 6 — everything before it uses existing models.
-

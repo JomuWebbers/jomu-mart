@@ -89,10 +89,10 @@ export default function SellerWallet() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full border-b border-black/10 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+        className="flex w-full items-center justify-between gap-3 border-b border-black/10 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
       >
-        Seller balance
-        <span className="float-right">
+        <span>Seller balance</span>
+        <span className="shrink-0">
           {account
             ? `₦${account.accountBalance.toLocaleString()}`
             : "Loading…"}
@@ -215,6 +215,5 @@ export default function SellerWallet() {
     </>
   );
 }
-
 
 
