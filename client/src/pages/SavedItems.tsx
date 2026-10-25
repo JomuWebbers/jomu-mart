@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useAuth } from "../context/useAuth";
@@ -21,7 +22,7 @@ export default function SavedItems() {
     return null;
   }
 
-  const handleAddToCart = (item: SavedItem) => {
+  const handleAddToCart = () => {
     // Placeholder — cart integration pending
   };
   const handleRemove = (item: SavedItem) => {
@@ -90,7 +91,7 @@ export default function SavedItems() {
                   )}
                 </div>
                 <button
-                  onClick={() => handleAddToCart(item)}
+                  onClick={handleAddToCart}
                   className="w-full mt-3 py-2.5 bg-black text-white text-sm font-bold rounded hover:bg-neutral-800 transition-colors"
                 >
                   Add to Cart
