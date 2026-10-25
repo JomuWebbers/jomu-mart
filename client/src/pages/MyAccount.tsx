@@ -729,7 +729,13 @@ type AccountOrder = {
   total: number;
   status: string;
   createdAt: string;
-  items: { name?: string; qty?: number }[];
+  items: {
+    productId?: string;
+    name?: string;
+    qty?: number;
+    price?: number;
+    image?: string;
+  }[];
 };
 
 function OrdersSection({ token }: { token: string | null }) {
@@ -737,6 +743,8 @@ function OrdersSection({ token }: { token: string | null }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!token) return;
@@ -765,6 +773,20 @@ function OrdersSection({ token }: { token: string | null }) {
     };
   }, [token, reloadKey]);
 
+  const statuses = ["All", ...new Set(orders.map((order) => order.status))];
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredOrders = orders.filter((order) => {
+    const matchesStatus =
+      statusFilter === "All" || order.status === statusFilter;
+    const matchesSearch =
+      !normalizedSearch ||
+      order.id.toLowerCase().includes(normalizedSearch) ||
+      order.items.some((item) =>
+        item.name?.toLowerCase().includes(normalizedSearch),
+      );
+    return matchesStatus && matchesSearch;
+  });
+
   return (
     <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-neutral-200 pb-4">
@@ -772,17 +794,51 @@ function OrdersSection({ token }: { token: string | null }) {
           <h2 className="text-xl font-bold text-neutral-950">Order History</h2>
           {!loading && !error && (
             <p className="mt-1 text-sm text-neutral-500">
-              {orders.length} {orders.length === 1 ? "order" : "orders"}
+              Showing {filteredOrders.length} of {orders.length}{" "}
+              {orders.length === 1 ? "order" : "orders"}
             </p>
           )}
         </div>
         <Link
-          to="/my-orders"
+          to="/my-orders?tab=returns"
           className="text-sm font-semibold text-neutral-700 underline decoration-neutral-300 underline-offset-4 hover:text-[#E63312]"
         >
-          Manage orders and returns
+          Manage returns
         </Link>
       </div>
+
+      {!loading && !error && orders.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-neutral-600">
+              Search orders or products
+            </span>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Order number or product name"
+              className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-neutral-600">
+              Order status
+            </span>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            >
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status === "All" ? "All statuses" : status}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
 
       {loading ? (
         <p className="py-10 text-center text-sm text-neutral-500" role="status">
@@ -817,9 +873,28 @@ function OrdersSection({ token }: { token: string | null }) {
             Start shopping
           </Link>
         </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-5 py-10 text-center">
+          <p className="font-semibold text-neutral-900">
+            No orders match these filters
+          </p>
+          <p className="mt-1 text-sm text-neutral-600">
+            Try a different order status or search term.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm("");
+              setStatusFilter("All");
+            }}
+            className="mt-4 text-sm font-semibold text-[#E63312] underline underline-offset-4"
+          >
+            Clear filters
+          </button>
+        </div>
       ) : (
         <div className="space-y-3">
-          {orders.slice(0, 5).map((order) => (
+          {filteredOrders.map((order) => (
             <article
               key={order.id}
               className="rounded-lg border border-neutral-200 p-4 sm:p-5"
@@ -828,6 +903,9 @@ function OrdersSection({ token }: { token: string | null }) {
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
                     Order #{order.id.slice(-8).toUpperCase()}
+                  </p>
+                  <p className="mt-1 break-all font-mono text-[11px] text-neutral-400">
+                    {order.id}
                   </p>
                   <p className="mt-1 text-sm text-neutral-600">
                     {new Intl.DateTimeFormat("en-NG", {
@@ -842,56 +920,73 @@ function OrdersSection({ token }: { token: string | null }) {
                   <p className="font-bold text-neutral-950">
                     ₦{order.total.toLocaleString()}
                   </p>
-                  <span className="mt-1 inline-block rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-700">
+                  <span className={`mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    order.status.toLowerCase() === "delivered"
+                      ? "bg-emerald-50 text-emerald-800"
+                      : order.status.toLowerCase().includes("cancel")
+                        ? "bg-red-50 text-red-800"
+                        : "bg-amber-50 text-amber-800"
+                  }`}>
                     {order.status}
                   </span>
                 </div>
               </div>
               <ul className="mt-3 divide-y divide-neutral-100 border-y border-neutral-100">
-                {order.items.slice(0, 2).map((item, index) => (
+                {order.items.slice(0, 3).map((item, index) => (
                   <li
-                    key={`${order.id}-${index}`}
-                    className="flex justify-between gap-3 py-2 text-sm"
+                    key={`${order.id}-${item.productId ?? index}`}
+                    className="flex min-w-0 items-center justify-between gap-3 py-2 text-sm"
                   >
-                    <span className="line-clamp-1 text-neutral-700">
-                      {item.name || "Product"}
+                    <span className="flex min-w-0 items-center gap-3">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt=""
+                          loading="lazy"
+                          className="h-11 w-11 shrink-0 rounded border border-neutral-100 object-cover"
+                        />
+                      ) : (
+                        <span className="h-11 w-11 shrink-0 rounded bg-neutral-100" aria-hidden="true" />
+                      )}
+                      <span className="min-w-0">
+                        <span className="block line-clamp-1 text-neutral-700">
+                          {item.name || "Product"}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-neutral-500">
+                          Qty: {item.qty ?? 1}
+                        </span>
+                      </span>
                     </span>
-                    <span className="shrink-0 text-neutral-500">
-                      × {item.qty ?? 1}
-                    </span>
+                    {typeof item.price === "number" && (
+                      <span className="shrink-0 text-xs font-semibold text-neutral-700">
+                        ₦{(item.price * (item.qty ?? 1)).toLocaleString()}
+                      </span>
+                    )}
                   </li>
                 ))}
-                {order.items.length > 2 && (
+                {order.items.length > 3 && (
                   <li className="py-2 text-xs text-neutral-500">
-                    +{order.items.length - 2} more{" "}
-                    {order.items.length - 2 === 1 ? "item" : "items"}
+                    +{order.items.length - 3} more{" "}
+                    {order.items.length - 3 === 1 ? "item" : "items"}
                   </li>
                 )}
               </ul>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
                   to={`/track/${encodeURIComponent(order.id)}`}
-                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black"
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
                 >
                   Track order
                 </Link>
                 <Link
                   to="/my-orders"
-                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black"
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
                 >
-                  View details
+                  Order and return details
                 </Link>
               </div>
             </article>
           ))}
-          {orders.length > 5 && (
-            <Link
-              to="/my-orders"
-              className="block rounded-md border border-neutral-200 px-4 py-3 text-center text-sm font-semibold hover:border-black"
-            >
-              View all {orders.length} orders
-            </Link>
-          )}
         </div>
       )}
     </section>
