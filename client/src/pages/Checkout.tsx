@@ -1,9 +1,9 @@
 import { useMemo, useState, type SubmitEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Check, LockKeyhole } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Wire,
-  MicroLabel,
   Divider,
   PageShell,
 } from "../components/wireframe-primitives";
@@ -327,10 +327,34 @@ export default function Checkout() {
   };
 
   return (
-    <PageShell title="Checkout" breadcrumb="Cart / Delivery / Payment / Review">
+    <PageShell title="Checkout" breadcrumb="HOME / CART / CHECKOUT">
       {/* Responsive: form stacks full width on mobile, order summary sits beside it from lg up */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <p className="text-sm text-neutral-600">
+          Secure checkout · Review your delivery and payment details.
+        </p>
+        <Link to="/cart" className="inline-flex items-center gap-2 text-sm font-semibold text-[#E63312] hover:underline">
+          <ArrowLeft className="h-4 w-4" /> Edit cart
+        </Link>
+      </div>
+      <ol className="mb-8 flex items-center gap-2 text-xs font-semibold sm:gap-4">
+        <li className="flex items-center gap-2 text-green-700">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green-50"><Check className="h-4 w-4" /></span>
+          Cart
+        </li>
+        <li aria-hidden className="h-px flex-1 bg-neutral-200" />
+        <li className="flex items-center gap-2 text-[#E63312]" aria-current="step">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E63312] text-white">2</span>
+          Checkout
+        </li>
+        <li aria-hidden className="h-px flex-1 bg-neutral-200" />
+        <li className="flex items-center gap-2 text-neutral-400">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100">3</span>
+          Confirmation
+        </li>
+      </ol>
       {isBuyNow && activeBuyNowItem && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-2 border-black bg-neutral-50 p-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
           <p className="text-[13px] font-bold">
             Buy Now: {activeBuyNowItem.name} × {activeBuyNowItem.qty} — only
             this item will be ordered.
@@ -342,7 +366,7 @@ export default function Checkout() {
           <button
             type="button"
             onClick={cancelBuyNow}
-            className="text-[11px] font-black uppercase tracking-widest underline"
+            className="text-sm font-bold text-[#E63312] underline underline-offset-2"
           >
             Cancel Buy Now
           </button>
@@ -350,37 +374,62 @@ export default function Checkout() {
       )}
       <form onSubmit={handlePlaceOrder}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-8">
+          <div className="space-y-5 lg:col-span-8">
             {/* ── Delivery address ──────────────────────────────────── */}
-            <section>
-              <MicroLabel>1. Delivery Address</MicroLabel>
-              <div className="border-2 border-black p-4 mt-3 space-y-3">
+            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">1</span>
+                <div>
+                  <h2 className="font-bold">Delivery address</h2>
+                  <p className="mt-1 text-xs text-neutral-500">Where should we deliver your order?</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Full name</span>
                 <input
                   placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full border border-black/20 p-3 text-[13px] outline-none"
+                  autoComplete="name"
+                  required
+                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
                 />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Phone number</span>
                 <input
                   placeholder="Phone Number"
+                  type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full border border-black/20 p-3 text-[13px] outline-none"
+                  autoComplete="tel"
+                  required
+                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
                 />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Street address</span>
                 <input
                   placeholder="Street Address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full border border-black/20 p-3 text-[13px] outline-none"
+                  autoComplete="street-address"
+                  required
+                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
                 />
+                </label>
 
                 {/* Responsive: two columns from sm up, stacked on mobile */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-semibold text-neutral-700">LGA / City</span>
                   <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     required
-                    className="w-full border border-black/20 p-3 text-[13px] outline-none"
+                    autoComplete="address-level2"
+                    className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
                   >
                     <option value="" disabled>
                       Select LGA
@@ -389,63 +438,85 @@ export default function Checkout() {
                       <option key={c}>{c}</option>
                     ))}
                   </select>
+                  </label>
 
+                  <label className="block">
+                    <span className="mb-1 block text-xs font-semibold text-neutral-700">State</span>
                   <select
                     value={state}
                     onChange={(e) => {
                       setState(e.target.value);
                       setCity(""); // reset city so an old LGA from a different state can't linger
                     }}
-                    className="w-full border border-black/20 p-3 text-[13px] outline-none"
+                    autoComplete="address-level1"
+                    required
+                    className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
                   >
                     {STATES.map((s) => (
                       <option key={s}>{s}</option>
                     ))}
                   </select>
+                  </label>
                 </div>
-                <MicroLabel>
-                  Delivery tracking is available in Osun, Lagos, and Oyo states
-                </MicroLabel>
+                <p className="text-xs text-neutral-500">
+                  Delivery tracking is available in Osun, Lagos, and Oyo states.
+                </p>
               </div>
             </section>
 
             {/* ── Payment method ────────────────────────────────────── */}
-            <section>
-              <MicroLabel>2. Payment Method</MicroLabel>
+            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">2</span>
+                <div>
+                  <h2 className="font-bold">Payment method</h2>
+                  <p className="mt-1 text-xs text-neutral-500">Choose how you would like to pay.</p>
+                </div>
+              </div>
               <div className="mt-3 space-y-2">
                 {PAYMENT_METHODS.map((m) => (
                   <label
                     key={m}
-                    className={`flex items-center gap-3 border-2 p-4 cursor-pointer ${
-                      payment === m ? "border-black" : "border-black/15"
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors ${
+                      payment === m ? "border-[#E63312] bg-red-50/40" : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
                     <input
                       type="radio"
                       checked={payment === m}
                       onChange={() => setPayment(m)}
-                      className="accent-black"
+                      name="payment-method"
+                      className="accent-[#E63312]"
                     />
-                    <span className="text-[13px] font-semibold">{m}</span>
+                    <span className="flex-1 text-sm font-semibold">{m}</span>
+                    {m === "Bank Transfer" && <span className="text-xs text-neutral-500">Account details after order</span>}
+                    {m === "Pay on Delivery" && <span className="text-xs text-neutral-500">Where available</span>}
+                    {m === "Card (Paystack)" && <span className="text-xs text-neutral-500">Secure payment</span>}
                   </label>
                 ))}
               </div>
             </section>
 
             {/* ── Order items review ────────────────────────────────── */}
-            <section>
-              <MicroLabel>3. Review Items</MicroLabel>
-              <div className="space-y-3 mt-3">
+            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">3</span>
+                <div>
+                  <h2 className="font-bold">Review items</h2>
+                  <p className="mt-1 text-xs text-neutral-500">Confirm quantities and items before placing your order.</p>
+                </div>
+              </div>
+              <div className="mt-3 space-y-3">
                 {checkoutItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 border border-black/15 p-3"
+                    className="flex items-center gap-4 rounded border border-neutral-200 p-3"
                   >
                     {item.image ? (
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="h-16 w-16 object-cover"
+                        className="h-16 w-16 rounded object-cover"
                       />
                     ) : (
                       <Wire h="h-16 w-16" />
@@ -453,9 +524,10 @@ export default function Checkout() {
                     <div className="flex-1">
                       <p className="text-sm font-bold">{item.name}</p>
                       <p className="mt-1 text-xs text-neutral-500">
-                        Qty {item.qty} · {fmt(item.price * item.qty)}
+                        Qty {item.qty} · {fmt(item.price)} each
                       </p>
                     </div>
+                    <span className="shrink-0 text-sm font-bold">{fmt(item.price * item.qty)}</span>
                   </div>
                 ))}
               </div>
@@ -464,8 +536,27 @@ export default function Checkout() {
 
           {/* ── Order total + place order ──────────────────────────── */}
           <div className="lg:col-span-4">
-            <div className="border-2 border-black p-5 sticky top-4">
-              <MicroLabel>Order Total</MicroLabel>
+            <div className="sticky top-4 rounded-lg border border-neutral-200 bg-white p-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold">Order summary</h2>
+                <Link to="/cart" className="text-xs font-semibold text-[#E63312] hover:underline">Edit</Link>
+              </div>
+              <div className="mt-4 max-h-64 space-y-3 overflow-y-auto border-b border-neutral-200 pb-4">
+                {checkoutItems.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    {item.image ? (
+                      <img src={item.image} alt="" className="h-12 w-12 rounded object-cover" />
+                    ) : (
+                      <Wire h="h-12 w-12" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-xs font-semibold">{item.name}</p>
+                      <p className="mt-1 text-xs text-neutral-500">Qty: {item.qty}</p>
+                    </div>
+                    <span className="shrink-0 text-xs font-bold">{fmt(item.price * item.qty)}</span>
+                  </div>
+                ))}
+              </div>
               <div className="mt-4 space-y-3 text-[13px] font-semibold">
                 <div className="flex justify-between">
                   <span className="text-neutral-500">Subtotal</span>
@@ -486,11 +577,14 @@ export default function Checkout() {
               <button
                 type="submit"
                 disabled={placing}
-                style={{ backgroundColor: "var(--vermilion)" }}
-                className="w-full py-4 mt-5 text-white text-[11px] tracking-[0.2em] uppercase font-black disabled:opacity-60"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded bg-[#E63312] py-4 text-sm font-bold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {placing ? "Placing Order…" : "Place Order"}
+                <LockKeyhole className="h-4 w-4" />
+                {placing ? "Placing order…" : `Place order · ${fmt(total)}`}
               </button>
+              <p className="mt-3 text-center text-[11px] leading-5 text-neutral-500">
+                Your order is protected. Delivery is charged based on seller settings.
+              </p>
             </div>
           </div>
         </div>
