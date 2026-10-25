@@ -12,7 +12,9 @@ import {
   WalletIcon,
   TicketIcon,
   UserXIcon,
+  ShieldCheckIcon,
 } from "lucide-react";
+import TrustedVendorRequest from "../components/TrustedVendorRequest";
 
 type User = {
   id: string;
@@ -40,6 +42,7 @@ type Tab =
   | "pending-ratings"
   | "wallet"
   | "voucher"
+  | "trusted-vendor"
   | "delete-account";
 
 type ApiError = {
@@ -67,6 +70,7 @@ export default function MyAccount() {
   const [userData, setUserData] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
+  const [trustedVendorStatus, setTrustedVendorStatus] = useState<{ isTrustedVendor: boolean; trustedVendorRequestStatus: string | null } | null>(null);
   const [saving, setSaving] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -111,6 +115,18 @@ export default function MyAccount() {
     }
   }, [token]);
 
+  const loadTrustedVendorStatus = useCallback(async () => {
+    try {
+      const data = await apiRequest("/users/me", { token: token ?? undefined });
+      setTrustedVendorStatus({
+        isTrustedVendor: data.isTrustedVendor ?? false,
+        trustedVendorRequestStatus: data.trustedVendorRequestStatus ?? null,
+      });
+    } catch {
+      // Silent fail — trusted vendor section will show default state
+    }
+  }, [token]);
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -120,7 +136,8 @@ export default function MyAccount() {
     loadUser();
     loadAddresses();
     loadPendingRatingsCount();
-  }, [token, navigate, loadUser, loadAddresses, loadPendingRatingsCount]);
+    loadTrustedVendorStatus();
+  }, [token, navigate, loadUser, loadAddresses, loadPendingRatingsCount, loadTrustedVendorStatus]);
 
   const handleSaveProfile = async () => {
     if (!token || !userData) return;
@@ -240,6 +257,11 @@ export default function MyAccount() {
       items: [{ id: "voucher", label: "Voucher" }],
     },
     {
+      section: "Trusted Vendor",
+      icon: ShieldCheckIcon,
+      items: [{ id: "trusted-vendor", label: "Trusted Vendor" }],
+    },
+    {
       section: "Delete Account",
       icon: UserXIcon,
       items: [{ id: "delete-account", label: "Delete Account" }],
@@ -325,6 +347,7 @@ export default function MyAccount() {
             {tab === "pending-ratings" && <OrdersSection />}
             {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
+            {tab === "trusted-vendor" && <TrustedVendorView />}
             {tab === "delete-account" && <DeleteAccountView />}
           </main>
         </div>
@@ -634,6 +657,37 @@ function VoucherView() {
       <div className="bg-white p-4 border border-gray-300 rounded">
         <p className="text-gray-500">No vouchers found.</p>
       </div>
+    </div>
+  );
+}
+
+function TrustedVendorView() {
+  return (
+    <div className="space-y-6">
+      {trustedVendorStatus?.isTrustedVendor ? (
+        <>
+          <h2 className="text-lg font-bold">Trusted Vendor</h2>
+          <div className="bg-green-50 border border-green-200 p-4 rounded">
+            <p className="text-green-800 text-sm font-medium">
+              You are already a trusted vendor.
+            </p>
+          </div>
+        </>
+      ) : trustedVendorStatus?.trustedVendorRequestStatus === "pending" ? (
+        <>
+          <h2 className="text-lg font-bold">Trusted Vendor</h2>
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded">
+            <p className="text-amber-800 text-sm font-medium">
+              Your trusted-vendor request is pending review.
+            </p>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className="text-lg font-bold">Trusted Vendor</h2>
+          <TrustedVendorRequest />
+        </>
+      )}
     </div>
   );
 }

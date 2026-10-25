@@ -213,8 +213,8 @@ export default function Layout() {
                         My Orders
                       </Link>
                       <Link
-                        to="#"
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10 opacity-50"
+                        to="/saved-items"
+                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Saved Items
                       </Link>
