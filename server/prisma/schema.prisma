@@ -45,6 +45,8 @@ model Wishlist {
   @@unique([userId, productId])
   @@index([userId])
 }
+
+model Address {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -92,6 +94,7 @@ model Product {
   listingFeeAmount  Float?   @default(0)
 
   reviews Review[]
+  wishlist Wishlist[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -200,6 +203,5 @@ model ReturnRequest {
   @@index([orderId])
   @@index([userId])
 }
-
 
 

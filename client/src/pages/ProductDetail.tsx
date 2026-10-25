@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Heart } from "lucide-react";
 import { Divider, MicroLabel, PageShell } from "../components/wireframe-primitives";
 import { fmt, pct } from "../components/wireframe-helpers";
 import { apiRequest } from "../lib/api";
@@ -62,6 +63,12 @@ export default function ProductDetail() {
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const [savedStatus, setSavedStatus] = useState<{
+    productId: string;
+    token: string;
+    saved: boolean;
+  } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
 
 
@@ -89,6 +96,42 @@ export default function ProductDetail() {
       cancelled = true;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!id || !token) return;
+
+    let cancelled = false;
+    apiRequest("/wishlist", { token })
+      .then((items: Product[]) => {
+        if (!cancelled) {
+          setSavedStatus({
+            productId: id,
+            token,
+            saved: items.some((item) => item.id === id),
+          });
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Could not check saved-item status.",
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, token]);
+
+  const isSaved = Boolean(
+    token &&
+      savedStatus?.productId === id &&
+      savedStatus?.token === token &&
+      savedStatus?.saved,
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -235,6 +278,33 @@ export default function ProductDetail() {
     toast.success(`${currentProduct.name} added to cart`);
   }
 
+  async function toggleSavedItem() {
+    if (!token) {
+      toast.error("Sign in to save items.");
+      navigate("/login");
+      return;
+    }
+    if (!product) return;
+
+    setIsSaving(true);
+    try {
+      await apiRequest(`/wishlist/${encodeURIComponent(product.id)}`, {
+        method: isSaved ? "DELETE" : "POST",
+        token,
+      });
+      setSavedStatus({ productId: product.id, token, saved: !isSaved });
+      toast.success(
+        isSaved ? "Removed from saved items" : "Added to saved items",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not update saved items.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   function buyNow() {
     const currentProduct = product;
     
@@ -326,9 +396,25 @@ export default function ProductDetail() {
           <MicroLabel>
             {product.category}{product.subcategory ? ` / ${product.subcategory}` : ""}
           </MicroLabel>
-          <h1 className="mt-2 text-2xl font-black uppercase leading-tight md:text-3xl">
-            {product.name}
-          </h1>
+          <div className="mt-2 flex items-start justify-between gap-4">
+            <h1 className="text-2xl font-black uppercase leading-tight md:text-3xl">
+              {product.name}
+            </h1>
+            <button
+              type="button"
+              onClick={() => void toggleSavedItem()}
+              disabled={isSaving}
+              aria-label={
+                isSaved ? "Remove from saved items" : "Save item"
+              }
+              aria-pressed={isSaved}
+              className="shrink-0 border-2 border-black p-3 disabled:opacity-50"
+            >
+              <Heart
+                className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`}
+              />
+            </button>
+          </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
             {reviewCount > 0 ? (

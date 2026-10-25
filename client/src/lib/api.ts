@@ -18,7 +18,7 @@ export async function apiRequest(path: string, options: RequestOptions = {}) {
     body: body ? JSON.stringify(body) : undefined,
   })
 
-  const data = await res.json()
+  const data = res.status === 204 ? undefined : await res.json()
 
   if (!res.ok) {
     throw new Error(data.message || 'Something went wrong')
@@ -38,7 +38,6 @@ export async function apiUpload(path: string, body: FormData, token?: string) {
   if (!res.ok) throw new Error(data.message || 'Upload failed')
   return data
 }
-
 
 
 

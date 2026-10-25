@@ -9,6 +9,7 @@ import uploadRoutes from './routes/uploadRoutes'
 import streamRoutes from './routes/streamRoutes'
 import userRoutes from './routes/userRoutes'
 import returnRoutes from './routes/returnRoutes'
+import wishlistRoutes from './routes/wishlistRoutes'
 import { warmDatabaseConnection } from './lib/prisma'
 
 
@@ -72,6 +73,7 @@ app.use('/api/delivery-partners', deliveryPartnerRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/chat', streamRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/wishlist', wishlistRoutes)
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -86,4 +88,3 @@ if (process.env.NODE_ENV !== 'production') {
 
 
 export default app
-
