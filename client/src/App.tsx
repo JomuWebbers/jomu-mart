@@ -1,4 +1,4 @@
-import { Navigate, Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -8,7 +8,6 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderTracking from "./pages/OrderTracking";
-import MyOrders from "./pages/MyOrders";
 import MyAccount from "./pages/MyAccount";
 import AdminRoute from "./components/AdminRoutes";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -26,6 +25,16 @@ import TrackOrderLookup from "./pages/TrackOrderLookup";
 import HelpCenter from "./pages/HelpCenter";
 import SavedItems from "./pages/SavedItems";
 
+function LegacyOrdersRedirect() {
+  const location = useLocation();
+  return (
+    <Navigate
+      to={{ pathname: "/my-account/orders", search: location.search }}
+      replace
+    />
+  );
+}
+
 function App() {
   return (
     <Routes>
@@ -40,7 +49,10 @@ function App() {
         <Route path="/track/:id" element={<OrderTracking />} />
         <Route path="/sell" element={<SellProduct />} />
         <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
-        <Route path="/my-orders" element={<MyOrders />} />
+        <Route
+          path="/my-orders"
+          element={<LegacyOrdersRedirect />}
+        />
         <Route path="/my-account" element={<MyAccount />} />
         <Route path="/my-account/*" element={<MyAccount />} />
         <Route
@@ -48,7 +60,10 @@ function App() {
           element={<Navigate to="/my-account/pending-ratings" replace />}
         />
         <Route path="/saved-items" element={<SavedItems />} />
-        <Route path="/returns-and-orders" element={<MyOrders />} />
+        <Route
+          path="/returns-and-orders"
+          element={<LegacyOrdersRedirect />}
+        />
       </Route>
 
       <Route element={<AdminRoute />}>

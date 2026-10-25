@@ -51,7 +51,7 @@ type Order = {
   returnRequests?: ReturnRequestData[];
 };
 
-type Tab = "orders" | "returns";
+type Tab = "orders" | "cancelled" | "returns";
 
 // Delivered orders can be returned within this many days.
 const RETURN_WINDOW_DAYS = 7;
@@ -125,7 +125,7 @@ function refundMethodLabel(method?: string) {
   return REFUND_METHOD_LABELS[method] ?? method.replaceAll("_", " ");
 }
 
-export default function MyOrders() {
+export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
   const { token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -137,13 +137,15 @@ export default function MyOrders() {
   const [selectedOrderForReturn, setSelectedOrderForReturn] =
     useState<Order | null>(null);
 
-  // The active tab lives in the URL so /my-orders?tab=returns can be linked to.
+  const requestedTab = searchParams.get("tab");
   const activeTab: Tab =
-    searchParams.get("tab") === "returns" ? "returns" : "orders";
+    requestedTab === "returns" || requestedTab === "cancelled"
+      ? requestedTab
+      : "orders";
 
   const setActiveTab = useCallback(
     (tab: Tab) => {
-      setSearchParams(tab === "returns" ? { tab: "returns" } : {}, {
+      setSearchParams(tab === "orders" ? {} : { tab }, {
         replace: true,
       });
     },
@@ -212,6 +214,13 @@ export default function MyOrders() {
     );
   }, [orders, returns]);
 
+  const activeOrders = orders.filter(
+    (order) => !order.status.toLowerCase().includes("cancel"),
+  );
+  const cancelledOrders = orders.filter((order) =>
+    order.status.toLowerCase().includes("cancel"),
+  );
+
   async function copyOrderId(id: string) {
     try {
       await navigator.clipboard.writeText(id);
@@ -243,59 +252,91 @@ export default function MyOrders() {
     );
   }
 
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-10 md:px-8">
-      <MicroLabel>Account / Purchases</MicroLabel>
-      <h1 className="mt-2 text-3xl font-black uppercase tracking-tight">
-        Returns &amp; Orders
-      </h1>
-      <p className="mt-2 max-w-2xl text-sm text-neutral-600">
-        Track deliveries and request a return within {RETURN_WINDOW_DAYS} days
-        of delivery.
-      </p>
+  const Container = embedded ? "section" : "main";
 
-      <div className="mt-6 flex border-2 border-black">
-        {(["orders", "returns"] as const).map((tab) => (
+  return (
+    <Container className={embedded ? "space-y-5" : "mx-auto max-w-5xl px-4 py-10 md:px-8"}>
+      {!embedded && <MicroLabel>Account / Purchases</MicroLabel>}
+      <div className="border-b border-neutral-200 pb-4">
+        <h1 className={`${embedded ? "text-xl" : "mt-2 text-3xl"} font-bold text-neutral-950`}>
+          {embedded ? "Orders" : "Returns & Orders"}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm text-neutral-600">
+          Track deliveries. Eligible delivered orders can be returned within{" "}
+          {RETURN_WINDOW_DAYS} days.
+        </p>
+      </div>
+
+      <div
+        className="flex overflow-x-auto border-b border-neutral-200"
+        role="tablist"
+        aria-label="Order categories"
+      >
+        {(["orders", "cancelled", "returns"] as const).map((tab) => (
           <button
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest ${
-              activeTab === tab ? "bg-black text-white" : "bg-white"
+            role="tab"
+            id={`order-tab-${tab}`}
+            aria-controls="order-category-panel"
+            aria-selected={activeTab === tab}
+            className={`shrink-0 border-b-2 px-4 py-3 text-xs font-bold uppercase tracking-wide transition-colors sm:px-5 ${
+              activeTab === tab
+                ? "border-[#E63312] text-[#E63312]"
+                : "border-transparent text-neutral-500 hover:text-neutral-900"
             }`}
           >
             {tab === "orders"
-              ? `Orders (${orders.length})`
-              : `Returns (${returnRecords.length})`}
+              ? `Ongoing / Delivered (${activeOrders.length})`
+              : tab === "cancelled"
+                ? `Cancelled (${cancelledOrders.length})`
+                : `Returns (${returnRecords.length})`}
           </button>
         ))}
       </div>
 
       {error && (
-        <p className="mt-4 border-2 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <p className="mt-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
           {error}
         </p>
       )}
 
-      {loading ? (
-        <div className="mt-6 space-y-4">
-          {[0, 1].map((index) => (
-            <Wire key={index} h="h-36" label="Loading" />
-          ))}
-        </div>
-      ) : activeTab === "orders" ? (
-        <OrdersPanel
-          orders={orders}
-          copiedId={copiedId}
-          onCopy={(id) => void copyOrderId(id)}
-          onRequestReturn={setSelectedOrderForReturn}
-        />
-      ) : (
-        <ReturnsPanel
-          records={returnRecords}
-          onViewOrders={() => setActiveTab("orders")}
-        />
-      )}
+      <div
+        id="order-category-panel"
+        role="tabpanel"
+        aria-labelledby={`order-tab-${activeTab}`}
+      >
+        {loading ? (
+          <div className="mt-6 space-y-4">
+            {[0, 1].map((index) => (
+              <Wire key={index} h="h-36" label="Loading" />
+            ))}
+          </div>
+        ) : activeTab === "orders" ? (
+          <OrdersPanel
+            orders={activeOrders}
+            copiedId={copiedId}
+            onCopy={(id) => void copyOrderId(id)}
+            onRequestReturn={setSelectedOrderForReturn}
+            emptyMessage="No ongoing or delivered orders yet."
+            showShopLink
+          />
+        ) : activeTab === "cancelled" ? (
+          <OrdersPanel
+            orders={cancelledOrders}
+            copiedId={copiedId}
+            onCopy={(id) => void copyOrderId(id)}
+            onRequestReturn={setSelectedOrderForReturn}
+            emptyMessage="You have no cancelled orders."
+          />
+        ) : (
+          <ReturnsPanel
+            records={returnRecords}
+            onViewOrders={() => setActiveTab("orders")}
+          />
+        )}
+      </div>
 
       {selectedOrderForReturn && (
         <RequestReturnModal
@@ -309,7 +350,7 @@ export default function MyOrders() {
           }}
         />
       )}
-    </main>
+    </Container>
   );
 }
 
@@ -318,22 +359,28 @@ function OrdersPanel({
   copiedId,
   onCopy,
   onRequestReturn,
+  emptyMessage,
+  showShopLink = false,
 }: {
   orders: Order[];
   copiedId: string;
   onCopy: (id: string) => void;
   onRequestReturn: (order: Order) => void;
+  emptyMessage: string;
+  showShopLink?: boolean;
 }) {
   if (orders.length === 0) {
     return (
-      <section className="mt-6 border-2 border-black p-8 text-center">
-        <p className="font-bold uppercase">No orders yet</p>
-        <Link
-          to="/"
-          className="mt-4 inline-block bg-black px-5 py-3 text-xs font-bold uppercase tracking-widest text-white"
-        >
-          Start shopping
-        </Link>
+      <section className="rounded-lg border border-neutral-200 bg-neutral-50 px-5 py-12 text-center">
+        <p className="font-semibold text-neutral-900">{emptyMessage}</p>
+        {showShopLink && (
+          <Link
+            to="/"
+            className="mt-4 inline-flex rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#E63312]"
+          >
+            Start shopping
+          </Link>
+        )}
       </section>
     );
   }
@@ -618,9 +665,6 @@ function ReturnCard({ request }: { request: ReturnRequestData }) {
     </article>
   );
 }
-
-
-
 
 
 
