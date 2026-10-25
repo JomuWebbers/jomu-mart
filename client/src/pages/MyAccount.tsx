@@ -347,7 +347,9 @@ export default function MyAccount() {
             {tab === "pending-ratings" && <OrdersSection />}
             {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
-            {tab === "trusted-vendor" && <TrustedVendorView />}
+            {tab === "trusted-vendor" && (
+              <TrustedVendorView status={trustedVendorStatus} />
+            )}
             {tab === "delete-account" && <DeleteAccountView />}
           </main>
         </div>
@@ -661,10 +663,17 @@ function VoucherView() {
   );
 }
 
-function TrustedVendorView() {
+function TrustedVendorView({
+  status,
+}: {
+  status: {
+    isTrustedVendor: boolean;
+    trustedVendorRequestStatus: string | null;
+  } | null;
+}) {
   return (
     <div className="space-y-6">
-      {trustedVendorStatus?.isTrustedVendor ? (
+      {status?.isTrustedVendor ? (
         <>
           <h2 className="text-lg font-bold">Trusted Vendor</h2>
           <div className="bg-green-50 border border-green-200 p-4 rounded">
@@ -673,7 +682,7 @@ function TrustedVendorView() {
             </p>
           </div>
         </>
-      ) : trustedVendorStatus?.trustedVendorRequestStatus === "pending" ? (
+      ) : status?.trustedVendorRequestStatus === "pending" ? (
         <>
           <h2 className="text-lg font-bold">Trusted Vendor</h2>
           <div className="bg-amber-50 border border-amber-200 p-4 rounded">
