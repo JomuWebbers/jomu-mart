@@ -10,6 +10,7 @@ import SellerWallet from "./SellerWallet";
 import TrustedVendorRequest from "./TrustedVendorRequest";
 import MobileDrawer from "./MobileDrawer";
 import { useSavedItems } from "../context/useSavedItems";
+import { ShoppingCart } from "lucide-react";
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -111,8 +112,21 @@ export default function Layout() {
           <Link to={user ? "/my-account" : "/login"} className="text-[13px] font-bold hover:text-[#E63312]">
             {user ? "👤 Account" : "👤 Login"}
           </Link>
-          <Link to="/cart" className="text-[13px] font-bold hover:text-[#E63312]">
-            🛒 <span className="text-[#E63312]">{totalItems}</span>
+          <Link
+            to="/cart"
+            aria-label={
+              user
+                ? `Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`
+                : "Shopping cart"
+            }
+            className="relative flex h-9 w-9 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+          >
+            <ShoppingCart aria-hidden="true" className="h-5 w-5" />
+            {user && totalItems > 0 && (
+              <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
+                {totalItems}
+              </span>
+            )}
           </Link>
         </div>
 
@@ -361,9 +375,19 @@ export default function Layout() {
 
             <Link
               to="/cart"
-              className="flex items-center gap-1.5 text-[12px] tracking-[0.12em] uppercase font-semibold hover:text-[#E63312]"
+              aria-label={
+                user
+                  ? `Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`
+                  : "Shopping cart"
+              }
+              className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
             >
-              🛒 Cart <span className="text-[#E63312]">({totalItems})</span>
+              <ShoppingCart aria-hidden="true" className="h-5 w-5" />
+              {user && totalItems > 0 && (
+                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
+                  {totalItems}
+                </span>
+              )}
             </Link>
           </div>
 
