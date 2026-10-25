@@ -62,7 +62,7 @@ export default function StoreProductCard({
         </Link>
         {hasDiscount && (
           <span className="absolute left-2 top-2 rounded bg-[#E63312] px-2 py-1 text-[10px] font-bold text-white">
-            -{pct(product.price, originalPrice)}
+            -{pct(product.price, originalPrice)}%
           </span>
         )}
         <button
