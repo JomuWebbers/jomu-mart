@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { apiRequest } from "../lib/api";
 import { useAuth } from "../context/useAuth";
 import { PageShell } from "../components/wireframe-primitives";
-import { STATES } from "../data/nigeriaLocations";
+import { CITIES_BY_STATE, STATES } from "../data/nigeriaLocations";
 import toast from "react-hot-toast";
 import {
   UserIcon,
@@ -101,6 +101,8 @@ export default function MyAccount() {
       : "account-information");
   const [userData, setUserData] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [addressesError, setAddressesError] = useState("");
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
   const [trustedVendorStatus, setTrustedVendorStatus] = useState<{ isTrustedVendor: boolean; trustedVendorRequestStatus: string | null } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -119,16 +121,24 @@ export default function MyAccount() {
   }, [token]);
 
   const loadAddresses = useCallback(async () => {
+    setAddressesLoading(true);
+    setAddressesError("");
     try {
       const data = await apiRequest("/addresses", {
         token: token ?? undefined,
       });
-      setAddresses(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) {
+        throw new Error("The address service returned an invalid response.");
+      }
+      setAddresses(data);
+      return true;
     } catch (err: unknown) {
-      const apiErr = err as ApiError;
-      toast.error(
-        apiErr?.response?.data?.message || "Failed to load addresses",
+      setAddressesError(
+        err instanceof Error ? err.message : "Failed to load addresses.",
       );
+      return false;
+    } finally {
+      setAddressesLoading(false);
     }
   }, [token]);
 
@@ -265,7 +275,7 @@ export default function MyAccount() {
     if (!token) return;
     try {
       await apiRequest(`/addresses/${id}`, { method: "DELETE", token });
-      setAddresses((prev) => prev.filter((a) => a.id !== id));
+      await loadAddresses();
       toast.success("Address deleted");
     } catch (err: unknown) {
       const apiErr = err as ApiError;
@@ -428,6 +438,9 @@ export default function MyAccount() {
             {tab === "delivery-address" && (
               <DeliveryAddress
                 addresses={addresses}
+                loading={addressesLoading}
+                error={addressesError}
+                onRetry={() => void loadAddresses()}
                 form={form}
                 setForm={setForm}
                 editingAddress={editingAddress}
@@ -691,6 +704,9 @@ function AccountInformation({
 
 function DeliveryAddress({
   addresses,
+  loading,
+  error,
+  onRetry,
   form,
   setForm,
   editingAddress,
@@ -704,6 +720,9 @@ function DeliveryAddress({
   saving,
 }: {
   addresses: Address[];
+  loading: boolean;
+  error: string;
+  onRetry: () => void;
   form: Address;
   setForm: React.Dispatch<React.SetStateAction<Address>>;
   editingAddress: Address | null;
@@ -719,6 +738,16 @@ function DeliveryAddress({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+  const handleLocationChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) =>
+      name === "state"
+        ? { ...prev, state: value, city: "" }
+        : { ...prev, city: value },
+    );
+  };
   const handleIsDefaultChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, isDefault: e.target.checked }));
   };
@@ -731,74 +760,109 @@ function DeliveryAddress({
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Delivery Addresses</h2>
         <button
+          type="button"
           onClick={onAdd}
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E63312]"
         >
           + Add Address
         </button>
       </div>
+      {error && (
+        <div
+          className="rounded-lg border border-red-200 bg-red-50 p-4"
+          role="alert"
+        >
+          <p className="text-sm text-red-800">
+            Could not load delivery addresses: {error}
+          </p>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 rounded-md border border-red-300 px-3 py-2 text-sm font-semibold text-red-800 hover:bg-red-100"
+          >
+            Try again
+          </button>
+        </div>
+      )}
       {showAddressForm && (
         <form
           onSubmit={handleSubmit}
           className="space-y-4 bg-white p-4 border border-gray-300 rounded"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="delivery-label" className="block text-sm font-medium text-neutral-700">
                 Label
               </label>
               <input
+                id="delivery-label"
                 name="label"
                 value={form.label}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="space-y-1.5 sm:col-span-2">
+              <label htmlFor="delivery-street" className="block text-sm font-medium text-neutral-700">
                 Address
               </label>
               <input
+                id="delivery-street"
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                City
-              </label>
-              <input
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="delivery-state" className="block text-sm font-medium text-neutral-700">
                 State
               </label>
-              <input
+              <select
+                id="delivery-state"
                 name="state"
                 value={form.state}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                onChange={handleLocationChange}
+                className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5"
                 required
-              />
+              >
+                {STATES.map((state) => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
+              </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="space-y-1.5">
+              <label htmlFor="delivery-city" className="block text-sm font-medium text-neutral-700">
+                City
+              </label>
+              <select
+                id="delivery-city"
+                name="city"
+                value={form.city}
+                onChange={handleLocationChange}
+                className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5"
+                required
+              >
+                <option value="" disabled>Select city / local government</option>
+                {form.city && !CITIES_BY_STATE[form.state]?.includes(form.city) && (
+                  <option value={form.city}>{form.city}</option>
+                )}
+                {(CITIES_BY_STATE[form.state] ?? []).map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="delivery-zip" className="block text-sm font-medium text-neutral-700">
                 Zip Code
               </label>
               <input
+                id="delivery-zip"
                 name="zip"
                 value={form.zip}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
                 required
               />
             </div>
@@ -828,53 +892,81 @@ function DeliveryAddress({
           </button>
         </form>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {addresses.map((addr) => (
-          <div
-            key={addr.id}
-            className="bg-white p-4 border border-gray-300 rounded"
+      {loading ? (
+        <p className="py-12 text-center text-sm text-neutral-500" role="status">
+          Loading delivery addresses…
+        </p>
+      ) : !error && addresses.length === 0 ? (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-5 py-16 text-center">
+          <h3 className="text-lg font-semibold text-neutral-950">
+            You do not have any address
+          </h3>
+          <p className="mt-2 text-sm text-neutral-600">
+            When you add an address, you can manage it here.
+          </p>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="mt-5 rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E63312]"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium">{addr.label}</span>
-              {addr.isDefault && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                  Default
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-600 mb-2">
-              {addr.address}, {addr.city}, {addr.state} {addr.zip}
-            </p>
-            <div className="flex gap-2">
-              {!addr.isDefault && (
+            Add new address
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {addresses.map((addr) => (
+            <article
+              key={addr.id}
+              className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold text-neutral-950">
+                    {addr.label}
+                  </h3>
+                  {addr.isDefault && (
+                    <span className="mt-2 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                      Default address
+                    </span>
+                  )}
+                </div>
+                <span aria-hidden="true" className="text-xl">⌖</span>
+              </div>
+              <address className="mt-4 space-y-1 text-sm not-italic leading-6 text-neutral-600">
+                <p>{addr.address}</p>
+                <p>
+                  {addr.city}, {addr.state} {addr.zip}
+                </p>
+              </address>
+              <div className="mt-4 flex flex-wrap gap-3 border-t border-neutral-100 pt-3">
+                {!addr.isDefault && (
+                  <button
+                    type="button"
+                    onClick={() => onSetDefault(addr.id)}
+                    className="text-sm font-semibold text-neutral-700 hover:text-[#E63312]"
+                  >
+                    Set as default
+                  </button>
+                )}
                 <button
-                  onClick={() => onSetDefault(addr.id)}
-                  className="text-xs text-blue-600 hover:text-blue-800"
+                  type="button"
+                  onClick={() => onEdit(addr)}
+                  className="text-sm font-semibold text-neutral-700 hover:text-[#E63312]"
                 >
-                  Set Default
+                  Edit
                 </button>
-              )}
-              <button
-                onClick={() => {
-                  onEdit(addr);
-                }}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => onDelete(addr.id)}
-                className="text-xs text-red-600 hover:text-red-800"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-        {addresses.length === 0 && (
-          <p className="text-gray-500">No addresses found.</p>
-        )}
-      </div>
+                <button
+                  type="button"
+                  onClick={() => onDelete(addr.id)}
+                  className="text-sm font-semibold text-red-700 hover:text-red-900"
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
