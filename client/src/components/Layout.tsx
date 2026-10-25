@@ -218,8 +218,8 @@ export default function Layout() {
                       >
                         <span className="flex items-center justify-between">
                           Saved Items
-                          <span className="bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                            2
+                          <span className="bg-black text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            0
                           </span>
                         </span>
                       </Link>
