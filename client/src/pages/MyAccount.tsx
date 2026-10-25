@@ -421,7 +421,7 @@ export default function MyAccount() {
                 saving={saving}
               />
             )}
-            {tab === "order-history" && <OrdersSection />}
+            {tab === "order-history" && <OrdersSection token={token} />}
             {tab === "pending-ratings" && (
               <PendingRatingsSection count={pendingRatingsCount} />
             )}
@@ -724,14 +724,177 @@ function DeliveryAddress({
   );
 }
 
-function OrdersSection() {
+type AccountOrder = {
+  id: string;
+  total: number;
+  status: string;
+  createdAt: string;
+  items: { name?: string; qty?: number }[];
+};
+
+function OrdersSection({ token }: { token: string | null }) {
+  const [orders, setOrders] = useState<AccountOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    apiRequest("/orders/my-orders", { token })
+      .then((data: AccountOrder[]) => {
+        if (cancelled) return;
+        setOrders(Array.isArray(data) ? data : []);
+        setError("");
+      })
+      .catch((loadError: unknown) => {
+        if (cancelled) return;
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Could not load your orders.",
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, reloadKey]);
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-bold">Order History</h2>
-      <div className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-gray-500">No orders found.</p>
+    <section className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-neutral-200 pb-4">
+        <div>
+          <h2 className="text-xl font-bold text-neutral-950">Order History</h2>
+          {!loading && !error && (
+            <p className="mt-1 text-sm text-neutral-500">
+              {orders.length} {orders.length === 1 ? "order" : "orders"}
+            </p>
+          )}
+        </div>
+        <Link
+          to="/my-orders"
+          className="text-sm font-semibold text-neutral-700 underline decoration-neutral-300 underline-offset-4 hover:text-[#E63312]"
+        >
+          Manage orders and returns
+        </Link>
       </div>
-    </div>
+
+      {loading ? (
+        <p className="py-10 text-center text-sm text-neutral-500" role="status">
+          Loading your orders…
+        </p>
+      ) : error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-5" role="alert">
+          <p className="text-sm text-red-800">{error}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setError("");
+              setLoading(true);
+              setReloadKey((current) => current + 1);
+            }}
+            className="mt-3 rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-[#E63312]"
+          >
+            Try again
+          </button>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-5 py-12 text-center">
+          <ShoppingBagIcon className="mx-auto h-9 w-9 text-neutral-400" />
+          <h3 className="mt-3 font-semibold text-neutral-950">No orders yet</h3>
+          <p className="mt-1 text-sm text-neutral-600">
+            Your purchases will appear here once you place an order.
+          </p>
+          <Link
+            to="/"
+            className="mt-5 inline-flex rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#E63312]"
+          >
+            Start shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {orders.slice(0, 5).map((order) => (
+            <article
+              key={order.id}
+              className="rounded-lg border border-neutral-200 p-4 sm:p-5"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    Order #{order.id.slice(-8).toUpperCase()}
+                  </p>
+                  <p className="mt-1 text-sm text-neutral-600">
+                    {new Intl.DateTimeFormat("en-NG", {
+                      dateStyle: "medium",
+                    }).format(new Date(order.createdAt))}
+                    {" · "}
+                    {order.items.length}{" "}
+                    {order.items.length === 1 ? "item" : "items"}
+                  </p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <p className="font-bold text-neutral-950">
+                    ₦{order.total.toLocaleString()}
+                  </p>
+                  <span className="mt-1 inline-block rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-700">
+                    {order.status}
+                  </span>
+                </div>
+              </div>
+              <ul className="mt-3 divide-y divide-neutral-100 border-y border-neutral-100">
+                {order.items.slice(0, 2).map((item, index) => (
+                  <li
+                    key={`${order.id}-${index}`}
+                    className="flex justify-between gap-3 py-2 text-sm"
+                  >
+                    <span className="line-clamp-1 text-neutral-700">
+                      {item.name || "Product"}
+                    </span>
+                    <span className="shrink-0 text-neutral-500">
+                      × {item.qty ?? 1}
+                    </span>
+                  </li>
+                ))}
+                {order.items.length > 2 && (
+                  <li className="py-2 text-xs text-neutral-500">
+                    +{order.items.length - 2} more{" "}
+                    {order.items.length - 2 === 1 ? "item" : "items"}
+                  </li>
+                )}
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link
+                  to={`/track/${encodeURIComponent(order.id)}`}
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black"
+                >
+                  Track order
+                </Link>
+                <Link
+                  to="/my-orders"
+                  className="rounded-md border border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-800 hover:border-black"
+                >
+                  View details
+                </Link>
+              </div>
+            </article>
+          ))}
+          {orders.length > 5 && (
+            <Link
+              to="/my-orders"
+              className="block rounded-md border border-neutral-200 px-4 py-3 text-center text-sm font-semibold hover:border-black"
+            >
+              View all {orders.length} orders
+            </Link>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 
