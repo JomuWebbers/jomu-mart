@@ -138,10 +138,6 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
     useState<Order | null>(null);
 
   const requestedTab = searchParams.get("tab");
-  const activeTab: Tab =
-    requestedTab === "returns" || requestedTab === "cancelled"
-      ? requestedTab
-      : "orders";
 
   const setActiveTab = useCallback(
     (tab: Tab) => {
@@ -214,12 +210,23 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
     );
   }, [orders, returns]);
 
+  const activeTab: Tab =
+    requestedTab === "returns" && returnRecords.length > 0
+      ? "returns"
+      : requestedTab === "cancelled"
+        ? "cancelled"
+        : "orders";
+
   const activeOrders = orders.filter(
     (order) => !order.status.toLowerCase().includes("cancel"),
   );
   const cancelledOrders = orders.filter((order) =>
     order.status.toLowerCase().includes("cancel"),
   );
+  const orderTabs: Tab[] =
+    returnRecords.length > 0
+      ? ["orders", "cancelled", "returns"]
+      : ["orders", "cancelled"];
 
   async function copyOrderId(id: string) {
     try {
@@ -262,8 +269,7 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
           {embedded ? "Orders" : "Returns & Orders"}
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-neutral-600">
-          Track deliveries. Eligible delivered orders can be returned within{" "}
-          {RETURN_WINDOW_DAYS} days.
+          View your order status and delivery updates.
         </p>
       </div>
 
@@ -272,7 +278,7 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
         role="tablist"
         aria-label="Order categories"
       >
-        {(["orders", "cancelled", "returns"] as const).map((tab) => (
+        {orderTabs.map((tab) => (
           <button
             key={tab}
             type="button"
@@ -665,8 +671,6 @@ function ReturnCard({ request }: { request: ReturnRequestData }) {
     </article>
   );
 }
-
-
 
 
 
