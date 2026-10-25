@@ -114,15 +114,11 @@ export default function Layout() {
           </Link>
           <Link
             to="/cart"
-            aria-label={
-              user
-                ? `Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`
-                : "Shopping cart"
-            }
+            aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
             className="relative flex h-9 w-9 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
           >
             <ShoppingCart aria-hidden="true" className="h-5 w-5" />
-            {user && totalItems > 0 && (
+            {totalItems > 0 && (
               <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
                 {totalItems}
               </span>
@@ -375,15 +371,11 @@ export default function Layout() {
 
             <Link
               to="/cart"
-              aria-label={
-                user
-                  ? `Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`
-                  : "Shopping cart"
-              }
+              aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
               className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
             >
               <ShoppingCart aria-hidden="true" className="h-5 w-5" />
-              {user && totalItems > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
                   {totalItems}
                 </span>
