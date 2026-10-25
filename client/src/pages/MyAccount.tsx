@@ -15,6 +15,7 @@ import {
   ShieldCheckIcon,
   Eye,
   EyeOff,
+  MapPin,
 } from "lucide-react";
 import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
@@ -898,19 +899,15 @@ function DeliveryAddress({
         </p>
       ) : !error && addresses.length === 0 ? (
         <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-5 py-16 text-center">
+          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-white text-[#E63312] shadow-sm">
+            <MapPin className="h-10 w-10" strokeWidth={1.5} aria-hidden="true" />
+          </div>
           <h3 className="text-lg font-semibold text-neutral-950">
             You do not have any address
           </h3>
           <p className="mt-2 text-sm text-neutral-600">
             When you add an address, you can manage it here.
           </p>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="mt-5 rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E63312]"
-          >
-            Add new address
-          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
