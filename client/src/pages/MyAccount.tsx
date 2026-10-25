@@ -13,6 +13,8 @@ import {
   TicketIcon,
   UserXIcon,
   ShieldCheckIcon,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
@@ -193,6 +195,30 @@ export default function MyAccount() {
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async (passwords: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => {
+    if (!token) return false;
+    try {
+      await apiRequest("/users/password", {
+        method: "PATCH",
+        body: passwords,
+        token,
+      });
+      toast.success("Password updated successfully");
+      return true;
+    } catch (err: unknown) {
+      const apiErr = err as ApiError;
+      toast.error(
+        apiErr?.response?.data?.message ||
+          (err instanceof Error ? err.message : "Failed to update password"),
+      );
+      return false;
     }
   };
 
@@ -390,6 +416,7 @@ export default function MyAccount() {
                   key={`${userData.id}:${userData.name}:${userData.phone ?? ""}`}
                   user={userData}
                   onSave={handleSaveProfile}
+                  onChangePassword={handleChangePassword}
                   saving={saving}
                 />
               ) : (
@@ -442,12 +469,29 @@ export default function MyAccount() {
 function AccountInformation({
   user,
   onSave,
+  onChangePassword,
   saving,
 }: {
   user: User;
   onSave: (name: string, phone: string) => Promise<void>;
+  onChangePassword: (passwords: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => Promise<boolean>;
   saving: boolean;
 }) {
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [visiblePasswords, setVisiblePasswords] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
   const [form, setForm] = useState({
     firstName: user?.name?.split(" ")[0] || "",
     lastName: user?.name?.split(" ").slice(1).join(" ") || "",
@@ -462,15 +506,101 @@ function AccountInformation({
     const name = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
     await onSave(name, form.phone);
   };
-  return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
-      <div className="border-b border-neutral-200 pb-4">
-        <h2 className="text-xl font-bold text-neutral-950">Account Information</h2>
-        <p className="mt-1 text-sm text-neutral-600">
-          Update your personal details and how we reach you.
-        </p>
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error("New password and confirmation do not match");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const updated = await onChangePassword(passwords);
+      if (updated) {
+        setPasswords({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const passwordFields = [
+    { name: "currentPassword", label: "Current Password", autoComplete: "current-password" },
+    { name: "newPassword", label: "New Password", autoComplete: "new-password" },
+    { name: "confirmPassword", label: "Confirm New Password", autoComplete: "new-password" },
+  ] as const;
+
+  const togglePasswordVisibility = (
+    field: keyof typeof visiblePasswords,
+  ) => {
+    setVisiblePasswords((current) => ({
+      ...current,
+      [field]: !current[field],
+    }));
+  };
+
+  const handlePasswordChange = (
+    field: keyof typeof passwords,
+    value: string,
+  ) => {
+    setPasswords((current) => ({ ...current, [field]: value }));
+  };
+
+  const renderPasswordField = (
+    field: (typeof passwordFields)[number],
+  ) => (
+    <div key={field.name} className="space-y-1.5">
+      <label
+        htmlFor={`profile-${field.name}`}
+        className="block text-sm font-medium text-neutral-700"
+      >
+        {field.label}
+      </label>
+      <div className="relative">
+        <input
+          id={`profile-${field.name}`}
+          name={field.name}
+          type={visiblePasswords[field.name] ? "text" : "password"}
+          value={passwords[field.name]}
+          onChange={(event) =>
+            handlePasswordChange(field.name, event.target.value)
+          }
+          autoComplete={field.autoComplete}
+          minLength={field.name === "currentPassword" ? undefined : 6}
+          required
+          disabled={changingPassword}
+          className="block w-full rounded-md border border-neutral-300 px-3 py-2.5 pr-12 focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-neutral-50"
+        />
+        <button
+          type="button"
+          onClick={() => togglePasswordVisibility(field.name)}
+          aria-label={`${visiblePasswords[field.name] ? "Hide" : "Show"} ${field.label.toLowerCase()}`}
+          aria-pressed={visiblePasswords[field.name]}
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-neutral-500 hover:text-neutral-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+        >
+          {visiblePasswords[field.name] ? (
+            <EyeOff className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <Eye className="h-5 w-5" aria-hidden="true" />
+          )}
+        </button>
       </div>
-      <div className="space-y-5">
+    </div>
+  );
+
+  return (
+    <div className="max-w-2xl space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="border-b border-neutral-200 pb-4">
+          <h2 className="text-xl font-bold text-neutral-950">Account Information</h2>
+          <p className="mt-1 text-sm text-neutral-600">
+            Update your personal details and how we reach you.
+          </p>
+        </div>
         <div className="space-y-1.5">
           <label htmlFor="profile-first-name" className="block text-sm font-medium text-neutral-700">
             First Name
@@ -497,7 +627,6 @@ function AccountInformation({
             required
           />
         </div>
-      </div>
       <div className="space-y-1.5">
         <label htmlFor="profile-email" className="block text-sm font-medium text-neutral-700">Email</label>
         <input
@@ -531,7 +660,32 @@ function AccountInformation({
       >
         {saving ? "Saving…" : "Save Changes"}
       </button>
-    </form>
+      </form>
+
+      <form
+      onSubmit={handlePasswordSubmit}
+      className="space-y-5 border-t border-neutral-200 pt-6"
+      >
+      <div>
+        <h2 className="text-lg font-bold text-neutral-950">
+          Password &amp; Security
+        </h2>
+        <p className="mt-1 text-sm text-neutral-600">
+          Verify your current password before choosing a new one.
+        </p>
+      </div>
+      <div className="space-y-5">
+        {passwordFields.map(renderPasswordField)}
+      </div>
+      <button
+        type="submit"
+        disabled={changingPassword}
+        className="rounded-md bg-black px-6 py-2.5 font-semibold text-white transition-colors hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {changingPassword ? "Updating password…" : "Update Password"}
+      </button>
+      </form>
+    </div>
   );
 }
 

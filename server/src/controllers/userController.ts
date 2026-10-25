@@ -37,6 +37,60 @@ export const getMe = async (req: AuthRequest, res: Response) => {
   }
 }
 
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = req.body
+    if (
+      typeof currentPassword !== 'string' ||
+      typeof newPassword !== 'string' ||
+      typeof confirmPassword !== 'string' ||
+      !currentPassword ||
+      !newPassword ||
+      !confirmPassword
+    ) {
+      return res.status(400).json({ message: 'All password fields are required' })
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' })
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'New password and confirmation do not match' })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true },
+    })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    )
+    if (!currentPasswordMatches) {
+      return res.status(401).json({ message: 'Current password is incorrect' })
+    }
+
+    const password = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password },
+    })
+
+    return res.json({ message: 'Password updated successfully' })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Failed to update password' })
+  }
+}
+
 export const linkBankAccount = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId
@@ -184,6 +238,5 @@ export const reviewTrustedVendorRequest = async (req: AuthRequest, res: Response
     res.status(500).json({ message: 'Failed to review trusted vendor request' })
   }
 }
-
 
 
