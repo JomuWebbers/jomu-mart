@@ -66,7 +66,7 @@ const FOOTER_LINK_DESTINATIONS: Record<string, string> = {
   "Delivery Info": "/help#delivery",
   "Payment Options": "/help#payments",
   "Track Order": "/track-order",
-  "My Orders": "/my-orders",
+  "My Orders": "/my-account/orders",
   "Sign In": "/login",
   Register: "/register",
 };

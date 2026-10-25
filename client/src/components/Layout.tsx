@@ -258,7 +258,7 @@ export default function Layout() {
                           My Account
                         </Link>
                         <Link
-                          to="/my-orders"
+                          to="/my-account/orders"
                           onClick={() => setAccountOpen(false)}
                           className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
                         >
@@ -333,7 +333,7 @@ export default function Layout() {
                         My Account
                       </Link>
                       <Link
-                        to="/my-orders"
+                        to="/my-account/orders"
                         onClick={() => setAccountOpen(false)}
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >

@@ -135,7 +135,7 @@ export default function OrderConfirmation() {
           Track This Order
         </Link>
         <Link
-          to="/my-orders"
+          to="/my-account/orders"
           className="block border-2 border-black py-4 text-center text-xs font-bold uppercase tracking-widest"
         >
           View My Orders
@@ -144,6 +144,5 @@ export default function OrderConfirmation() {
     </div>
   )
 }
-
 
 
