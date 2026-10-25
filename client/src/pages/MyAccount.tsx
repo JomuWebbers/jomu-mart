@@ -174,17 +174,17 @@ export default function MyAccount() {
     loadTrustedVendorStatus();
   }, [token, navigate, loadUser, loadAddresses, loadPendingRatingsCount, loadTrustedVendorStatus]);
 
-  const handleSaveProfile = async () => {
-    if (!token || !userData) return;
+  const handleSaveProfile = async (name: string, phone: string) => {
+    if (!token) return;
     setSaving(true);
     try {
       await apiRequest("/users/me", {
         method: "PATCH",
-        body: { name: userData.name, phone: userData.phone ?? "" },
+        body: { name, phone },
         token,
       });
       toast.success("Profile updated successfully");
-      loadUser();
+      await loadUser();
     } catch (err: unknown) {
       const apiErr = err as ApiError;
       toast.error(
@@ -305,54 +305,97 @@ export default function MyAccount() {
 
   return (
     <PageShell title="My Account" breadcrumb="MY ACCOUNT">
-      <div className="border-2 border-black bg-neutral-50 min-h-screen">
-        <div className="flex h-screen">
-          {/* Sidebar */}
-          <aside className="w-64 border-r border-black bg-white hidden md:flex flex-col">
-            <div className="p-4">
-              <h2 className="text-lg font-bold">My Account</h2>
-              <p className="text-sm text-gray-500">{authUser?.email || ""}</p>
-              <nav className="mt-6 space-y-4">
-                {navItems.map((group) => (
-                  <div key={group.section} className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <group.icon className="w-5 h-5 text-gray-600" />
-                      <h3 className="text-sm font-semibold text-gray-800">
-                        {group.section}
-                      </h3>
-                    </div>
-                    {group.items.map((item) => (
-                      <Link
-                        key={item.id}
-                        to={ACCOUNT_SECTION_PATHS[item.id as Tab]}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-left ${
-                          tab === item.id
-                            ? "bg-black text-white"
-                            : "text-gray-600 hover:bg-neutral-100 hover:text-gray-900"
-                        }`}
-                      >
-                        {item.label}
-                        {item.id === "pending-ratings" && (
-                          <span className="ml-auto px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
-                            {item.badge ?? 0}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-              </nav>
-            </div>
-          </aside>
+      <div className="grid min-h-[560px] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm md:grid-cols-[248px_minmax(0,1fr)]">
+        <aside className="hidden border-r border-neutral-200 bg-neutral-50 md:block">
+          <div className="border-b border-neutral-200 p-5">
+            <h2 className="font-bold text-neutral-950">My Account</h2>
+            <p className="mt-1 break-all text-sm text-neutral-500">
+              {authUser?.email || ""}
+            </p>
+          </div>
+          <nav className="space-y-5 p-4" aria-label="Account sections">
+            {navItems.map((group) => (
+              <div key={group.section}>
+                <div className="mb-2 flex items-center gap-2 px-2">
+                  <group.icon className="h-4 w-4 text-neutral-500" />
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-neutral-500">
+                    {group.section}
+                  </h3>
+                </div>
+                <div className="space-y-1">
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={ACCOUNT_SECTION_PATHS[item.id as Tab]}
+                      aria-current={tab === item.id ? "page" : undefined}
+                      className={`flex min-h-10 items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] ${
+                        tab === item.id
+                          ? "bg-black font-semibold text-white"
+                          : "text-neutral-700 hover:bg-neutral-200"
+                      }`}
+                    >
+                      {item.label}
+                      {item.id === "pending-ratings" && pendingRatingsCount > 0 && (
+                        <span
+                          className={`ml-auto rounded px-2 py-0.5 text-xs font-bold ${
+                            tab === item.id
+                              ? "bg-white text-black"
+                              : "bg-neutral-200 text-neutral-700"
+                          }`}
+                        >
+                          {pendingRatingsCount}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </nav>
+        </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 p-8 md:p-12 overflow-y-auto">
+        <div className="min-w-0">
+          <nav
+            className="flex gap-2 overflow-x-auto border-b border-neutral-200 p-3 md:hidden"
+            aria-label="Account sections"
+          >
+            {navItems.flatMap((group) =>
+              group.items.map((item) => (
+                <Link
+                  key={item.id}
+                  to={ACCOUNT_SECTION_PATHS[item.id as Tab]}
+                  aria-current={tab === item.id ? "page" : undefined}
+                  className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] ${
+                    tab === item.id
+                      ? "border-black bg-black text-white"
+                      : "border-neutral-200 text-neutral-700"
+                  }`}
+                >
+                  {item.label}
+                  {item.id === "pending-ratings" && pendingRatingsCount > 0 && (
+                    <span className="rounded-full bg-[#E63312] px-1.5 py-0.5 text-[10px] text-white">
+                      {pendingRatingsCount}
+                    </span>
+                  )}
+                </Link>
+              )),
+            )}
+          </nav>
+
+          <main className="min-w-0 p-4 sm:p-6 lg:p-8">
             {tab === "account-information" && (
-              <AccountInformation
-                user={userData}
-                onSave={handleSaveProfile}
-                saving={saving}
-              />
+              userData ? (
+                <AccountInformation
+                  key={`${userData.id}:${userData.name}:${userData.phone ?? ""}`}
+                  user={userData}
+                  onSave={handleSaveProfile}
+                  saving={saving}
+                />
+              ) : (
+                <p className="py-12 text-center text-sm text-neutral-500" role="status">
+                  Loading your profile…
+                </p>
+              )
             )}
             {tab === "delivery-address" && (
               <DeliveryAddress
@@ -400,8 +443,8 @@ function AccountInformation({
   onSave,
   saving,
 }: {
-  user: User | null;
-  onSave: (e: React.FormEvent) => Promise<void>;
+  user: User;
+  onSave: (name: string, phone: string) => Promise<void>;
   saving: boolean;
 }) {
   const [form, setForm] = useState({
@@ -415,63 +458,77 @@ function AccountInformation({
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(e);
+    const name = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
+    await onSave(name, form.phone);
   };
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="border-b border-neutral-200 pb-4">
+        <h2 className="text-xl font-bold text-neutral-950">Account Information</h2>
+        <p className="mt-1 text-sm text-neutral-600">
+          Update your personal details and how we reach you.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="profile-first-name" className="block text-sm font-medium text-neutral-700">
             First Name
           </label>
           <input
+            id="profile-first-name"
             name="firstName"
             value={form.firstName}
             onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="profile-last-name" className="block text-sm font-medium text-neutral-700">
             Last Name
           </label>
           <input
+            id="profile-last-name"
             name="lastName"
             value={form.lastName}
             onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             required
           />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Email</label>
+        <label htmlFor="profile-email" className="block text-sm font-medium text-neutral-700">Email</label>
         <input
+          id="profile-email"
           name="email"
           value={form.email}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+          readOnly
+          aria-describedby="profile-email-help"
+          className="mt-1 block w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-neutral-600"
           type="email"
-          required
         />
+        <p id="profile-email-help" className="mt-1 text-xs text-neutral-500">
+          Email address cannot be changed here.
+        </p>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Phone</label>
+        <label htmlFor="profile-phone" className="block text-sm font-medium text-neutral-700">Phone</label>
         <input
+          id="profile-phone"
           name="phone"
           value={form.phone}
           onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2.5 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
           type="tel"
         />
       </div>
       <button
         type="submit"
         disabled={saving}
-        className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 disabled:opacity-50"
+        className="rounded-md bg-black px-6 py-2.5 font-semibold text-white transition-colors hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Save Changes
+        {saving ? "Saving…" : "Save Changes"}
       </button>
     </form>
   );

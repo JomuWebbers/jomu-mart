@@ -103,18 +103,23 @@ export default function SavedItems() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="px-4 py-3 max-w-screen-2xl mx-auto">
-        <nav className="flex items-center gap-2 text-sm text-neutral-600">
-          <span className="cursor-pointer hover:text-black">Home</span>
-          <span className="text-neutral-400">›</span>
-          <span className="font-semibold text-black">Saved Items</span>
+    <div className="bg-white">
+      <div className="mx-auto max-w-screen-2xl px-4 py-4 sm:px-6">
+        <nav className="flex items-center gap-2 text-sm text-neutral-600" aria-label="Breadcrumb">
+          <Link to="/" className="hover:text-[#E63312]">Home</Link>
+          <span aria-hidden="true" className="text-neutral-400">›</span>
+          <span aria-current="page" className="font-semibold text-neutral-950">Saved Items</span>
         </nav>
-      </div>
-      <div className="px-4 max-w-screen-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-black mb-6">Saved Items</h1>
-      </div>
-      <div className="max-w-screen-2xl mx-auto px-4 pb-20">
+        <div className="mb-6 mt-5 flex items-end justify-between border-b border-neutral-200 pb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-950 sm:text-3xl">Saved Items</h1>
+            {!isLoading && !error && savedItems.length > 0 && (
+              <p className="mt-1 text-sm text-neutral-500">
+                {savedItems.length} {savedItems.length === 1 ? "item" : "items"} saved
+              </p>
+            )}
+          </div>
+        </div>
         {isLoading ? (
           <p className="py-20 text-center text-neutral-600" role="status">
             Loading saved items…
@@ -124,30 +129,37 @@ export default function SavedItems() {
             <p className="mb-4 text-neutral-600">{error}</p>
             <button
               onClick={handleRetry}
-              className="border border-black px-6 py-2.5 text-sm font-bold hover:bg-black hover:text-white"
+              className="rounded-md border border-black px-6 py-2.5 text-sm font-bold transition-colors hover:bg-black hover:text-white"
             >
               Try Again
             </button>
           </div>
         ) : savedItems.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 gap-3 pb-16 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {savedItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-md transition-shadow"
+                className="group flex min-w-0 flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white transition-shadow hover:shadow-md"
               >
-                <div className="relative aspect-square mb-3 overflow-hidden rounded">
-                  {item.image ? (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-neutral-100 flex items-center justify-center text-neutral-400">
-                      No image
-                    </div>
-                  )}
+                <div className="relative aspect-square overflow-hidden bg-neutral-100">
+                  <Link
+                    to={`/products/${encodeURIComponent(item.id)}`}
+                    aria-label={`View ${item.name}`}
+                    className="block h-full w-full"
+                  >
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-neutral-400">
+                        Product image unavailable
+                      </div>
+                    )}
+                  </Link>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -156,44 +168,45 @@ export default function SavedItems() {
                     disabled={removingId === item.id}
                     aria-label={`Remove ${item.name} from saved items`}
                     aria-busy={removingId === item.id}
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black text-white transition-all disabled:opacity-50"
+                    className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#E63312] shadow-sm transition-colors hover:bg-neutral-100 disabled:cursor-wait disabled:opacity-50"
                   >
-                    <Heart className="w-5 h-5 fill-current" />
+                    <Heart className="h-5 w-5 fill-current" />
                   </button>
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-sm font-semibold text-black">
+                <div className="flex flex-1 flex-col p-3">
+                  <Link
+                    to={`/products/${encodeURIComponent(item.id)}`}
+                    className="line-clamp-2 min-h-10 text-sm font-medium leading-5 text-neutral-900 hover:text-[#E63312]"
+                  >
                     {item.name}
+                  </Link>
+                  <span className="mt-2 text-base font-bold text-neutral-950">
+                    ₦{item.price.toLocaleString()}
                   </span>
-                  {item.price !== undefined && (
-                    <span className="text-sm font-medium text-neutral-600 ml-1">
-                      ₦{item.price.toLocaleString()}
-                    </span>
-                  )}
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="mt-3 w-full rounded bg-black px-3 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#E63312]"
+                  >
+                    Add to cart
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="w-full mt-3 py-2.5 bg-black text-white text-sm font-bold rounded hover:bg-neutral-800 transition-colors"
-                >
-                  Add to Cart
-                </button>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neutral-200">
-              <Heart className="w-10 h-10 text-neutral-400" />
+          <div className="py-16 text-center sm:py-20">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50">
+              <Heart className="h-10 w-10 text-neutral-400" />
             </div>
-            <h2 className="text-lg font-semibold text-black mb-2">
+            <h2 className="mb-2 text-lg font-semibold text-neutral-950">
               No saved items yet
             </h2>
-            <p className="text-neutral-600 max-w-xs mx-auto mb-6">
+            <p className="mx-auto mb-6 max-w-xs text-neutral-600">
               Items you save while browsing will appear here.
             </p>
             <Link
               to="/"
-              className="px-6 py-2.5 border border-black text-black text-sm font-bold hover:bg-black hover:text-white transition-colors"
+              className="inline-flex rounded-md bg-black px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#E63312]"
             >
               Start Shopping
             </Link>
