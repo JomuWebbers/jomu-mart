@@ -2,6 +2,7 @@ import { createContext } from "react";
 
 export type SavedItemsContextType = {
   savedCount: number | null;
+  savedItemIds: string[] | null;
   markSavedItem: (productId: string, saved: boolean) => void;
 };
 

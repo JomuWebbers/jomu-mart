@@ -88,6 +88,8 @@ export function SavedItemsProvider({ children }: { children: ReactNode }) {
       value={{
         savedCount:
           token && savedItems?.token === token ? savedItems.ids.length : null,
+        savedItemIds:
+          token && savedItems?.token === token ? savedItems.ids : null,
         markSavedItem,
       }}
     >

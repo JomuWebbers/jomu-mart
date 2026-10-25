@@ -1,27 +1,20 @@
 import { useState, useEffect } from "react";
 import { apiRequest } from "../lib/api";
 import { Wire, MicroLabel } from "../components/wireframe-primitives";
-import { fmt, pct } from "../components/wireframe-helpers";
-import { Link } from "react-router-dom";
-import { useOutletContext, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from "react-router-dom";
 import { CATEGORY_NAMES } from "../data/categories";
-
-
-
-// ─── Data ────────────────────────────────────────────────────────────────────
-
-
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  category: string;
-  stock: number;
-};
-
+import StoreProductCard, {
+  type StoreProduct,
+} from "../components/StoreProductCard";
+import { useAuth } from "../context/useAuth";
+import { useCart } from "../context/useCart";
+import { useSavedItems } from "../context/useSavedItems";
+import toast from "react-hot-toast";
 
 
 const FOOTER_COLS = [
@@ -78,141 +71,6 @@ const FOOTER_LINK_DESTINATIONS: Record<string, string> = {
   Register: "/register",
 };
 
-// ─── Product Cards ────────────────────────────────────────────────────────────
-function ProductCard({
-  id,
-  name,
-  price,
-  original,
-  tag,
-  image,
-}: {
-  id: string;
-  name: string;
-  price: number;
-  original: number;
-  tag: string;
-  image?: string;
-}) {
-  const hasDiscount = original > price;
-
-  return (
-    <Link
-      to={`/products/${id}`}
-      className="border-t-2 border-black group cursor-pointer block"
-    >
-      {image ? (
-        <div className="h-32 sm:h-44 overflow-hidden bg-neutral-100">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        </div>
-      ) : (
-        <Wire h="h-32 sm:h-44" label="PRODUCT IMAGE" />
-      )}
-      <div className="p-3 space-y-1.5">
-        {/* ...unchanged... */}
-        <MicroLabel>{tag}</MicroLabel>
-        <p className="text-[13px] font-semibold leading-snug line-clamp-2 mt-1">
-          {name}
-        </p>
-        <div className="flex items-baseline gap-2 pt-1 flex-wrap">
-          <span className="text-[15px] font-black">{fmt(price)}</span>
-          {hasDiscount && (
-            <>
-              <span className="text-[11px] text-neutral-400 line-through">
-                {fmt(original)}
-              </span>
-              <span className="text-[9px] font-black bg-black text-white px-1.5 py-0.5">
-                -{pct(price, original)}%
-              </span>
-            </>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-function DealCard({
-  id,
-  name,
-  price,
-  original,
-  tag,
-  image,
-}: {
-  id: string;
-  name: string;
-  price: number;
-  original: number;
-  tag: string;
-  image?: string;
-}) {
-  const hasDiscount = original > price;
-
-  return (
-    <Link
-      to={`/products/${id}`}
-      className="bg-white text-black border-t-2 border-white/40 group cursor-pointer block"
-    >
-      {image ? (
-        <div className="h-28 sm:h-40 overflow-hidden bg-neutral-100">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        </div>
-      ) : (
-        <Wire h="h-28 sm:h-40" label="PRODUCT" />
-      )}
-      <div className="p-3 space-y-1">
-        <MicroLabel>{tag}</MicroLabel>
-        <p className="text-[13px] font-semibold leading-snug line-clamp-2 mt-1">
-          {name}
-        </p>
-        <div className="flex items-baseline gap-2 pt-1 flex-wrap">
-          <span className="text-[14px] font-black">{fmt(price)}</span>
-          {hasDiscount && (
-            <span className="text-[9px] font-black bg-black text-white px-1.5 py-0.5">
-              -{pct(price, original)}%
-            </span>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-function ArrivalCard({
-  id,
-  name,
-  price,
-  tag,
-  image,
-}: {
-  id: string;
-  name: string;
-  price: number;
-  tag: string;
-  image?: string;
-}) {
-  return (
-    <Link
-      to={`/products/${id}`}
-      className="border-t-2 border-black group cursor-pointer block"
-    >
-      {image ? (
-        <div className="h-32 sm:h-44 overflow-hidden bg-neutral-100">
-          <img src={image} alt={name} className="w-full h-full object-cover" />
-        </div>
-      ) : (
-        <Wire h="h-32 sm:h-44" label="NEW" />
-      )}
-      <div className="p-3 space-y-1.5">
-        <MicroLabel>{tag}</MicroLabel>
-        <p className="text-[13px] font-semibold leading-snug mt-1">{name}</p>
-        <span className="text-[15px] font-black block pt-1">{fmt(price)}</span>
-      </div>
-    </Link>
-  );
-}
-
 // ─── Homepage ──────────────────────────────────────────────────────────────
 
 export default function Homepage() {
@@ -220,16 +78,27 @@ export default function Homepage() {
     activeNav: string;
     setActiveNav: (category: string) => void;
   }>();
+  const { token, user } = useAuth();
+  const { addToCart } = useCart();
+  const { markSavedItem, savedItemIds } = useSavedItems();
+  const navigate = useNavigate();
 
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<StoreProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [reloadProducts, setReloadProducts] = useState(0);
+  const [savingIds, setSavingIds] = useState<string[]>([]);
 
   useEffect(() => {
     apiRequest("/products")
-      .then((data) => setProducts(data))
-      .catch(() => setProducts([]))
+      .then((data: StoreProduct[]) => setProducts(data))
+      .catch((error: unknown) => {
+        setLoadError(
+          error instanceof Error ? error.message : "Could not load products.",
+        );
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [reloadProducts]);
 
   const [searchParams] = useSearchParams();
   const q = (searchParams.get("q") ?? "").trim().toLowerCase();
@@ -239,18 +108,88 @@ export default function Homepage() {
       (activeNav === "All" || p.category === activeNav) &&
       (q === "" ||
         p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q))
+        p.category.toLowerCase().includes(q)),
   );
 
   // what happens when a tile is clicked: filter + jump to the product grid
   const selectCategory = (category: string) => {
     setActiveNav(category);
-    const grid = document.getElementById("product-grid");
-    if (grid) {
-      grid.scrollIntoView({ behavior: "smooth" });
+    scrollTo("product-grid");
+  };
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const retryProducts = () => {
+    setLoading(true);
+    setLoadError("");
+    setReloadProducts((current) => current + 1);
+  };
+
+  const addProductToCart = (product: StoreProduct) => {
+    if (user?.id === product.sellerId) {
+      toast.error("You can’t purchase a listing you created.");
+      return;
+    }
+    if (product.stock != null && product.stock <= 0) {
+      toast.error("This product is out of stock.");
+      return;
     }
 
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image ?? "",
+      sellerId: product.sellerId,
+    });
+    toast.success(`${product.name} added to cart`);
   };
+
+  const toggleSavedProduct = async (product: StoreProduct) => {
+    if (!token) {
+      toast.error("Sign in to save items.");
+      navigate("/login");
+      return;
+    }
+    if (savingIds.includes(product.id)) return;
+
+    const currentlySaved = savedItemIds?.includes(product.id) ?? false;
+    setSavingIds((current) => [...current, product.id]);
+    try {
+      await apiRequest(`/wishlist/${encodeURIComponent(product.id)}`, {
+        method: currentlySaved ? "DELETE" : "POST",
+        token,
+      });
+      markSavedItem(product.id, !currentlySaved);
+      toast.success(
+        currentlySaved
+          ? "Removed from saved items"
+          : "Added to saved items",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not update saved items.",
+      );
+    } finally {
+      setSavingIds((current) => current.filter((id) => id !== product.id));
+    }
+  };
+
+  const renderProductCard = (product: StoreProduct) => (
+    <StoreProductCard
+      key={product.id}
+      product={product}
+      saved={savedItemIds?.includes(product.id) ?? false}
+      saving={savingIds.includes(product.id)}
+      isOwnListing={Boolean(user && user.id === product.sellerId)}
+      onToggleSaved={(savedProduct) => void toggleSavedProduct(savedProduct)}
+      onAddToCart={addProductToCart}
+    />
+  );
 
   const categoryTiles = [
     ...CATEGORY_NAMES.map((name) => ({
@@ -267,13 +206,17 @@ export default function Homepage() {
     },
   ];
 
-  // Deals = approved products with a real markdown, deepest discount first, max 4
-  const flashDeals = products
-    .filter((p) => (p.originalPrice ?? 0) > p.price && (p.stock ?? 0) > 0)
+  // Deals are based on actual current prices and available stock.
+  const discountedProducts = products.filter(
+    (product) =>
+      (product.originalPrice ?? 0) > product.price &&
+      (product.stock ?? 0) > 0,
+  );
+  const flashDeals = [...discountedProducts]
     .sort(
       (a, b) =>
-        (b.originalPrice - b.price) / b.originalPrice -
-        (a.originalPrice - a.price) / a.originalPrice,
+        ((b.originalPrice ?? 0) - b.price) / (b.originalPrice ?? 1) -
+        ((a.originalPrice ?? 0) - a.price) / (a.originalPrice ?? 1),
     )
     .slice(0, 4);
 
@@ -312,12 +255,16 @@ export default function Homepage() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
               <button
+                onClick={() => scrollTo("product-grid")}
                 style={{ backgroundColor: "var(--vermilion)" }}
-                className="px-10 py-4 text-white text-[10px] tracking-[0.25em] uppercase font-black"
+                className="px-10 py-4 text-white text-[10px] tracking-[0.25em] uppercase font-black hover:bg-black transition-colors"
               >
                 Shop Now
               </button>
-              <button className="px-10 py-4 text-black text-[10px] tracking-[0.25em] uppercase font-black border-2 border-black">
+              <button
+                onClick={() => scrollTo("flash-sale")}
+                className="px-10 py-4 text-black text-[10px] tracking-[0.25em] uppercase font-black border-2 border-black hover:border-[#E63312] hover:text-[#E63312] transition-colors"
+              >
                 View Deals
               </button>
             </div>
@@ -362,10 +309,14 @@ export default function Homepage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 border-l-2 border-t-2 border-black">
             {categoryTiles.map((sc) => (
-              <div
+              <button
                 key={sc.label}
-                onClick={() => selectCategory(sc.isViewAll ? "All" : sc.label)}
-                className="border-r-2 border-b-2 border-black p-4 cursor-pointer hover:bg-neutral-50"
+                type="button"
+                onClick={() => {
+                  selectCategory(sc.isViewAll ? "All" : sc.label);
+                  if (sc.isViewAll) scrollTo("product-grid");
+                }}
+                className="border-r-2 border-b-2 border-black p-4 text-left hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
               >
                 <Wire h="h-17 sm:h-20" />
                 <div className="mt-3">
@@ -374,74 +325,51 @@ export default function Homepage() {
                     {sc.count === null ? "…" : `${sc.count} items`}
                   </p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── Flash Sale — 2 cols mobile, 4 from sm up ─────────────────────── */}
-      <section className="border-t-2 border-b-2 border-black bg-black text-white px-4 md:px-8 py-10 md:py-12">
+      <section
+        id="flash-sale"
+        className="border-t-2 border-b-2 border-black bg-neutral-50 px-4 md:px-8 py-10 md:py-12"
+      >
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-baseline gap-6 md:gap-8 flex-wrap">
+            <div>
+              <MicroLabel>Currently discounted products</MicroLabel>
               <h2
-                className="font-black uppercase leading-none"
+                className="font-black uppercase leading-none mt-1"
                 style={{ fontSize: 20, letterSpacing: "-0.03em" }}
               >
-                Flash Sale
+                Deals
               </h2>
-              <div className="flex items-center gap-2">
-                <MicroLabel>Ends In</MicroLabel>
-                <div className="flex items-center gap-1 ml-2">
-                  {["02", "14", "38"].map((t, i) => (
-                    <span key={i} className="flex items-center gap-1">
-                      <span className="bg-white text-black text-[13px] font-black px-2 py-0.5 font-mono leading-tight">
-                        {t}
-                      </span>
-                      {i < 2 && (
-                        <span className="text-white/50 font-black text-sm">
-                          :
-                        </span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
             <button
-              onClick={() => selectCategory("All")}
-              className="text-[10px] tracking-[0.2em] uppercase font-black border border-white px-6 py-3 hover:bg-white hover:text-black transition-colors self-start sm:self-auto"
+              onClick={() => scrollTo("product-grid")}
+              className="text-[10px] tracking-[0.2em] uppercase font-black border border-black px-6 py-3 hover:bg-[#E63312] hover:border-[#E63312] hover:text-white transition-colors self-start sm:self-auto"
             >
-              All Deals
+              Browse products
             </button>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {flashDeals.length === 0 ? (
-              <p className="col-span-full text-center text-white/60 py-10">
+              <p className="col-span-full text-center text-neutral-500 py-10">
                 {loading
                   ? "Loading deals…"
-                  : "No active deals right now — new discounts drop every 24 hours."}
+                  : "No discounted products are available right now."}
               </p>
             ) : (
-              flashDeals.map((d) => (
-                <DealCard
-                  key={d.id}
-                  id={d.id}
-                  name={d.name}
-                  price={d.price}
-                  original={d.originalPrice}
-                  tag={d.category}
-                  image={d.image}
-                />
-              ))
+              flashDeals.map(renderProductCard)
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Best Sellers — 2 cols mobile, 4 from sm up ───────────────────── */}
+      {/* ── Product listing — 2 cols mobile, 4 from sm up ───────────────── */}
 
       <section
         id="product-grid"
@@ -457,8 +385,19 @@ export default function Homepage() {
                 className="font-black uppercase mt-1"
                 style={{ fontSize: 18, letterSpacing: "-0.03em" }}
               >
-                Best Sellers
+                {q
+                  ? "Search Results"
+                  : activeNav === "All"
+                    ? "Shop Products"
+                    : `${activeNav} Products`}
               </h2>
+              {!loading && !loadError && (
+                <p className="mt-1 text-xs text-neutral-500">
+                  {filtered.length}{" "}
+                  {filtered.length === 1 ? "product" : "products"}
+                  {q ? ` matching “${searchParams.get("q")?.trim()}”` : ""}
+                </p>
+              )}
             </div>
             <button
               onClick={() => selectCategory("All")}
@@ -472,33 +411,36 @@ export default function Homepage() {
             <p className="text-center text-neutral-400 py-10">
               Loading products…
             </p>
+          ) : loadError ? (
+            <div className="py-10 text-center" role="alert">
+              <p className="mb-4 text-neutral-600">{loadError}</p>
+              <button
+                type="button"
+                onClick={retryProducts}
+                className="rounded bg-black px-5 py-2.5 text-sm font-bold text-white hover:bg-[#E63312]"
+              >
+                Try again
+              </button>
+            </div>
           ) : filtered.length === 0 ? (
             <p className="text-center text-neutral-400 py-10">
-              No products yet — check back soon.
+              {q || activeNav !== "All"
+                ? "No products match this selection."
+                : "No products are available yet."}
             </p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {filtered.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  id={p.id}
-                  name={p.name}
-                  price={p.price}
-                  original={p.originalPrice}
-                  tag={p.category}
-                  image={p.image}
-                />
-              ))}
+              {filtered.map(renderProductCard)}
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Promo Banner — stacked on mobile, side-by-side from md up ────── */}
+      {/* ── Deal callout — based on live product discounts ───────────────── */}
       <section className="border-t-2 border-b-2 border-black bg-neutral-50 px-4 md:px-8 py-10 md:py-16">
         <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           <div className="md:col-span-7">
-            <MicroLabel>Limited Time Offer · This Week Only</MicroLabel>
+            <MicroLabel>Current marketplace deals</MicroLabel>
             <p
               className="font-black uppercase leading-none mt-3"
               style={{
@@ -506,27 +448,27 @@ export default function Homepage() {
                 letterSpacing: "-0.04em",
               }}
             >
-              UP TO 70% OFF
+              PRICE DROPS
               <br />
-              SELECTED ITEMS
+              AVAILABLE NOW
             </p>
             <p className="text-[14px] text-neutral-600 font-medium mt-4 leading-relaxed">
-              Over 2,400 products marked down this week. New discounts added
-              every 24 hours.
+              {loading
+                ? "Checking current discounts…"
+                : `${discountedProducts.length} in-stock ${
+                    discountedProducts.length === 1
+                      ? "product has"
+                      : "products have"
+                  } a reduced price.`}
             </p>
           </div>
-          <div className="md:col-span-5 flex flex-col gap-4">
-            <div className="p-5 border-2 border-black bg-white">
-              <MicroLabel>Use Promo Code</MicroLabel>
-              <p
-                className="font-black uppercase tracking-tight mt-2"
-                style={{ fontSize: 32, letterSpacing: "-0.04em" }}
-              >
-                Jomu Mart 70
-              </p>
-            </div>
-            <button className="w-full py-4 bg-black text-white text-[10px] tracking-[0.25em] uppercase font-black">
-              Claim Discount
+          <div className="md:col-span-5">
+            <button
+              type="button"
+              onClick={() => scrollTo("flash-sale")}
+              className="w-full bg-[#E63312] py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-black"
+            >
+              Explore current deals
             </button>
           </div>
         </div>
@@ -557,16 +499,7 @@ export default function Homepage() {
                   : "No new arrivals yet — check back soon."}
               </p>
             ) : (
-              newArrivals.map((p) => (
-                <ArrivalCard
-                  key={p.id}
-                  id={p.id}
-                  name={p.name}
-                  price={p.price}
-                  tag={p.category}
-                  image={p.image}
-                />
-              ))
+              newArrivals.map(renderProductCard)
             )}
           </div>
         </div>
