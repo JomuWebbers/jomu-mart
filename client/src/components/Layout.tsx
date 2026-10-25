@@ -216,7 +216,12 @@ export default function Layout() {
                         to="/saved-items"
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
-                        Saved Items
+                        <span className="flex items-center justify-between">
+                          Saved Items
+                          <span className="bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                            2
+                          </span>
+                        </span>
                       </Link>
                       <Link
                         to="/track-order"
@@ -271,7 +276,7 @@ export default function Layout() {
                         My Orders
                       </Link>
                       <Link
-                        to="#"
+                        to="/saved-items"
                         className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
                       >
                         Saved Items
