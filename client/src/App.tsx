@@ -42,9 +42,10 @@ function App() {
         <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/my-account" element={<MyAccount />} />
+        <Route path="/my-account/*" element={<MyAccount />} />
         <Route
           path="/pending-ratings"
-          element={<Navigate to="/my-account?section=pending-ratings" replace />}
+          element={<Navigate to="/my-account/pending-ratings" replace />}
         />
         <Route path="/saved-items" element={<SavedItems />} />
         <Route path="/returns-and-orders" element={<MyOrders />} />

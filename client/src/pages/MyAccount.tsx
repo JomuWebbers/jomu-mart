@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { apiRequest } from "../lib/api";
 import { useAuth } from "../context/useAuth";
 import { PageShell } from "../components/wireframe-primitives";
@@ -45,6 +45,24 @@ type Tab =
   | "trusted-vendor"
   | "delete-account";
 
+const ACCOUNT_SECTION_PATHS: Record<Tab, string> = {
+  "account-information": "/my-account/profile",
+  "delivery-address": "/my-account/delivery-addresses",
+  "order-history": "/my-account/orders",
+  "pending-ratings": "/my-account/pending-ratings",
+  wallet: "/my-account/wallet",
+  voucher: "/my-account/vouchers",
+  "trusted-vendor": "/my-account/trusted-vendor",
+  "delete-account": "/my-account/delete-account",
+};
+
+const ACCOUNT_PATH_SECTIONS: Record<string, Tab> = Object.fromEntries(
+  Object.entries(ACCOUNT_SECTION_PATHS).map(([section, path]) => [
+    path,
+    section as Tab,
+  ]),
+);
+
 type ApiError = {
   response?: {
     data?: {
@@ -66,13 +84,18 @@ const EMPTY_ADDRESS: Address = {
 export default function MyAccount() {
   const { user: authUser, token } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const initialSection = searchParams.get("section");
-  const [tab, setTab] = useState<Tab>(
-    initialSection === "pending-ratings" || initialSection === "order-history"
-      ? initialSection
-      : "account-information",
-  );
+  const legacySection = searchParams.get("section");
+  const legacyTab: Tab | undefined =
+    legacySection === "pending-ratings" || legacySection === "order-history"
+      ? legacySection
+      : undefined;
+  const tab =
+    ACCOUNT_PATH_SECTIONS[location.pathname] ??
+    (location.pathname === "/my-account"
+      ? legacyTab ?? "account-information"
+      : "account-information");
   const [userData, setUserData] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
@@ -132,6 +155,12 @@ export default function MyAccount() {
       // Silent fail — trusted vendor section will show default state
     }
   }, [token]);
+
+  useEffect(() => {
+    if (location.pathname === "/my-account") {
+      navigate(ACCOUNT_SECTION_PATHS[tab], { replace: true });
+    }
+  }, [location.pathname, navigate, tab]);
 
   useEffect(() => {
     if (!token) {
@@ -293,9 +322,9 @@ export default function MyAccount() {
                       </h3>
                     </div>
                     {group.items.map((item) => (
-                      <button
+                      <Link
                         key={item.id}
-                        onClick={() => setTab(item.id as Tab)}
+                        to={ACCOUNT_SECTION_PATHS[item.id as Tab]}
                         className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-left ${
                           tab === item.id
                             ? "bg-black text-white"
@@ -308,7 +337,7 @@ export default function MyAccount() {
                             {item.badge ?? 0}
                           </span>
                         )}
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 ))}

@@ -23,7 +23,7 @@ const CAT_ICONS: Record<string, string> = {
 
 const UTILITY_LINKS: { label: string; to: string; soon?: boolean }[] = [
   { label: "My Orders", to: "/my-orders" },
-  { label: "Pending Reviews", to: "/my-account?section=pending-ratings" },
+  { label: "Pending Reviews", to: "/my-account/pending-ratings" },
   { label: "Saved Items", to: "/saved-items" },
   { label: "Track Orders", to: "/track-order" },
   { label: "Sell on Jomu Mart", to: "/sell" },
