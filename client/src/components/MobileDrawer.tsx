@@ -129,11 +129,17 @@ export default function MobileDrawer({
           Need Help? <span>›</span>
         </Link>
         <Link
-          to={user ? "/my-account" : "/login"}
+          to={
+            user
+              ? user.role === "admin"
+                ? "/admin"
+                : "/my-account"
+              : "/login"
+          }
           onClick={onClose}
           className="flex items-center justify-between px-4 py-4 text-[15px] font-bold border-b border-black/5"
         >
-          My Account <span>›</span>
+          {user?.role === "admin" ? "Admin Dashboard" : "My Account"} <span>›</span>
         </Link>
 
         {/* Account block */}
@@ -142,13 +148,22 @@ export default function MobileDrawer({
             <p className="text-[13px] font-bold">{user.name}</p>
             <p className="text-[11px] text-neutral-400">{user.email}</p>
             {user.role === "admin" && (
-              <Link
-                to="/admin"
-                onClick={onClose}
-                className="block mt-2 text-[11px] uppercase font-bold tracking-wide"
-              >
-                Admin Dashboard
-              </Link>
+              <div className="mt-2 flex gap-4">
+                <Link
+                  to="/admin"
+                  onClick={onClose}
+                  className="text-[11px] uppercase font-bold tracking-wide"
+                >
+                  Admin Dashboard
+                </Link>
+                <Link
+                  to="/"
+                  onClick={onClose}
+                  className="text-[11px] uppercase font-bold tracking-wide"
+                >
+                  View Store
+                </Link>
+              </div>
             )}
             {/* Sellers need wallet + trusted-vendor access on mobile too */}
             {user.role !== "admin" && (
@@ -186,7 +201,7 @@ export default function MobileDrawer({
           </>
         )}
 
-        {UTILITY_LINKS.map((item) => (
+        {user?.role !== "admin" && UTILITY_LINKS.map((item) => (
           <Link
             key={item.label}
             to={item.to}

@@ -10,6 +10,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderTracking from "./pages/OrderTracking";
 import MyAccount from "./pages/MyAccount";
 import AdminRoute from "./components/AdminRoutes";
+import CustomerAccessRoute from "./components/CustomerAccessRoute";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -41,29 +42,28 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/orders/:id" element={<OrderConfirmation />} />
-        <Route path="/track-order" element={<TrackOrderLookup />} />
         <Route path="/help" element={<HelpCenter />} />
-        <Route path="/track/:id" element={<OrderTracking />} />
-        <Route path="/sell" element={<SellProduct />} />
-        <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
-        <Route
-          path="/my-orders"
-          element={<LegacyOrdersRedirect />}
-        />
-        <Route path="/my-account" element={<MyAccount />} />
-        <Route path="/my-account/*" element={<MyAccount />} />
-        <Route
-          path="/pending-ratings"
-          element={<Navigate to="/my-account/pending-ratings" replace />}
-        />
-        <Route path="/saved-items" element={<SavedItems />} />
-        <Route
-          path="/returns-and-orders"
-          element={<LegacyOrdersRedirect />}
-        />
+        <Route element={<CustomerAccessRoute />}>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders/:id" element={<OrderConfirmation />} />
+          <Route path="/track-order" element={<TrackOrderLookup />} />
+          <Route path="/track/:id" element={<OrderTracking />} />
+          <Route path="/sell" element={<SellProduct />} />
+          <Route path="/sell/fee/verify" element={<ListingFeeReturn />} />
+          <Route path="/my-orders" element={<LegacyOrdersRedirect />} />
+          <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/my-account/*" element={<MyAccount />} />
+          <Route
+            path="/pending-ratings"
+            element={<Navigate to="/my-account/pending-ratings" replace />}
+          />
+          <Route path="/saved-items" element={<SavedItems />} />
+          <Route
+            path="/returns-and-orders"
+            element={<LegacyOrdersRedirect />}
+          />
+        </Route>
       </Route>
 
       <Route element={<AdminRoute />}>

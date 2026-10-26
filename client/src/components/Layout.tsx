@@ -109,21 +109,23 @@ export default function Layout() {
             Jomu Mart
           </Link>
           <span className="flex-1" />
-          <Link to={user ? "/my-account" : "/login"} className="text-[13px] font-bold hover:text-[#E63312]">
-            {user ? "👤 Account" : "👤 Login"}
+          <Link to={user ? (user.role === "admin" ? "/admin" : "/my-account") : "/login"} className="text-[13px] font-bold hover:text-[#E63312]">
+            {user ? (user.role === "admin" ? "Admin" : "👤 Account") : "👤 Login"}
           </Link>
-          <Link
-            to="/cart"
-            aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
-            className="relative flex h-9 w-9 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
-          >
-            <ShoppingCart aria-hidden="true" className="h-5 w-5" />
-            {totalItems > 0 && (
-              <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+          {user?.role !== "admin" && (
+            <Link
+              to="/cart"
+              aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
+              className="relative flex h-9 w-9 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+            >
+              <ShoppingCart aria-hidden="true" className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          )}
         </div>
 
         {/* Desktop row */}
@@ -138,12 +140,14 @@ export default function Layout() {
             <MicroLabel>Nigeria's Marketplace</MicroLabel>
           </Link>
 
-          <Link
-            to="/sell"
-            className="hidden xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold hover:opacity-70"
-          >
-            🏷 Sell on Jomu Mart
-          </Link>
+          {user?.role !== "admin" && (
+            <Link
+              to="/sell"
+              className="hidden xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold hover:opacity-70"
+            >
+              🏷 Sell on Jomu Mart
+            </Link>
+          )}
 
           <span
             title="Coming soon"
@@ -248,7 +252,39 @@ export default function Layout() {
                   id={accountMenuId}
                   className="max-h-[calc(100vh-6rem)] w-80 max-w-[calc(100vw-2rem)] overflow-x-hidden overflow-y-auto border-2 border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.15)]"
                 >
-                  {user ? (
+                  {user?.role === "admin" ? (
+                    <>
+                      <div className="border-b border-black/10 px-4 py-3">
+                        <p className="text-[12px] font-bold">{user.name}</p>
+                        <p className="text-[10px] text-neutral-400">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/admin"
+                        onClick={() => setAccountOpen(false)}
+                        className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                      >
+                        Admin Dashboard
+                      </Link>
+                      <Link
+                        to="/"
+                        onClick={() => setAccountOpen(false)}
+                        className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                      >
+                        View Store
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAccountOpen(false);
+                          handleLogout();
+                        }}
+                        className="block w-full border-t border-black/10 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-red-600 hover:bg-neutral-50"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : user ? (
                     <>
                       <div className="px-4 py-3 border-b border-black/10">
                         <p className="text-[12px] font-bold">{user.name}</p>
@@ -296,22 +332,8 @@ export default function Layout() {
                           Track My Order
                         </Link>
                       </div>
-                      {user.role !== "admin" && (
-                        <>
-                          <SellerWallet />
-                          <TrustedVendorRequest />
-                        </>
-                      )}
-
-                      {user.role === "admin" && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setAccountOpen(false)}
-                          className="block w-full border-t border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
-                        >
-                          Admin Dashboard
-                        </Link>
-                      )}
+                      <SellerWallet />
+                      <TrustedVendorRequest />
                       <div className="border-t border-black/10">
                         <button
                           type="button"
@@ -369,18 +391,20 @@ export default function Layout() {
               </div>
             </div>
 
-            <Link
-              to="/cart"
-              aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
-              className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
-            >
-              <ShoppingCart aria-hidden="true" className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {user?.role !== "admin" && (
+              <Link
+                to="/cart"
+                aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+              >
+                <ShoppingCart aria-hidden="true" className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
           </div>
 
         </div>
@@ -495,7 +519,7 @@ export default function Layout() {
       />
 
       <Outlet context={{ activeNav, setActiveNav }} />
-      <ChatWidget />
+      {user?.role !== "admin" && <ChatWidget />}
     </div>
   );
 }

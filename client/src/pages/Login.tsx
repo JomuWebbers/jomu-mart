@@ -23,7 +23,7 @@ export default function Login() {
       })
       login(data.user, data.token)
       toast.success('Welcome back!')
-      navigate('/')
+      navigate(data.user.role === "admin" ? "/admin" : "/")
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed'
       toast.error(message)
@@ -80,5 +80,4 @@ export default function Login() {
     </div>
   )
 }
-
 

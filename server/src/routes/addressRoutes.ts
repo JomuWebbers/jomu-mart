@@ -5,11 +5,11 @@ import {
   getAddresses,
   updateAddress,
 } from '../controllers/addressController'
-import { protect } from '../middleware/authMiddleware'
+import { protect, isCustomer } from '../middleware/authMiddleware'
 
 const router = Router()
 
-router.use(protect)
+router.use(protect, isCustomer)
 router.get('/', getAddresses)
 router.post('/', createAddress)
 router.patch('/:id', updateAddress)

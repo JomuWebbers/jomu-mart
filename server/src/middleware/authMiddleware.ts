@@ -46,6 +46,13 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
   next()
 }
 
+export const isCustomer = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.userRole !== 'customer') {
+    return res.status(403).json({ message: 'Customer access required' })
+  }
+  next()
+}
+
 export const optionalAuth = (req: AuthRequest, _res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -65,7 +72,6 @@ export const optionalAuth = (req: AuthRequest, _res: Response, next: NextFunctio
   }
   next()
 }
-
 
 
 

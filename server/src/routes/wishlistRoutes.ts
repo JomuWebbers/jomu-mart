@@ -4,11 +4,11 @@ import {
   getWishlist,
   removeFromWishlist,
 } from "../controllers/wishlistController";
-import { protect } from "../middleware/authMiddleware";
+import { protect, isCustomer } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.use(protect);
+router.use(protect, isCustomer);
 router.get("/", getWishlist);
 router.post("/:productId", addToWishlist);
 router.delete("/:productId", removeFromWishlist);

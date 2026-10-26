@@ -1,6 +1,6 @@
 
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboardIcon, PackageIcon, ShoppingBagIcon, TruckIcon, MessageCircleIcon, UsersIcon, LogOutIcon, ShieldIcon, ClipboardCheckIcon, RotateCcwIcon } from 'lucide-react'
+import { LayoutDashboardIcon, PackageIcon, ShoppingBagIcon, TruckIcon, MessageCircleIcon, UsersIcon, StoreIcon, ShieldIcon, ClipboardCheckIcon, RotateCcwIcon } from 'lucide-react'
 
 
 const ADMIN_LINKS = [
@@ -42,7 +42,7 @@ export default function AdminLayout() {
             to="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-600 hover:bg-zinc-100 whitespace-nowrap"
           >
-            <LogOutIcon className="size-4" /> Exit to Store
+            <StoreIcon className="size-4" /> View Store
           </NavLink>
         </nav>
       </aside>
@@ -52,5 +52,4 @@ export default function AdminLayout() {
     </div>
   )
 }
-
 

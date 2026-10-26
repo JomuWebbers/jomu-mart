@@ -10,7 +10,7 @@ import {
   assignDeliveryPartner,
 } from '../controllers/orderController'
 
-import { protect, isAdmin } from '../middleware/authMiddleware'
+import { protect, isAdmin, isCustomer } from '../middleware/authMiddleware'
 import { verifyPayment } from '../controllers/paymentController'
 import { payoutSeller } from '../controllers/orderController'
 
@@ -18,18 +18,17 @@ import { payoutSeller } from '../controllers/orderController'
 const router = Router()
 
 // Logged-in user routes
-router.post('/', protect, createOrder)
-router.get('/my-orders', protect, getMyOrders)
-router.get('/pending-ratings', protect, getPendingRatings)
-router.get('/:id', protect, getOrderById)
+router.post('/', protect, isCustomer, createOrder)
+router.get('/my-orders', protect, isCustomer, getMyOrders)
+router.get('/pending-ratings', protect, isCustomer, getPendingRatings)
+router.get('/:id', protect, isCustomer, getOrderById)
 
 // Admin-only routes
 router.get('/', protect, isAdmin, getAllOrders)
 router.patch('/:id/status', protect, isAdmin, updateOrderStatus)
 router.patch('/:id/assign', protect, isAdmin, assignDeliveryPartner)
-router.patch('/:id/verify-payment', protect, verifyPayment)
+router.patch('/:id/verify-payment', protect, isCustomer, verifyPayment)
 router.patch('/:orderId/items/:productId/payout', protect, isAdmin, payoutSeller)
 
 
 export default router
-

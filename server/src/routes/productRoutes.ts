@@ -19,7 +19,7 @@ import {
   submitProductReview,
 } from "../controllers/productReviewController";
 
-import { protect, isAdmin, optionalAuth } from '../middleware/authMiddleware'
+import { protect, isAdmin, isCustomer, optionalAuth } from '../middleware/authMiddleware'
 
 const router = Router()
 
@@ -28,11 +28,11 @@ router.get("/", getProducts);
 
 // Specific paths must come before /:id
 router.get("/pending", protect, isAdmin, getPendingListings);
-router.get("/my-listings", protect, getMyListings);
-router.post("/listing-fee/verify", protect, verifyListingFee);
+router.get("/my-listings", protect, isCustomer, getMyListings);
+router.post("/listing-fee/verify", protect, isCustomer, verifyListingFee);
 router.get("/:id/reviews", optionalAuth, getProductReviews);
-router.post("/:id/reviews", protect, submitProductReview);
-router.post("/:id/listing-fee/initialize", protect, initializeListingFee);
+router.post("/:id/reviews", protect, isCustomer, submitProductReview);
+router.post("/:id/listing-fee/initialize", protect, isCustomer, initializeListingFee);
 
 
 // Generic product path goes after specific paths
@@ -47,7 +47,5 @@ router.delete("/:id", protect, isAdmin, deleteProduct);
 router.patch("/:id/review", protect, isAdmin, reviewListing);
 
 export default router
-
-
 
 
