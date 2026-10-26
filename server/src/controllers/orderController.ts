@@ -420,9 +420,18 @@ export const getPendingRatings = async (req: AuthRequest, res: Response) => {
     }
 
     const productIds = [...orderByProduct.keys()]
+    const deliveredOrderIds = orders.map((order) => order.id)
     const [reviewedProducts, products] = await Promise.all([
       prisma.review.findMany({
-        where: { userId, productId: { in: productIds } },
+        where: {
+          productId: { in: productIds },
+          // Older reviews may be linked to the customer's delivered order even
+          // when their stored userId differs from the current account id.
+          OR: [
+            { userId },
+            { orderId: { in: deliveredOrderIds } },
+          ],
+        },
         select: { productId: true },
       }),
       prisma.product.findMany({
@@ -607,8 +616,6 @@ export const payoutSeller = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Failed to process seller payout' })
   }
 }
-
-
 
 
 
