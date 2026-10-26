@@ -17,6 +17,9 @@ import {
   EyeOff,
   MapPin,
   Star,
+  FileText,
+  ArrowDownLeft,
+  ArrowUpRight,
 } from "lucide-react";
 import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
@@ -490,7 +493,7 @@ export default function MyAccount() {
                 onReviewed={loadPendingRatings}
               />
             )}
-            {tab === "wallet" && <WalletView />}
+            {tab === "wallet" && <WalletView balance={userData?.accountBalance} />}
             {tab === "voucher" && <VoucherView />}
             {tab === "trusted-vendor" && (
               <TrustedVendorView status={trustedVendorStatus} />
@@ -1193,13 +1196,80 @@ function PendingRatingsSection({
   );
 }
 
-function WalletView() {
+function WalletView({ balance }: { balance?: number }) {
+  const [activeTab, setActiveTab] = useState<"all" | "received" | "sent">("all");
+  const tabs = [
+    { id: "all" as const, label: "Transaction History", icon: FileText },
+    { id: "received" as const, label: "Received", icon: ArrowDownLeft },
+    { id: "sent" as const, label: "Sent", icon: ArrowUpRight },
+  ];
+
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-bold">My Wallet</h2>
-      <div className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-gray-500">Wallet functionality coming soon.</p>
+      <section
+        aria-label="Wallet balance"
+        className="max-w-md rounded-2xl bg-gradient-to-br from-fuchsia-800 to-pink-600 p-7 text-white shadow-sm"
+      >
+        <p className="text-sm font-medium text-white/90">Wallet Balance (₦)</p>
+        <p className="mt-2 text-3xl font-bold">
+          {balance === undefined ? (
+            <span className="text-lg font-medium text-white/80" role="status">
+              Loading balance…
+            </span>
+          ) : (
+            `₦${balance.toLocaleString("en-NG")}`
+          )}
+        </p>
+      </section>
+
+      <div
+        className="flex flex-wrap gap-2 border-b border-neutral-200"
+        role="tablist"
+        aria-label="Wallet transactions"
+      >
+        {tabs.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            id={`wallet-tab-${id}`}
+            aria-selected={activeTab === id}
+            aria-controls="wallet-transactions-panel"
+            onClick={() => setActiveTab(id)}
+            className={`inline-flex min-h-12 items-center gap-2 border-b-2 px-4 text-sm font-semibold transition-colors ${
+              activeTab === id
+                ? "border-[#E63312] bg-rose-50 text-neutral-950"
+                : "border-transparent text-neutral-500 hover:text-neutral-900"
+            }`}
+          >
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            {label}
+          </button>
+        ))}
       </div>
+
+      <section
+        id="wallet-transactions-panel"
+        role="tabpanel"
+        aria-labelledby={`wallet-tab-${activeTab}`}
+        className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-neutral-200 bg-white px-6 py-12 text-center"
+      >
+        <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-neutral-50 text-neutral-300">
+          <FileText className="h-20 w-20" strokeWidth={1.6} aria-hidden="true" />
+        </div>
+        <h3 className="text-xl font-semibold text-neutral-950">
+          No transactions yet
+        </h3>
+        <p className="mt-3 max-w-md text-base leading-7 text-neutral-500">
+          When you make your first transaction, it will appear here. Start by
+          adding money to your account or making a payment.
+        </p>
+        <p className="mt-8 text-sm text-neutral-400">
+          <span aria-hidden="true">✨</span> Your transactions are secure and
+          encrypted <span aria-hidden="true">✨</span>
+        </p>
+      </section>
     </div>
   );
 }
