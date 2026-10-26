@@ -31,6 +31,7 @@ model User {
   reviews Review[]
   sellerListingFees SellerListingFee[]
   wishlist Wishlist[]
+  walletTransactions WalletTransaction[]
 }
 
 model Wishlist {
@@ -146,6 +147,25 @@ model Review {
   @@index([orderId])
 }
 
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String
+  direction   String
+  amount      Float
+  status      String   @default("pending")
+  description String
+  reference   String?  @unique
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([userId, direction, createdAt])
+  @@index([type, status, createdAt])
+}
+
 model DeliveryPartner {
   id          String   @id @default(cuid())
   name        String
@@ -203,5 +223,4 @@ model ReturnRequest {
   @@index([orderId])
   @@index([userId])
 }
-
 

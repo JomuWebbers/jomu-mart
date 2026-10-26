@@ -116,56 +116,6 @@ export const linkBankAccount = async (req: AuthRequest, res: Response) => {
   }
 }
 
-export const withdraw = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.userId
-    if (!userId) {
-      return res.status(401).json({ message: 'Not authorized' })
-    }
-
-    const { password } = req.body
-    if (!password) {
-      return res.status(400).json({ message: 'Password is required to confirm withdrawal' })
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    if (!user.linkedBankAccountNumber || !user.linkedBankName) {
-      return res.status(400).json({ message: 'Please link a bank account before withdrawing' })
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Incorrect password' })
-    }
-
-    if (user.accountBalance <= 0) {
-      return res.status(400).json({ message: 'No balance available to withdraw' })
-    }
-
-    const withdrawnAmount = user.accountBalance
-
-    const updated = await prisma.user.update({
-      where: { id: userId },
-      data: { accountBalance: 0 },
-      select: { id: true, accountBalance: true },
-    })
-
-    res.json({
-      message: 'Withdraw successful, thanks for shopping with us',
-      amountWithdrawn: withdrawnAmount,
-      newBalance: updated.accountBalance,
-    })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Failed to process withdrawal' })
-  }
-}
-
-
 export const requestTrustedVendor = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId
@@ -238,5 +188,4 @@ export const reviewTrustedVendorRequest = async (req: AuthRequest, res: Response
     res.status(500).json({ message: 'Failed to review trusted vendor request' })
   }
 }
-
 

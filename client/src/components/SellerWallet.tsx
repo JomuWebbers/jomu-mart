@@ -66,17 +66,24 @@ export default function SellerWallet() {
 
     setWithdrawing(true);
     try {
-      const result = await apiRequest("/users/withdraw", {
+      const result = await apiRequest("/wallet/payout", {
         method: "POST",
         token,
-        body: { password },
+        body: {
+          amount: account?.accountBalance,
+          password,
+          bankName: account?.linkedBankName,
+          accountNumber: account?.linkedBankAccountNumber,
+        },
       });
 
       setAccount((current) =>
-        current ? { ...current, accountBalance: result.newBalance } : current,
+        current
+          ? { ...current, accountBalance: result.accountBalance }
+          : current,
       );
       setPassword("");
-      toast.success(`₦${Number(result.amountWithdrawn).toLocaleString()} withdrawal recorded`);
+      toast.success("Payout request submitted for admin review");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not withdraw");
     } finally {
@@ -141,8 +148,8 @@ export default function SellerWallet() {
             </div>
 
             <div className="mb-6 border-l-2 border-amber-500 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-              Withdrawals currently update the demo wallet balance; this endpoint
-              does not send a real bank transfer.
+              Payout requests reserve your full balance until an admin reviews
+              the request. A bank transfer is processed separately.
             </div>
 
             <div className="mb-6">
@@ -187,7 +194,7 @@ export default function SellerWallet() {
             </div>
 
             <form onSubmit={withdraw} className="space-y-3 border-t border-black/15 pt-5">
-              <h3 className="text-sm font-bold">Withdraw full balance</h3>
+              <h3 className="text-sm font-bold">Request payout of full balance</h3>
               <input
                 type="password"
                 value={password}
@@ -202,7 +209,7 @@ export default function SellerWallet() {
                 disabled={
                   withdrawing ||
                   !account?.linkedBankAccountNumber ||
-                  account.accountBalance <= 0
+                  account.accountBalance < 100
                 }
                 className="w-full bg-black px-4 py-3 text-xs font-bold uppercase text-white disabled:opacity-50"
               >
@@ -215,5 +222,4 @@ export default function SellerWallet() {
     </>
   );
 }
-
 

@@ -11,6 +11,7 @@ import userRoutes from './routes/userRoutes'
 import returnRoutes from './routes/returnRoutes'
 import wishlistRoutes from './routes/wishlistRoutes'
 import addressRoutes from './routes/addressRoutes'
+import walletRoutes from './routes/walletRoutes'
 import { warmDatabaseConnection } from './lib/prisma'
 
 
@@ -76,6 +77,7 @@ app.use('/api/chat', streamRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/wishlist', wishlistRoutes)
 app.use('/api/addresses', addressRoutes)
+app.use('/api/wallet', walletRoutes)
 
 
 if (process.env.NODE_ENV !== 'production') {

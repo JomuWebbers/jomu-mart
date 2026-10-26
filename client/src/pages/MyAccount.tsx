@@ -20,6 +20,9 @@ import {
   FileText,
   ArrowDownLeft,
   ArrowUpRight,
+  Eye as BalanceVisibleIcon,
+  EyeOff as BalanceHiddenIcon,
+  X,
 } from "lucide-react";
 import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
@@ -493,7 +496,7 @@ export default function MyAccount() {
                 onReviewed={loadPendingRatings}
               />
             )}
-            {tab === "wallet" && <WalletView balance={userData?.accountBalance} />}
+            {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
             {tab === "trusted-vendor" && (
               <TrustedVendorView status={trustedVendorStatus} />
@@ -1196,32 +1199,238 @@ function PendingRatingsSection({
   );
 }
 
-function WalletView({ balance }: { balance?: number }) {
+type WalletTransaction = {
+  id: string;
+  type: string;
+  direction: "received" | "sent";
+  amount: number;
+  status: string;
+  description: string;
+  reference: string | null;
+  createdAt: string;
+};
+
+function WalletView() {
+  const { token } = useAuth();
   const [activeTab, setActiveTab] = useState<"all" | "received" | "sent">("all");
+  const [balance, setBalance] = useState<number>();
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+  const [balanceVisible, setBalanceVisible] = useState(true);
+  const [activeForm, setActiveForm] = useState<"fund" | "payout" | null>(null);
+  const [fundAmount, setFundAmount] = useState("");
+  const [payoutAmount, setPayoutAmount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [fundingMessage, setFundingMessage] = useState("");
+  const [payoutMessage, setPayoutMessage] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paymentReference = searchParams.get("reference");
+
   const tabs = [
     { id: "all" as const, label: "Transaction History", icon: FileText },
     { id: "received" as const, label: "Received", icon: ArrowDownLeft },
     { id: "sent" as const, label: "Sent", icon: ArrowUpRight },
   ];
 
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    Promise.all([
+      apiRequest("/wallet", { token }),
+      apiRequest("/wallet/transactions", { token }),
+    ])
+      .then(([wallet, transactionRows]) => {
+        if (cancelled) return;
+        if (!Array.isArray(transactionRows)) {
+          throw new Error("The wallet service returned invalid transaction data.");
+        }
+        setBalance(wallet.accountBalance);
+        setBankName(wallet.linkedBankName ?? "");
+        setAccountNumber(wallet.linkedBankAccountNumber ?? "");
+        setTransactions(transactionRows);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "Could not load wallet details.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, reloadKey]);
+
+  useEffect(() => {
+    if (!token || !paymentReference) return;
+    let cancelled = false;
+
+    apiRequest("/wallet/fund/verify", {
+      method: "POST",
+      token,
+      body: { reference: paymentReference },
+    })
+      .then((result) => {
+        if (cancelled) return;
+        setBalance(result.accountBalance);
+        toast.success("Wallet funding confirmed.");
+        setLoading(true);
+        setError("");
+        setReloadKey((key) => key + 1);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setFundingMessage(
+            err instanceof Error ? err.message : "Could not verify wallet funding.",
+          );
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setProcessing(false);
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.delete("reference");
+        setSearchParams(nextParams, { replace: true });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, paymentReference, searchParams, setSearchParams]);
+
+  const handleFundWallet = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!token) return;
+    setProcessing(true);
+    setFundingMessage("");
+    try {
+      const result = await apiRequest("/wallet/fund/initialize", {
+        method: "POST",
+        token,
+        body: { amount: Number(fundAmount) },
+      });
+      window.location.assign(result.authorizationUrl);
+    } catch (err: unknown) {
+      setFundingMessage(
+        err instanceof Error ? err.message : "Could not start wallet funding.",
+      );
+      setProcessing(false);
+    }
+  };
+
+  const handlePayoutRequest = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    if (!token) return;
+    setProcessing(true);
+    setPayoutMessage("");
+    try {
+      const result = await apiRequest("/wallet/payout", {
+        method: "POST",
+        token,
+        body: {
+          amount: Number(payoutAmount),
+          bankName,
+          accountNumber,
+          password,
+        },
+      });
+      setBalance(result.accountBalance);
+      setPassword("");
+      setActiveForm(null);
+      setLoading(true);
+      setError("");
+      setReloadKey((key) => key + 1);
+      toast.success("Payout request submitted for admin review.");
+    } catch (err: unknown) {
+      setPayoutMessage(
+        err instanceof Error ? err.message : "Could not submit payout request.",
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const visibleTransactions = transactions.filter(
+    (transaction) =>
+      activeTab === "all" || transaction.direction === activeTab,
+  );
+  const formatAmount = (amount: number) =>
+    `₦${amount.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-bold">My Wallet</h2>
       <section
         aria-label="Wallet balance"
-        className="max-w-md rounded-2xl bg-gradient-to-br from-fuchsia-800 to-pink-600 p-7 text-white shadow-sm"
+        className="relative max-w-md rounded-2xl bg-gradient-to-br from-fuchsia-800 to-pink-600 p-7 text-white shadow-sm"
       >
+        <button
+          type="button"
+          onClick={() => setBalanceVisible((visible) => !visible)}
+          aria-label={balanceVisible ? "Hide wallet balance" : "Show wallet balance"}
+          aria-pressed={!balanceVisible}
+          className="absolute right-5 top-5 rounded-full p-2 text-white/90 transition-colors hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          {balanceVisible ? (
+            <BalanceVisibleIcon className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <BalanceHiddenIcon className="h-5 w-5" aria-hidden="true" />
+          )}
+        </button>
         <p className="text-sm font-medium text-white/90">Wallet Balance (₦)</p>
         <p className="mt-2 text-3xl font-bold">
-          {balance === undefined ? (
+          {loading && balance === undefined ? (
             <span className="text-lg font-medium text-white/80" role="status">
               Loading balance…
             </span>
           ) : (
-            `₦${balance.toLocaleString("en-NG")}`
+            balanceVisible
+              ? formatAmount(balance ?? 0)
+              : "₦ ••••••"
           )}
         </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setActiveForm("fund")}
+            className="rounded-xl border border-white/30 bg-white/15 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white/25"
+          >
+            + Fund Wallet
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPayoutAmount("");
+              setActiveForm("payout");
+            }}
+            disabled={!balance || balance < 100}
+            className="rounded-xl border border-white/30 bg-white/15 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            ↑ Payout
+          </button>
+        </div>
       </section>
+
+      {(fundingMessage || payoutMessage) && !activeForm && (
+        <div
+          className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"
+          role="status"
+        >
+          {fundingMessage || payoutMessage}
+        </div>
+      )}
 
       <div
         className="flex flex-wrap gap-2 border-b border-neutral-200"
@@ -1253,23 +1462,253 @@ function WalletView({ balance }: { balance?: number }) {
         id="wallet-transactions-panel"
         role="tabpanel"
         aria-labelledby={`wallet-tab-${activeTab}`}
-        className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-neutral-200 bg-white px-6 py-12 text-center"
+        className="min-h-[420px] rounded-lg border border-neutral-200 bg-white px-6 py-8"
       >
-        <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-neutral-50 text-neutral-300">
-          <FileText className="h-20 w-20" strokeWidth={1.6} aria-hidden="true" />
-        </div>
-        <h3 className="text-xl font-semibold text-neutral-950">
-          No transactions yet
-        </h3>
-        <p className="mt-3 max-w-md text-base leading-7 text-neutral-500">
-          When you make your first transaction, it will appear here. Start by
-          adding money to your account or making a payment.
-        </p>
-        <p className="mt-8 text-sm text-neutral-400">
-          <span aria-hidden="true">✨</span> Your transactions are secure and
-          encrypted <span aria-hidden="true">✨</span>
-        </p>
+        {error ? (
+          <div className="flex min-h-[360px] flex-col items-center justify-center text-center" role="alert">
+            <p className="text-sm text-red-700">Could not load wallet transactions: {error}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoading(true);
+                setError("");
+                setReloadKey((key) => key + 1);
+              }}
+              className="mt-4 rounded-md border border-neutral-300 px-4 py-2 text-sm font-semibold hover:bg-neutral-50"
+            >
+              Try again
+            </button>
+          </div>
+        ) : loading ? (
+          <p className="py-16 text-center text-sm text-neutral-500" role="status">
+            Loading transactions…
+          </p>
+        ) : visibleTransactions.length > 0 ? (
+          <div className="divide-y divide-neutral-100">
+            {visibleTransactions.map((transaction) => (
+              <article
+                key={transaction.id}
+                className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                      transaction.direction === "received"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-neutral-100 text-neutral-700"
+                    }`}
+                  >
+                    {transaction.direction === "received" ? (
+                      <ArrowDownLeft className="h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
+                    )}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-semibold text-neutral-900">
+                      {transaction.description}
+                    </h3>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {new Intl.DateTimeFormat("en-NG", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      }).format(new Date(transaction.createdAt))}
+                    </p>
+                    {transaction.status === "pending" && (
+                      <p className="mt-1 text-xs font-medium text-amber-700">
+                        Pending admin approval
+                      </p>
+                    )}
+                    {transaction.status === "rejected" && (
+                      <p className="mt-1 text-xs font-medium text-red-700">
+                        Rejected · funds returned to wallet
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p
+                  className={`text-sm font-bold ${
+                    transaction.direction === "received"
+                      ? "text-emerald-700"
+                      : "text-neutral-900"
+                  }`}
+                >
+                  {transaction.direction === "received" ? "+" : "−"}
+                  {formatAmount(transaction.amount)}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : transactions.length === 0 && activeTab === "all" ? (
+          <div className="flex min-h-[360px] flex-col items-center justify-center text-center">
+            <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-neutral-50 text-neutral-300">
+              <FileText className="h-20 w-20" strokeWidth={1.6} aria-hidden="true" />
+            </div>
+            <h3 className="text-xl font-semibold text-neutral-950">
+              No transactions yet
+            </h3>
+            <p className="mt-3 max-w-md text-base leading-7 text-neutral-500">
+              When you make your first transaction, it will appear here. Start by
+              adding money to your account or making a payment.
+            </p>
+            <p className="mt-8 text-sm text-neutral-400">
+              <span aria-hidden="true">✨</span> Your transactions are secure and
+              encrypted <span aria-hidden="true">✨</span>
+            </p>
+          </div>
+        ) : (
+          <p className="py-16 text-center text-sm text-neutral-500">
+            No {activeTab === "received" ? "received" : "sent"} transactions yet.
+          </p>
+        )}
       </section>
+
+      {activeForm && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !processing) {
+              setActiveForm(null);
+              setFundingMessage("");
+              setPayoutMessage("");
+            }
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="wallet-action-title"
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 id="wallet-action-title" className="text-lg font-bold">
+                  {activeForm === "fund" ? "Fund Wallet" : "Request a Payout"}
+                </h3>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {activeForm === "fund"
+                    ? "Payments are securely processed by Paystack."
+                    : "Your payout amount is reserved while an admin reviews your request."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveForm(null)}
+                disabled={processing}
+                aria-label="Close form"
+                className="rounded p-2 text-neutral-500 hover:bg-neutral-100 disabled:opacity-50"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            {activeForm === "fund" ? (
+              <form onSubmit={(event) => void handleFundWallet(event)} className="space-y-4">
+                <label className="block text-sm font-medium text-neutral-700" htmlFor="wallet-fund-amount">
+                  Amount (₦)
+                </label>
+                <input
+                  id="wallet-fund-amount"
+                  type="number"
+                  min="100"
+                  max="5000000"
+                  step="0.01"
+                  value={fundAmount}
+                  onChange={(event) => setFundAmount(event.target.value)}
+                  required
+                  className="w-full rounded-md border border-neutral-300 px-3 py-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                  placeholder="Enter amount (minimum ₦100)"
+                />
+                {fundingMessage && (
+                  <p className="text-sm text-red-700" role="alert">{fundingMessage}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="w-full rounded-md bg-black px-4 py-3 text-sm font-semibold text-white hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {processing ? "Preparing secure payment…" : "Continue to Paystack"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={(event) => void handlePayoutRequest(event)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700" htmlFor="wallet-payout-amount">
+                    Amount (₦)
+                  </label>
+                  <input
+                    id="wallet-payout-amount"
+                    type="number"
+                    min="100"
+                    max={balance ?? 0}
+                    step="0.01"
+                    value={payoutAmount}
+                    onChange={(event) => setPayoutAmount(event.target.value)}
+                    required
+                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                    placeholder={`Available: ${formatAmount(balance ?? 0)}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700" htmlFor="wallet-payout-bank">
+                    Bank name
+                  </label>
+                  <input
+                    id="wallet-payout-bank"
+                    value={bankName}
+                    onChange={(event) => setBankName(event.target.value)}
+                    required
+                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                    placeholder="Enter bank name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700" htmlFor="wallet-payout-account">
+                    10-digit account number
+                  </label>
+                  <input
+                    id="wallet-payout-account"
+                    value={accountNumber}
+                    onChange={(event) => setAccountNumber(event.target.value)}
+                    required
+                    inputMode="numeric"
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                    placeholder="Account number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700" htmlFor="wallet-payout-password">
+                    Confirm with your password
+                  </label>
+                  <input
+                    id="wallet-payout-password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                    placeholder="Account password"
+                  />
+                </div>
+                {payoutMessage && (
+                  <p className="text-sm text-red-700" role="alert">{payoutMessage}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="w-full rounded-md bg-black px-4 py-3 text-sm font-semibold text-white hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {processing ? "Submitting request…" : "Submit Payout Request"}
+                </button>
+              </form>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

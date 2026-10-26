@@ -579,13 +579,36 @@ export const payoutSeller = async (req: AuthRequest, res: Response) => {
 
     items[itemIndex] = { ...item, payoutStatus: 'paid' }
 
-    const [, seller] = await prisma.$transaction([
-      prisma.order.update({ where: { id: orderId }, data: { items } }),
-      prisma.user.update({
+    const payoutReference = `seller-payout:${orderId}:${productId}`
+    const seller = await prisma.$transaction(async (tx) => {
+      const existingPayout = await tx.walletTransaction.findUnique({
+        where: { reference: payoutReference },
+        select: { id: true },
+      })
+      if (existingPayout) return null
+
+      await tx.order.update({ where: { id: orderId }, data: { items } })
+      const creditedSeller = await tx.user.update({
         where: { id: item.sellerId },
         data: { accountBalance: { increment: payoutAmount } },
-      }),
-    ])
+      })
+      await tx.walletTransaction.create({
+        data: {
+          userId: item.sellerId,
+          type: "seller_payout",
+          direction: "received",
+          amount: payoutAmount,
+          status: "completed",
+          description: `Seller payout for order #${orderId.slice(-8).toUpperCase()}`,
+          reference: payoutReference,
+          metadata: { orderId, productId },
+        },
+      })
+      return creditedSeller
+    })
+    if (!seller) {
+      return res.status(409).json({ message: 'This item has already been paid out' })
+    }
 
     // Send an automated chat message to the seller
     try {
@@ -616,7 +639,6 @@ export const payoutSeller = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Failed to process seller payout' })
   }
 }
-
 
 
 

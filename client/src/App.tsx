@@ -21,6 +21,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import SellProduct from "./pages/SellProduct";
 import AdminListingReview from "./pages/admin/AdminListingReview";
 import AdminReturns from "./pages/admin/AdminReturns";
+import AdminWalletPayouts from "./pages/admin/AdminWalletPayouts";
 import ListingFeeReturn from "./pages/ListingFeeReturn";
 import TrackOrderLookup from "./pages/TrackOrderLookup";
 import HelpCenter from "./pages/HelpCenter";
@@ -79,6 +80,7 @@ function App() {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/listings" element={<AdminListingReview />} />
           <Route path="/admin/returns" element={<AdminReturns />} />
+          <Route path="/admin/wallet-payouts" element={<AdminWalletPayouts />} />
         </Route>
       </Route>
 

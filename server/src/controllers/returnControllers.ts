@@ -201,24 +201,34 @@ export const updateReturnStatus = async (req: AuthRequest, res: Response) => {
 
     // If status is refunded, credit user's accountBalance automatically
     if (status === "refunded" && currentReturn.status !== "refunded") {
-      await prisma.$transaction([
-        prisma.user.update({
-          where: { id: currentReturn.userId },
-          data: {
-            accountBalance: {
-              increment: currentReturn.refundAmount,
-            },
-          },
-        }),
-        prisma.returnRequest.update({
-          where: { id },
+      await prisma.$transaction(async (tx) => {
+        const claimed = await tx.returnRequest.updateMany({
+          where: { id, status: { not: "refunded" } },
           data: {
             status,
             adminNote: adminNote || currentReturn.adminNote,
             statusHistory: history,
           },
-        }),
-      ]);
+        });
+        if (claimed.count === 0) return;
+
+        await tx.user.update({
+          where: { id: currentReturn.userId },
+          data: { accountBalance: { increment: currentReturn.refundAmount } },
+        });
+        await tx.walletTransaction.create({
+          data: {
+            userId: currentReturn.userId,
+            type: "refund",
+            direction: "received",
+            amount: currentReturn.refundAmount,
+            status: "completed",
+            description: `Refund for order #${currentReturn.orderId.slice(-8).toUpperCase()}`,
+            reference: `return-refund:${id}`,
+            metadata: { returnRequestId: id, orderId: currentReturn.orderId },
+          },
+        });
+      });
     } else {
       await prisma.returnRequest.update({
         where: { id },
@@ -244,7 +254,6 @@ export const updateReturnStatus = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 
 

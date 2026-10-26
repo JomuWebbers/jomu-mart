@@ -265,6 +265,18 @@ export const initializeListingFee = async (req: AuthRequest, res: Response) => {
           where: { id: sellerId },
           data: { accountBalance: newBalance },
         });
+        await tx.walletTransaction.create({
+          data: {
+            userId: sellerId,
+            type: "listing_fee",
+            direction: "sent",
+            amount: MONTHLY_FEE_NAIRA,
+            status: "completed",
+            description: `Monthly listing fee for ${monthKey}`,
+            reference: `listing-fee:${sellerId}:${monthKey}`,
+            metadata: { monthKey, productId: product.id },
+          },
+        });
 
         await tx.sellerListingFee.upsert({
           where: { sellerId_monthKey: { sellerId, monthKey } },
