@@ -16,6 +16,7 @@ import {
   Eye,
   EyeOff,
   MapPin,
+  Star,
 } from "lucide-react";
 import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
@@ -37,6 +38,13 @@ type Address = {
   state: string;
   zip: string;
   isDefault: boolean;
+};
+
+type PendingRating = {
+  productId: string;
+  orderId: string;
+  name: string;
+  image: string;
 };
 
 type Tab =
@@ -104,7 +112,10 @@ export default function MyAccount() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [addressesError, setAddressesError] = useState("");
+  const [pendingRatings, setPendingRatings] = useState<PendingRating[]>([]);
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
+  const [pendingRatingsLoading, setPendingRatingsLoading] = useState(true);
+  const [pendingRatingsError, setPendingRatingsError] = useState("");
   const [trustedVendorStatus, setTrustedVendorStatus] = useState<{ isTrustedVendor: boolean; trustedVendorRequestStatus: string | null } | null>(null);
   const [saving, setSaving] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -143,18 +154,24 @@ export default function MyAccount() {
     }
   }, [token]);
 
-  const loadPendingRatingsCount = useCallback(async () => {
+  const loadPendingRatings = useCallback(async () => {
+    setPendingRatingsLoading(true);
+    setPendingRatingsError("");
     try {
-      const data = await apiRequest("/ratings/pending-count", {
+      const data = await apiRequest("/orders/pending-ratings", {
         token: token ?? undefined,
       });
-      if (typeof data === "number") {
-        setPendingRatingsCount(data);
-      } else if (data && typeof data.count === "number") {
-        setPendingRatingsCount(data.count);
+      if (!Array.isArray(data)) {
+        throw new Error("The ratings service returned an invalid response.");
       }
-    } catch {
-      // Silent fail — badge stays at 0 until backend endpoint exists
+      setPendingRatings(data);
+      setPendingRatingsCount(data.length);
+    } catch (err: unknown) {
+      setPendingRatingsError(
+        err instanceof Error ? err.message : "Failed to load products for review.",
+      );
+    } finally {
+      setPendingRatingsLoading(false);
     }
   }, [token]);
 
@@ -184,9 +201,9 @@ export default function MyAccount() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadUser();
     loadAddresses();
-    loadPendingRatingsCount();
+    loadPendingRatings();
     loadTrustedVendorStatus();
-  }, [token, navigate, loadUser, loadAddresses, loadPendingRatingsCount, loadTrustedVendorStatus]);
+  }, [token, navigate, loadUser, loadAddresses, loadPendingRatings, loadTrustedVendorStatus]);
 
   const handleSaveProfile = async (name: string, phone: string) => {
     if (!token) return;
@@ -373,7 +390,7 @@ export default function MyAccount() {
                       }`}
                     >
                       {item.label}
-                      {item.id === "pending-ratings" && pendingRatingsCount > 0 && (
+                      {item.id === "pending-ratings" && (
                         <span
                           className={`ml-auto rounded px-2 py-0.5 text-xs font-bold ${
                             tab === item.id
@@ -410,7 +427,7 @@ export default function MyAccount() {
                   }`}
                 >
                   {item.label}
-                  {item.id === "pending-ratings" && pendingRatingsCount > 0 && (
+                  {item.id === "pending-ratings" && (
                     <span className="rounded-full bg-[#E63312] px-1.5 py-0.5 text-[10px] text-white">
                       {pendingRatingsCount}
                     </span>
@@ -465,7 +482,13 @@ export default function MyAccount() {
             )}
             {tab === "order-history" && <OrdersSection />}
             {tab === "pending-ratings" && (
-              <PendingRatingsSection count={pendingRatingsCount} />
+              <PendingRatingsSection
+                items={pendingRatings}
+                loading={pendingRatingsLoading}
+                error={pendingRatingsError}
+                onRetry={() => void loadPendingRatings()}
+                onReviewed={loadPendingRatings}
+              />
             )}
             {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
@@ -974,22 +997,198 @@ function OrdersSection() {
   return <MyOrders embedded />;
 }
 
-function PendingRatingsSection({ count }: { count: number }) {
+function PendingRatingsSection({
+  items,
+  loading,
+  error,
+  onRetry,
+  onReviewed,
+}: {
+  items: PendingRating[];
+  loading: boolean;
+  error: string;
+  onRetry: () => void;
+  onReviewed: () => Promise<void>;
+}) {
+  const { token } = useAuth();
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [comments, setComments] = useState<Record<string, string>>({});
+  const [submittingProductId, setSubmittingProductId] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  const submitReview = async (
+    event: React.FormEvent<HTMLFormElement>,
+    item: PendingRating,
+  ) => {
+    event.preventDefault();
+    const rating = ratings[item.productId] ?? 0;
+    const comment = comments[item.productId]?.trim() ?? "";
+    if (!token || rating < 1 || comment.length < 10) return;
+
+    setSubmittingProductId(item.productId);
+    setSubmitError("");
+    try {
+      await apiRequest(`/products/${encodeURIComponent(item.productId)}/reviews`, {
+        method: "POST",
+        token,
+        body: { rating, comment },
+      });
+      toast.success("Your verified-purchase review has been saved.");
+      await onReviewed();
+    } catch (err: unknown) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Could not submit your review.",
+      );
+    } finally {
+      setSubmittingProductId("");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold flex items-center gap-2">
-        Pending Ratings
-        <span className="px-2 py-0.5 rounded bg-gray-200 text-gray-600 text-xs font-bold">
-          {count}
-        </span>
-      </h2>
-      <div className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-gray-500">
-          {count === 0
-            ? "You do not have product for review."
-            : "Your products awaiting review will appear here."}
+      <h2 className="text-lg font-bold">Rate &amp; Review</h2>
+      {loading ? (
+        <p className="py-12 text-center text-sm text-neutral-500" role="status">
+          Loading products for review…
         </p>
-      </div>
+      ) : error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-5" role="alert">
+          <p className="text-sm text-red-800">
+            Could not load products for review: {error}
+          </p>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 rounded-md border border-red-300 px-3 py-2 text-sm font-semibold text-red-800 hover:bg-red-100"
+          >
+            Try again
+          </button>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-neutral-200 bg-white px-6 py-12 text-center">
+          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+            <Star className="h-12 w-12" strokeWidth={1.5} aria-hidden="true" />
+          </div>
+          <h3 className="text-lg font-semibold text-neutral-950">
+            You do not have product for review
+          </h3>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-neutral-600">
+            After your order is delivered, you will be able to write a review and
+            rate the product. Your review and rating will be published on Product
+            Page to help other shoppers make the best decision to get the best
+            shopping experience.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {submitError && (
+            <p className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">
+              {submitError}
+            </p>
+          )}
+          {items.map((item) => {
+            const rating = ratings[item.productId] ?? 0;
+            const comment = comments[item.productId] ?? "";
+            const submitting = submittingProductId === item.productId;
+            return (
+              <article
+                key={item.productId}
+                className="grid gap-5 rounded-lg border border-neutral-200 bg-white p-5 sm:grid-cols-[112px_minmax(0,1fr)]"
+              >
+                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-md bg-neutral-100">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <ShoppingBagIcon className="h-9 w-9 text-neutral-400" aria-hidden="true" />
+                  )}
+                </div>
+                <form
+                  onSubmit={(event) => void submitReview(event, item)}
+                  className="space-y-4"
+                >
+                  <div>
+                    <h3 className="font-semibold text-neutral-950">{item.name}</h3>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      Delivered order · {item.orderId.slice(-8).toUpperCase()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="block text-sm font-medium text-neutral-700">
+                      Your rating
+                    </span>
+                    <div
+                      className="mt-1 flex gap-1"
+                      role="radiogroup"
+                      aria-label={`Rate ${item.name}`}
+                    >
+                      {[1, 2, 3, 4, 5].map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          role="radio"
+                          aria-checked={rating === value}
+                          aria-label={`${value} star${value === 1 ? "" : "s"}`}
+                          onClick={() =>
+                            setRatings((current) => ({
+                              ...current,
+                              [item.productId]: value,
+                            }))
+                          }
+                          className={`text-2xl transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${
+                            value <= rating ? "text-amber-500" : "text-neutral-300"
+                          }`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`rating-review-${item.productId}`}
+                      className="block text-sm font-medium text-neutral-700"
+                    >
+                      Your review
+                    </label>
+                    <textarea
+                      id={`rating-review-${item.productId}`}
+                      value={comment}
+                      onChange={(event) =>
+                        setComments((current) => ({
+                          ...current,
+                          [item.productId]: event.target.value,
+                        }))
+                      }
+                      minLength={10}
+                      maxLength={1500}
+                      required
+                      rows={4}
+                      placeholder="Share your experience with this product…"
+                      className="mt-1 block w-full rounded-md border border-neutral-300 p-3 text-sm focus:border-[#E63312] focus:outline-none focus:ring-1 focus:ring-[#E63312]"
+                    />
+                    <p className="mt-1 text-right text-xs text-neutral-500">
+                      {comment.length}/1500 characters
+                    </p>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={submitting || rating === 0 || comment.trim().length < 10}
+                      className="rounded-md bg-black px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {submitting ? "Submitting…" : "Submit Review"}
+                    </button>
+                  </div>
+                </form>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

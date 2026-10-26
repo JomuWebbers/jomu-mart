@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   createOrder,
   getMyOrders,
+  getPendingRatings,
   getOrderById,
   getAllOrders,
   updateOrderStatus,
@@ -19,6 +20,7 @@ const router = Router()
 // Logged-in user routes
 router.post('/', protect, createOrder)
 router.get('/my-orders', protect, getMyOrders)
+router.get('/pending-ratings', protect, getPendingRatings)
 router.get('/:id', protect, getOrderById)
 
 // Admin-only routes
@@ -30,5 +32,4 @@ router.patch('/:orderId/items/:productId/payout', protect, isAdmin, payoutSeller
 
 
 export default router
-
 

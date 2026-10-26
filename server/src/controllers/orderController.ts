@@ -383,6 +383,80 @@ export const getMyOrders = async (req: AuthRequest, res: Response) => {
   }
 }
 
+export const getPendingRatings = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
+    const orders = await prisma.order.findMany({
+      where: { userId, status: 'Delivered' },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, items: true },
+    })
+
+    const orderByProduct = new Map<string, { orderId: string; name: string }>()
+    for (const order of orders) {
+      if (!Array.isArray(order.items)) continue
+      for (const item of order.items) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) continue
+        const snapshot = item as { productId?: unknown; name?: unknown }
+        if (
+          typeof snapshot.productId !== 'string' ||
+          orderByProduct.has(snapshot.productId)
+        ) {
+          continue
+        }
+        orderByProduct.set(snapshot.productId, {
+          orderId: order.id,
+          name: typeof snapshot.name === 'string' ? snapshot.name : 'Product',
+        })
+      }
+    }
+
+    if (orderByProduct.size === 0) {
+      return res.json([])
+    }
+
+    const productIds = [...orderByProduct.keys()]
+    const [reviewedProducts, products] = await Promise.all([
+      prisma.review.findMany({
+        where: { userId, productId: { in: productIds } },
+        select: { productId: true },
+      }),
+      prisma.product.findMany({
+        where: {
+          id: { in: productIds },
+          status: 'approved',
+          sellerId: { not: userId },
+        },
+        select: { id: true, name: true, image: true, images: true },
+      }),
+    ])
+
+    const reviewedIds = new Set(reviewedProducts.map((review) => review.productId))
+    const productById = new Map(products.map((product) => [product.id, product]))
+
+    res.json(
+      productIds.flatMap((productId) => {
+        const product = productById.get(productId)
+        const order = orderByProduct.get(productId)
+        if (!product || !order || reviewedIds.has(productId)) return []
+        return [{
+          productId,
+          orderId: order.orderId,
+          name: product.name || order.name,
+          image: product.image || product.images[0] || '',
+        }]
+      }),
+    )
+  } catch (error) {
+    console.error('Failed to fetch pending product ratings:', error)
+    res.status(500).json({ message: 'Failed to fetch products for review' })
+  }
+}
+
 export const getOrderById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params
@@ -533,7 +607,6 @@ export const payoutSeller = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Failed to process seller payout' })
   }
 }
-
 
 
 
