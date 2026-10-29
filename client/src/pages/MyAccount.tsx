@@ -1713,13 +1713,136 @@ function WalletView() {
   );
 }
 
+type VoucherStatus = "active" | "used" | "expired";
+
+type Voucher = {
+  code: string;
+  title: string;
+  description: string;
+  validity: string;
+  status: VoucherStatus;
+};
+
+const SAMPLE_VOUCHERS: Voucher[] = [
+  {
+    code: "WELCOME10",
+    title: "10% off your order",
+    description: "Save up to ₦2,000 on orders of ₦10,000 or more.",
+    validity: "Expires 31 Dec 2026",
+    status: "active",
+  },
+  {
+    code: "FREESHIP",
+    title: "Free standard delivery",
+    description: "Enjoy free standard delivery on orders of ₦15,000 or more.",
+    validity: "Expires 30 Nov 2026",
+    status: "active",
+  },
+  {
+    code: "SAVE1500",
+    title: "₦1,500 off your order",
+    description: "A sample voucher that has already been used.",
+    validity: "Used 14 Sep 2026",
+    status: "used",
+  },
+  {
+    code: "OLD500",
+    title: "₦500 off your order",
+    description: "A sample voucher that is no longer valid.",
+    validity: "Expired 30 Sep 2026",
+    status: "expired",
+  },
+];
+
 function VoucherView() {
+  const [activeFilter, setActiveFilter] = useState<VoucherStatus>("active");
+  const vouchers = SAMPLE_VOUCHERS.filter(
+    (voucher) => voucher.status === activeFilter,
+  );
+  const filters: { id: VoucherStatus; label: string }[] = [
+    { id: "active", label: "Active" },
+    { id: "used", label: "Used" },
+    { id: "expired", label: "Expired" },
+  ];
+
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold">Vouchers</h2>
-      <div className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-gray-500">No vouchers found.</p>
+      <div>
+        <h2 className="text-lg font-bold text-neutral-950">My Vouchers</h2>
+        <p className="mt-1 text-sm text-neutral-600">
+          Keep track of discounts and delivery offers available to you.
+        </p>
       </div>
+
+      <div
+        className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"
+        role="note"
+      >
+        <p className="font-semibold">Preview with sample vouchers</p>
+        <p className="mt-1 text-amber-900">
+          These examples are for display only. Voucher issuing and checkout
+          redemption are not connected yet.
+        </p>
+      </div>
+
+      <div className="flex gap-2 border-b border-neutral-200" aria-label="Voucher status">
+        {filters.map((filter) => (
+          <button
+            key={filter.id}
+            type="button"
+            aria-pressed={activeFilter === filter.id}
+            onClick={() => setActiveFilter(filter.id)}
+            className={`border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] ${
+              activeFilter === filter.id
+                ? "border-black text-neutral-950"
+                : "border-transparent text-neutral-500 hover:text-neutral-900"
+            }`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
+      {vouchers.length ? (
+        <ul className="grid gap-4 lg:grid-cols-2">
+          {vouchers.map((voucher) => (
+            <li
+              key={voucher.code}
+              className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-bold text-neutral-950">{voucher.title}</p>
+                  <p className="mt-1 text-sm leading-5 text-neutral-600">
+                    {voucher.description}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${
+                    voucher.status === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-neutral-100 text-neutral-600"
+                  }`}
+                >
+                  {voucher.status}
+                </span>
+              </div>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-neutral-200 pt-4">
+                <span className="rounded border border-dashed border-neutral-300 bg-neutral-50 px-3 py-1.5 font-mono text-sm font-bold tracking-wider text-neutral-800">
+                  {voucher.code}
+                </span>
+                <span className="text-xs text-neutral-500">
+                  {voucher.validity}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="rounded-lg border border-neutral-200 bg-neutral-50 p-6 text-center text-sm text-neutral-600">
+          No {activeFilter} vouchers in this preview.
+        </p>
+      )}
     </div>
   );
 }
