@@ -19,10 +19,11 @@ type UserRow = {
   trustedVendorWebsite: string | null
   trustedVendorRequestedAt: string | null
   trustedVendorRejectionReason: string | null
+  accountDeletionRequestedAt: string | null
   createdAt: string
 }
 
-type FilterMode = 'all' | 'pending' | 'trusted'
+type FilterMode = 'all' | 'pending' | 'trusted' | 'deletion'
 
 export default function AdminUsers() {
   const { token } = useAuth()
@@ -33,7 +34,13 @@ export default function AdminUsers() {
   const [rejectionReason, setRejectionReason] = useState('')
 
   const fetchUsers = useCallback((mode: FilterMode) => {
-    const query = mode === 'pending' ? '?pendingOnly=true' : mode === 'trusted' ? '?trustedOnly=true' : ''
+    const query = mode === 'pending'
+      ? '?pendingOnly=true'
+      : mode === 'trusted'
+        ? '?trustedOnly=true'
+        : mode === 'deletion'
+          ? '?deletionRequestedOnly=true'
+          : ''
     apiRequest(`/users${query}`, { token: token ?? undefined })
       .then(setUsers)
       .catch(() => toast.error('Failed to load users'))
@@ -69,10 +76,35 @@ export default function AdminUsers() {
     }
   }
 
+  const handleDeletionReview = async (id: string, approve: boolean) => {
+    if (
+      approve &&
+      !window.confirm('Permanently delete this account and its associated data?')
+    ) {
+      return
+    }
+
+    setActingId(id)
+    try {
+      await apiRequest(`/users/${id}/deletion-request`, {
+        method: 'PATCH',
+        token: token ?? undefined,
+        body: { approve },
+      })
+      toast.success(approve ? 'Account deletion approved' : 'Deletion request rejected')
+      fetchUsers(filter)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to review deletion request')
+    } finally {
+      setActingId(null)
+    }
+  }
+
   const FILTERS: { key: FilterMode; label: string }[] = [
     { key: 'all', label: 'All Customers' },
     { key: 'pending', label: 'Pending Requests' },
     { key: 'trusted', label: 'Trusted Vendors' },
+    { key: 'deletion', label: 'Deletion Requests' },
   ]
 
   return (
@@ -126,6 +158,33 @@ export default function AdminUsers() {
                   <WalletIcon className="size-3.5" /> ₦{u.accountBalance.toLocaleString()} balance
                 </p>
               </div>
+
+              {u.accountDeletionRequestedAt && (
+                <div className="mt-4 space-y-3 border-t border-red-100 pt-4">
+                  <p className="text-xs font-medium text-red-800">
+                    Account deletion requested{' '}
+                    {new Date(u.accountDeletionRequestedAt).toLocaleDateString()}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDeletionReview(u.id, true)}
+                      disabled={actingId === u.id}
+                      className="flex-1 rounded-lg bg-red-600 py-2 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {actingId === u.id ? 'Processing…' : 'Approve deletion'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeletionReview(u.id, false)}
+                      disabled={actingId === u.id}
+                      className="flex-1 rounded-lg border border-zinc-200 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                    >
+                      Reject request
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {u.trustedVendorBusinessName && (
                 <div className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-xs text-zinc-700">

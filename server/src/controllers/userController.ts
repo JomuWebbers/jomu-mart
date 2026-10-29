@@ -30,6 +30,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         trustedVendorWebsite: true,
         trustedVendorRequestedAt: true,
         trustedVendorRejectionReason: true,
+        accountDeletionRequestedAt: true,
       },
     })
 
@@ -41,6 +42,107 @@ export const getMe = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Failed to fetch account details' })
+  }
+}
+
+export const requestAccountDeletion = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
+    const { password } = req.body
+
+    if (typeof password !== 'string' || !password) {
+      return res.status(400).json({ message: 'Password is required' })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true, accountDeletionRequestedAt: true },
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password)
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Password is incorrect' })
+    }
+
+    const requestedAt = user.accountDeletionRequestedAt ?? new Date()
+    await prisma.user.update({
+      where: { id: userId },
+      data: { accountDeletionRequestedAt: requestedAt },
+    })
+
+    return res.json({
+      message: 'Account deletion request submitted',
+      accountDeletionRequestedAt: requestedAt,
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Failed to submit account deletion request' })
+  }
+}
+
+export const cancelAccountDeletion = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { accountDeletionRequestedAt: null },
+    })
+
+    return res.json({ message: 'Account deletion request cancelled' })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Failed to cancel account deletion request' })
+  }
+}
+
+export const reviewAccountDeletion = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params
+    const { approve } = req.body
+
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({ message: 'User id is required' })
+    }
+    if (typeof approve !== 'boolean') {
+      return res.status(400).json({ message: 'approve (true/false) is required' })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, accountDeletionRequestedAt: true },
+    })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    if (!user.accountDeletionRequestedAt) {
+      return res.status(409).json({ message: 'This user has no pending account deletion request' })
+    }
+
+    if (approve) {
+      await prisma.user.delete({ where: { id } })
+      return res.json({ message: 'Account deletion approved' })
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data: { accountDeletionRequestedAt: null },
+    })
+    return res.json({ message: 'Account deletion request rejected' })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Failed to review account deletion request' })
   }
 }
 
@@ -225,13 +327,16 @@ export const requestTrustedVendor = async (req: AuthRequest, res: Response) => {
 
 export const getUsers = async (req: AuthRequest, res: Response) => {
   try {
-    const { trustedOnly, pendingOnly } = req.query
+    const { trustedOnly, pendingOnly, deletionRequestedOnly } = req.query
 
     const users = await prisma.user.findMany({
       where: {
         role: 'customer',
         ...(trustedOnly === 'true' ? { isTrustedVendor: true } : {}),
         ...(pendingOnly === 'true' ? { trustedVendorRequestStatus: 'pending' } : {}),
+        ...(deletionRequestedOnly === 'true'
+          ? { accountDeletionRequestedAt: { not: null } }
+          : {}),
       },
       select: {
         id: true, name: true, email: true, phone: true,
@@ -240,6 +345,7 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
         trustedVendorLocation: true, trustedVendorDescription: true,
         trustedVendorWebsite: true, trustedVendorRequestedAt: true,
         trustedVendorRejectionReason: true,
+        accountDeletionRequestedAt: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' },

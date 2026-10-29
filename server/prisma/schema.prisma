@@ -34,6 +34,7 @@ model User {
   trustedVendorWebsite      String?
   trustedVendorRequestedAt  DateTime?
   trustedVendorRejectionReason String?
+  accountDeletionRequestedAt DateTime?
   products Product[]
   reviews Review[]
   sellerListingFees SellerListingFee[]

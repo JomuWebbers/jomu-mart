@@ -43,6 +43,7 @@ type User = {
   trustedVendorWebsite?: string | null;
   trustedVendorRequestedAt?: string | null;
   trustedVendorRejectionReason?: string | null;
+  accountDeletionRequestedAt?: string | null;
 };
 
 type Address = {
@@ -500,7 +501,12 @@ export default function MyAccount() {
                 onSubmitted={loadUser}
               />
             )}
-            {tab === "delete-account" && <DeleteAccountView />}
+            {tab === "delete-account" && (
+              <DeleteAccountView
+                requestedAt={userData?.accountDeletionRequestedAt ?? null}
+                onRequestUpdated={loadUser}
+              />
+            )}
           </main>
         </div>
       </div>
@@ -2144,15 +2150,204 @@ function VendorApplicationDetails({ status }: { status: User }) {
   );
 }
 
-function DeleteAccountView() {
+function DeleteAccountView({
+  requestedAt,
+  onRequestUpdated,
+}: {
+  requestedAt: string | null;
+  onRequestUpdated: () => Promise<void>;
+}) {
+  const { token } = useAuth();
+  const [password, setPassword] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleRequest = async () => {
+    if (!token) return;
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      await apiRequest("/users/me", {
+        method: "POST",
+        token,
+        body: { password },
+      });
+      setPassword("");
+      setShowConfirmation(false);
+      await onRequestUpdated();
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to submit account deletion request.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelRequest = async () => {
+    if (!token) return;
+    setIsSubmitting(true);
+    setError("");
+    try {
+      await apiRequest("/users/me/deletion-request", {
+        method: "DELETE",
+        token,
+      });
+      await onRequestUpdated();
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to cancel account deletion request.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold">Delete Account</h2>
-      <div className="bg-white p-4 border border-gray-300 rounded">
-        <p className="text-gray-500">
-          Account deletion functionality coming soon.
+      <div>
+        <h2 className="text-lg font-bold">Delete Account</h2>
+        <p className="mt-1 text-sm text-neutral-600">
+          Request permanent deletion of your account and associated data. An
+          administrator will review the request before it is completed.
         </p>
       </div>
+
+      {requestedAt ? (
+        <section
+          className="space-y-4 rounded-xl border border-amber-300 bg-amber-50 p-5"
+          aria-live="polite"
+        >
+          <div>
+            <h3 className="font-semibold text-amber-950">
+              Deletion request under review
+            </h3>
+            <p className="mt-1 text-sm text-amber-900">
+              Submitted {new Date(requestedAt).toLocaleDateString()}. Your
+              account remains active while an administrator reviews it.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void handleCancelRequest()}
+            disabled={isSubmitting}
+            className="rounded-md border border-neutral-300 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSubmitting ? "Cancelling…" : "Cancel deletion request"}
+          </button>
+        </section>
+      ) : (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            setError("");
+            setShowConfirmation(true);
+          }}
+          className="space-y-5 rounded-xl border border-red-200 bg-red-50 p-5"
+        >
+          <div className="space-y-2">
+            <label htmlFor="delete-account-password" className="block text-sm font-medium text-neutral-700">
+              Current password
+            </label>
+            <input
+              id="delete-account-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="rounded-md border border-red-200 bg-red-100 px-3 py-2 text-sm text-red-800" role="alert">
+              {error}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-red-200 pt-4">
+            <p className="text-sm text-neutral-600">
+              You can cancel your request before it is reviewed.
+            </p>
+            <button
+              type="submit"
+              className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+            >
+              Request account deletion
+            </button>
+          </div>
+        </form>
+      )}
+
+      {error && requestedAt && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+          {error}
+        </div>
+      )}
+
+      {showConfirmation && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isSubmitting) {
+              setShowConfirmation(false);
+            }
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-account-dialog-title"
+            aria-describedby="delete-account-dialog-description"
+            className="w-full max-w-lg space-y-5 rounded-xl bg-white p-6 shadow-xl"
+          >
+            <div>
+              <h3 id="delete-account-dialog-title" className="text-lg font-bold text-neutral-950">
+                Submit account deletion request?
+              </h3>
+              <p id="delete-account-dialog-description" className="mt-2 text-sm leading-6 text-neutral-600">
+                Your request will be sent to an administrator for review. Your
+                account will not be deleted immediately, and you can cancel the
+                request while it is pending.
+              </p>
+            </div>
+
+            {error && (
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+                {error}
+              </div>
+            )}
+
+            <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setShowConfirmation(false)}
+                disabled={isSubmitting}
+                className="rounded-md border border-neutral-300 px-4 py-2.5 text-sm font-semibold text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
+              >
+                Go back
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleRequest()}
+                disabled={isSubmitting}
+                className="rounded-md bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSubmitting ? "Submitting request…" : "Confirm request"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
