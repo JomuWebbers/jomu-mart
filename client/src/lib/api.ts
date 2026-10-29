@@ -18,7 +18,15 @@ export async function apiRequest(path: string, options: RequestOptions = {}) {
     body: body ? JSON.stringify(body) : undefined,
   })
 
-  const data = res.status === 204 ? undefined : await res.json()
+  let data
+  try {
+    data = res.status === 204 ? undefined : await res.json()
+  } catch {
+    if (!res.ok) {
+      throw new Error(`Request failed with status ${res.status}`)
+    }
+    throw new Error('The server returned an invalid response.')
+  }
 
   if (!res.ok) {
     throw new Error(data.message || 'Something went wrong')
@@ -38,7 +46,6 @@ export async function apiUpload(path: string, body: FormData, token?: string) {
   if (!res.ok) throw new Error(data.message || 'Upload failed')
   return data
 }
-
 
 
 

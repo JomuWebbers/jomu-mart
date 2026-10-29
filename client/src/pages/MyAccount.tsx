@@ -211,7 +211,7 @@ export default function MyAccount() {
     if (!token) return;
     setSaving(true);
     try {
-      await apiRequest("/users/me", {
+      await apiRequest("/users/me/deletion-request", {
         method: "PATCH",
         body: { name, phone },
         token,
