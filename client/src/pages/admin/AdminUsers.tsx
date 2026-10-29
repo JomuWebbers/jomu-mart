@@ -12,6 +12,13 @@ type UserRow = {
   accountBalance: number
   isTrustedVendor: boolean
   trustedVendorRequestStatus: string
+  trustedVendorBusinessName: string | null
+  trustedVendorCategories: string[]
+  trustedVendorLocation: string | null
+  trustedVendorDescription: string | null
+  trustedVendorWebsite: string | null
+  trustedVendorRequestedAt: string | null
+  trustedVendorRejectionReason: string | null
   createdAt: string
 }
 
@@ -22,6 +29,8 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<UserRow[] | null>(null)
   const [filter, setFilter] = useState<FilterMode>('all')
   const [actingId, setActingId] = useState<string | null>(null)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
 
   const fetchUsers = useCallback((mode: FilterMode) => {
     const query = mode === 'pending' ? '?pendingOnly=true' : mode === 'trusted' ? '?trustedOnly=true' : ''
@@ -34,15 +43,24 @@ export default function AdminUsers() {
     fetchUsers(filter)
   }, [filter, fetchUsers])
 
-  const handleReview = async (id: string, approve: boolean) => {
+  const handleReview = async (
+    id: string,
+    approve: boolean,
+    reason?: string,
+  ) => {
     setActingId(id)
     try {
       await apiRequest(`/users/${id}/trusted-vendor-request`, {
         method: 'PATCH',
         token: token ?? undefined,
-        body: { approve },
+        body: {
+          approve,
+          ...(reason?.trim() ? { rejectionReason: reason.trim() } : {}),
+        },
       })
       toast.success(approve ? 'Vendor approved' : 'Request rejected')
+      setRejectingId(null)
+      setRejectionReason('')
       fetchUsers(filter)
     } catch {
       toast.error('Failed to update request')
@@ -109,6 +127,47 @@ export default function AdminUsers() {
                 </p>
               </div>
 
+              {u.trustedVendorBusinessName && (
+                <div className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-xs text-zinc-700">
+                  <p>
+                    <span className="font-semibold">Business:</span>{' '}
+                    {u.trustedVendorBusinessName}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Location:</span>{' '}
+                    {u.trustedVendorLocation || 'Not provided'}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Categories:</span>{' '}
+                    {u.trustedVendorCategories?.join(', ') || 'Not provided'}
+                  </p>
+                  {u.trustedVendorDescription && (
+                    <p className="whitespace-pre-wrap">
+                      <span className="font-semibold">About:</span>{' '}
+                      {u.trustedVendorDescription}
+                    </p>
+                  )}
+                  {u.trustedVendorWebsite && (
+                    <p className="break-all">
+                      <span className="font-semibold">Website:</span>{' '}
+                      {u.trustedVendorWebsite}
+                    </p>
+                  )}
+                  {u.trustedVendorRequestedAt && (
+                    <p className="text-zinc-500">
+                      Submitted {new Date(u.trustedVendorRequestedAt).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {u.trustedVendorRequestStatus === 'rejected' &&
+                u.trustedVendorRejectionReason && (
+                  <p className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-800">
+                    Rejection note: {u.trustedVendorRejectionReason}
+                  </p>
+                )}
+
               {u.trustedVendorRequestStatus === 'pending' && (
                 <div className="mt-4 pt-4 border-t border-zinc-100">
                   <p className="flex items-center gap-1.5 text-[11px] font-medium text-amber-700 mb-3">
@@ -123,13 +182,55 @@ export default function AdminUsers() {
                       <CheckIcon className="size-3.5" /> Approve
                     </button>
                     <button
-                      onClick={() => handleReview(u.id, false)}
+                      onClick={() => {
+                        setRejectingId(u.id)
+                        setRejectionReason('')
+                      }}
                       disabled={actingId === u.id}
                       className="flex-1 flex items-center justify-center gap-1 py-2 bg-red-50 text-red-700 rounded-lg text-xs font-medium hover:bg-red-100 disabled:opacity-50"
                     >
                       <XIcon className="size-3.5" /> Reject
                     </button>
                   </div>
+                  {rejectingId === u.id && (
+                    <div className="mt-3 space-y-2">
+                      <label
+                        htmlFor={`rejection-reason-${u.id}`}
+                        className="block text-xs font-medium text-zinc-700"
+                      >
+                        Optional note for the applicant
+                      </label>
+                      <textarea
+                        id={`rejection-reason-${u.id}`}
+                        value={rejectionReason}
+                        onChange={(event) => setRejectionReason(event.target.value)}
+                        maxLength={500}
+                        rows={3}
+                        className="w-full rounded-lg border border-zinc-200 p-2 text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReview(u.id, false, rejectionReason)}
+                          disabled={actingId === u.id}
+                          className="flex-1 rounded-lg bg-red-600 py-2 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                        >
+                          {actingId === u.id ? 'Submitting…' : 'Confirm rejection'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRejectingId(null)
+                            setRejectionReason('')
+                          }}
+                          disabled={actingId === u.id}
+                          className="rounded-lg border border-zinc-200 px-3 py-2 text-xs font-medium text-zinc-700 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -139,4 +240,3 @@ export default function AdminUsers() {
     </div>
   )
 }
-

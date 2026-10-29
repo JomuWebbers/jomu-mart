@@ -27,6 +27,13 @@ model User {
   linkedBankName            String?
   isTrustedVendor           Boolean  @default(false)
   trustedVendorRequestStatus String? @default("none")  // "none" | "pending" | "approved" | "rejected"
+  trustedVendorBusinessName String?
+  trustedVendorCategories   String[] @default([])
+  trustedVendorLocation     String?
+  trustedVendorDescription  String?
+  trustedVendorWebsite      String?
+  trustedVendorRequestedAt  DateTime?
+  trustedVendorRejectionReason String?
   products Product[]
   reviews Review[]
   sellerListingFees SellerListingFee[]
@@ -223,4 +230,3 @@ model ReturnRequest {
   @@index([orderId])
   @@index([userId])
 }
-

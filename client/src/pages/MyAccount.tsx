@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { apiRequest } from "../lib/api";
 import { useAuth } from "../context/useAuth";
 import { PageShell } from "../components/wireframe-primitives";
+import { CATEGORIES } from "../data/categories";
 import { CITIES_BY_STATE, STATES } from "../data/nigeriaLocations";
 import toast from "react-hot-toast";
 import {
@@ -24,7 +25,6 @@ import {
   EyeOff as BalanceHiddenIcon,
   X,
 } from "lucide-react";
-import TrustedVendorRequest from "../components/TrustedVendorRequest";
 import MyOrders from "./MyOrders";
 
 type User = {
@@ -34,6 +34,15 @@ type User = {
   phone?: string | null;
   role?: string;
   accountBalance?: number;
+  isTrustedVendor?: boolean;
+  trustedVendorRequestStatus?: string | null;
+  trustedVendorBusinessName?: string | null;
+  trustedVendorCategories?: string[];
+  trustedVendorLocation?: string | null;
+  trustedVendorDescription?: string | null;
+  trustedVendorWebsite?: string | null;
+  trustedVendorRequestedAt?: string | null;
+  trustedVendorRejectionReason?: string | null;
 };
 
 type Address = {
@@ -122,7 +131,6 @@ export default function MyAccount() {
   const [pendingRatingsCount, setPendingRatingsCount] = useState(0);
   const [pendingRatingsLoading, setPendingRatingsLoading] = useState(true);
   const [pendingRatingsError, setPendingRatingsError] = useState("");
-  const [trustedVendorStatus, setTrustedVendorStatus] = useState<{ isTrustedVendor: boolean; trustedVendorRequestStatus: string | null } | null>(null);
   const [saving, setSaving] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -181,18 +189,6 @@ export default function MyAccount() {
     }
   }, [token]);
 
-  const loadTrustedVendorStatus = useCallback(async () => {
-    try {
-      const data = await apiRequest("/users/me", { token: token ?? undefined });
-      setTrustedVendorStatus({
-        isTrustedVendor: data.isTrustedVendor ?? false,
-        trustedVendorRequestStatus: data.trustedVendorRequestStatus ?? null,
-      });
-    } catch {
-      // Silent fail — trusted vendor section will show default state
-    }
-  }, [token]);
-
   useEffect(() => {
     if (location.pathname === "/my-account") {
       navigate(ACCOUNT_SECTION_PATHS[tab], { replace: true });
@@ -208,8 +204,7 @@ export default function MyAccount() {
     loadUser();
     loadAddresses();
     loadPendingRatings();
-    loadTrustedVendorStatus();
-  }, [token, navigate, loadUser, loadAddresses, loadPendingRatings, loadTrustedVendorStatus]);
+  }, [token, navigate, loadUser, loadAddresses, loadPendingRatings]);
 
   const handleSaveProfile = async (name: string, phone: string) => {
     if (!token) return;
@@ -499,7 +494,11 @@ export default function MyAccount() {
             {tab === "wallet" && <WalletView />}
             {tab === "voucher" && <VoucherView />}
             {tab === "trusted-vendor" && (
-              <TrustedVendorView status={trustedVendorStatus} />
+              <TrustedVendorView
+                status={userData}
+                token={token}
+                onSubmitted={loadUser}
+              />
             )}
             {tab === "delete-account" && <DeleteAccountView />}
           </main>
@@ -1849,39 +1848,299 @@ function VoucherView() {
 
 function TrustedVendorView({
   status,
+  token,
+  onSubmitted,
 }: {
-  status: {
-    isTrustedVendor: boolean;
-    trustedVendorRequestStatus: string | null;
-  } | null;
+  status: User | null;
+  token: string | null;
+  onSubmitted: () => Promise<void>;
 }) {
+  const [businessName, setBusinessName] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [website, setWebsite] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const requestStatus = status?.trustedVendorRequestStatus ?? "none";
+  const allCategories = Object.keys(CATEGORIES);
+
+  const toggleCategory = (category: string) => {
+    setCategories((selected) =>
+      selected.includes(category)
+        ? selected.filter((item) => item !== category)
+        : [...selected, category],
+    );
+  };
+
+  const submitApplication = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!token || submitting) return;
+    setSubmitting(true);
+    try {
+      await apiRequest("/users/trusted-vendor-request", {
+        method: "POST",
+        token,
+        body: { businessName, categories, location, description, website },
+      });
+      await onSubmitted();
+      toast.success("Trusted-vendor application submitted for review.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not submit your trusted-vendor application.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submittedDate = status?.trustedVendorRequestedAt
+    ? new Date(status.trustedVendorRequestedAt).toLocaleDateString("en-NG", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
+
   return (
-    <div className="space-y-6">
-      {status?.isTrustedVendor ? (
-        <>
-          <h2 className="text-lg font-bold">Trusted Vendor</h2>
-          <div className="bg-green-50 border border-green-200 p-4 rounded">
-            <p className="text-green-800 text-sm font-medium">
-              You are already a trusted vendor.
-            </p>
-          </div>
-        </>
-      ) : status?.trustedVendorRequestStatus === "pending" ? (
-        <>
-          <h2 className="text-lg font-bold">Trusted Vendor</h2>
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded">
-            <p className="text-amber-800 text-sm font-medium">
-              Your trusted-vendor request is pending review.
-            </p>
-          </div>
-        </>
+    <div className="max-w-3xl space-y-6">
+      <header>
+        <h2 className="text-lg font-bold text-neutral-950">Trusted Vendor</h2>
+        <p className="mt-1 text-sm leading-6 text-neutral-600">
+          Apply to have your seller account reviewed for trusted-vendor status.
+          Our team will review your business details before making a decision.
+        </p>
+      </header>
+
+      <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-5">
+        <h3 className="font-semibold text-neutral-950">What to expect</h3>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-5 text-neutral-700">
+          <li>Submit accurate business and product-category information.</li>
+          <li>An administrator will review your application.</li>
+          <li>
+            Trusted status does not replace marketplace policies or product
+            listing requirements.
+          </li>
+        </ul>
+      </section>
+
+      {!status ? (
+        <p className="py-8 text-center text-sm text-neutral-500" role="status">
+          Loading your application status…
+        </p>
+      ) : status.isTrustedVendor || requestStatus === "approved" ? (
+        <section className="rounded-xl border border-green-200 bg-green-50 p-5">
+          <p className="font-semibold text-green-900">
+            Your account has trusted-vendor status.
+          </p>
+          <p className="mt-1 text-sm text-green-800">
+            Continue to follow marketplace policies and keep your product and
+            business information up to date.
+          </p>
+          <VendorApplicationDetails status={status} />
+        </section>
+      ) : requestStatus === "pending" ? (
+        <section className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <p className="font-semibold text-amber-950">
+            Your application is under review.
+          </p>
+          <p className="mt-1 text-sm text-amber-900">
+            Submitted{submittedDate ? ` on ${submittedDate}` : ""}. You can
+            check this page for an update.
+          </p>
+          <VendorApplicationDetails status={status} />
+        </section>
       ) : (
         <>
-          <h2 className="text-lg font-bold">Trusted Vendor</h2>
-          <TrustedVendorRequest />
+          {requestStatus === "rejected" && (
+            <section className="rounded-xl border border-red-200 bg-red-50 p-5">
+              <p className="font-semibold text-red-900">
+                Your previous application was not approved.
+              </p>
+              <p className="mt-1 text-sm text-red-800">
+                You may update your details and submit a new application.
+                {status.trustedVendorRejectionReason
+                  ? ` Review note: ${status.trustedVendorRejectionReason}`
+                  : ""}
+              </p>
+            </section>
+          )}
+
+          <form
+            onSubmit={submitApplication}
+            className="space-y-5 rounded-xl border border-neutral-200 bg-white p-5"
+          >
+            <div>
+              <h3 className="font-semibold text-neutral-950">
+                Business application
+              </h3>
+              <p className="mt-1 text-sm text-neutral-600">
+                Share the details an administrator needs to review your seller
+                application. Do not submit identity documents here.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vendor-business-name"
+                className="block text-sm font-medium text-neutral-700"
+              >
+                Business or shop name
+              </label>
+              <input
+                id="vendor-business-name"
+                value={businessName}
+                onChange={(event) => setBusinessName(event.target.value)}
+                maxLength={100}
+                required
+                minLength={2}
+                autoComplete="organization"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
+              />
+            </div>
+
+            <fieldset>
+              <legend className="text-sm font-medium text-neutral-700">
+                Product categories
+              </legend>
+              <p className="mt-1 text-xs text-neutral-500">
+                Select at least one category you intend to sell in.
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {allCategories.map((category) => (
+                  <label
+                    key={category}
+                    className="flex items-start gap-2 rounded-md border border-neutral-200 p-3 text-sm text-neutral-700"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={categories.includes(category)}
+                      onChange={() => toggleCategory(category)}
+                      className="mt-0.5 accent-black"
+                    />
+                    <span>{category}</span>
+                  </label>
+                ))}
+              </div>
+              {categories.length === 0 && (
+                <p className="mt-2 text-xs text-neutral-500">
+                  Choose at least one category before submitting.
+                </p>
+              )}
+            </fieldset>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vendor-location"
+                className="block text-sm font-medium text-neutral-700"
+              >
+                Business location
+              </label>
+              <input
+                id="vendor-location"
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                maxLength={160}
+                minLength={2}
+                required
+                placeholder="City, State"
+                autoComplete="street-address"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vendor-description"
+                className="block text-sm font-medium text-neutral-700"
+              >
+                About your business
+              </label>
+              <textarea
+                id="vendor-description"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                maxLength={1000}
+                minLength={20}
+                required
+                rows={5}
+                placeholder="Tell us what you sell and about your experience serving customers."
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
+              />
+              <p className="text-right text-xs text-neutral-500">
+                {description.length}/1,000 characters
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="vendor-website"
+                className="block text-sm font-medium text-neutral-700"
+              >
+                Website or social media page{" "}
+                <span className="font-normal text-neutral-500">(optional)</span>
+              </label>
+              <input
+                id="vendor-website"
+                type="url"
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+                maxLength={200}
+                placeholder="https://example.com"
+                autoComplete="url"
+                className="block w-full rounded-md border border-neutral-300 px-3 py-2.5"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting || categories.length === 0}
+              className="rounded-md bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? "Submitting application…" : "Submit application"}
+            </button>
+          </form>
         </>
       )}
     </div>
+  );
+}
+
+function VendorApplicationDetails({ status }: { status: User }) {
+  if (!status.trustedVendorBusinessName) return null;
+
+  return (
+    <dl className="mt-5 grid gap-3 border-t border-current/10 pt-4 text-sm sm:grid-cols-2">
+      <div>
+        <dt className="font-medium">Business</dt>
+        <dd className="mt-0.5">{status.trustedVendorBusinessName}</dd>
+      </div>
+      <div>
+        <dt className="font-medium">Location</dt>
+        <dd className="mt-0.5">{status.trustedVendorLocation || "Not provided"}</dd>
+      </div>
+      <div className="sm:col-span-2">
+        <dt className="font-medium">Product categories</dt>
+        <dd className="mt-0.5">
+          {status.trustedVendorCategories?.join(", ") || "Not provided"}
+        </dd>
+      </div>
+      {status.trustedVendorDescription && (
+        <div className="sm:col-span-2">
+          <dt className="font-medium">About the business</dt>
+          <dd className="mt-0.5 whitespace-pre-wrap">
+            {status.trustedVendorDescription}
+          </dd>
+        </div>
+      )}
+      {status.trustedVendorWebsite && (
+        <div className="sm:col-span-2">
+          <dt className="font-medium">Website or social page</dt>
+          <dd className="mt-0.5 break-all">{status.trustedVendorWebsite}</dd>
+        </div>
+      )}
+    </dl>
   );
 }
 
