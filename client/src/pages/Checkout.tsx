@@ -19,10 +19,8 @@ import {
 } from "../lib/buyNow";
 import { STATES, CITIES_BY_STATE } from "../data/nigeriaLocations";
 
-// Order-level card payments are not wired yet (no initialize endpoint, no
-// inline popup, verify-payment has no caller), so card orders would sit
-// isPaid=false forever. Hide the option until Phase J wires it (option B).
-// Listing-fee card payments via Paystack redirect are unaffected.
+// Order-level card payments use the inline popup and server-side verification
+// below; listing-fee payments use a separate Paystack redirect flow.
 const PAYMENT_METHODS = ["Bank Transfer", "Pay on Delivery", "Card (Paystack)"];
 
 export default function Checkout() {
