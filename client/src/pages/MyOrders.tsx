@@ -45,6 +45,8 @@ type Order = {
   id: string;
   total: number;
   status: string;
+  paymentMethod?: string;
+  isPaid?: boolean | null;
   createdAt: string;
   items: OrderItem[];
   statusHistory?: { status: string; at: string }[];
@@ -133,6 +135,11 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
   const [loading, setLoading] = useState(() => Boolean(token));
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
+  const [checkingPaymentId, setCheckingPaymentId] = useState("");
+  const [paymentCheckError, setPaymentCheckError] = useState<{
+    orderId: string;
+    message: string;
+  } | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [selectedOrderForReturn, setSelectedOrderForReturn] =
     useState<Order | null>(null);
@@ -240,6 +247,41 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
     }
   }
 
+  async function checkOrderPayment(order: Order) {
+    setCheckingPaymentId(order.id);
+    setPaymentCheckError(null);
+    try {
+      const result = (await apiRequest(
+        `/orders/${encodeURIComponent(order.id)}/verify-payment`,
+        {
+          method: "PATCH",
+          token: token ?? undefined,
+          body: { reference: order.id },
+        },
+      )) as { isPaid?: boolean };
+
+      if (!result.isPaid) {
+        throw new Error("Payment is not confirmed yet. You can check again later.");
+      }
+
+      setOrders((current) =>
+        current.map((item) =>
+          item.id === order.id ? { ...item, isPaid: true } : item,
+        ),
+      );
+    } catch (err) {
+      setPaymentCheckError({
+        orderId: order.id,
+        message:
+          err instanceof Error
+            ? err.message
+            : "Could not check the payment. Please try again.",
+      });
+    } finally {
+      setCheckingPaymentId("");
+    }
+  }
+
   if (!token) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16">
@@ -325,6 +367,9 @@ export default function MyOrders({ embedded = false }: { embedded?: boolean }) {
             copiedId={copiedId}
             onCopy={(id) => void copyOrderId(id)}
             onRequestReturn={setSelectedOrderForReturn}
+            onVerifyPayment={(order) => void checkOrderPayment(order)}
+            checkingPaymentId={checkingPaymentId}
+            paymentCheckError={paymentCheckError}
             emptyMessage="No ongoing or delivered orders yet."
             showShopLink
           />
@@ -365,6 +410,9 @@ function OrdersPanel({
   copiedId,
   onCopy,
   onRequestReturn,
+  onVerifyPayment,
+  checkingPaymentId,
+  paymentCheckError,
   emptyMessage,
   showShopLink = false,
 }: {
@@ -372,6 +420,9 @@ function OrdersPanel({
   copiedId: string;
   onCopy: (id: string) => void;
   onRequestReturn: (order: Order) => void;
+  onVerifyPayment?: (order: Order) => void;
+  checkingPaymentId?: string;
+  paymentCheckError?: { orderId: string; message: string } | null;
   emptyMessage: string;
   showShopLink?: boolean;
 }) {
@@ -400,6 +451,15 @@ function OrdersPanel({
           copied={copiedId === order.id}
           onCopy={() => onCopy(order.id)}
           onRequestReturn={() => onRequestReturn(order)}
+          onVerifyPayment={
+            onVerifyPayment ? () => onVerifyPayment(order) : undefined
+          }
+          checkingPayment={checkingPaymentId === order.id}
+          paymentCheckError={
+            paymentCheckError?.orderId === order.id
+              ? paymentCheckError.message
+              : undefined
+          }
         />
       ))}
     </section>
@@ -411,11 +471,17 @@ function OrderCard({
   copied,
   onCopy,
   onRequestReturn,
+  onVerifyPayment,
+  checkingPayment,
+  paymentCheckError,
 }: {
   order: Order;
   copied: boolean;
   onCopy: () => void;
   onRequestReturn: () => void;
+  onVerifyPayment?: () => void;
+  checkingPayment: boolean;
+  paymentCheckError?: string;
 }) {
   const activeReturn = openReturn(order);
   const windowState = returnWindow(order);
@@ -434,7 +500,23 @@ function OrderCard({
         daysLeft={windowState.daysLeft}
         onCopy={onCopy}
         onRequestReturn={onRequestReturn}
+        onVerifyPayment={
+          order.paymentMethod === "Card (Paystack)" && !order.isPaid
+            ? onVerifyPayment
+            : undefined
+        }
+        checkingPayment={checkingPayment}
       />
+      {order.paymentMethod === "Card (Paystack)" && !order.isPaid && (
+        <p className="mt-3 text-xs text-neutral-600" role="status">
+          Payment pending. If you already paid, check its status here.
+        </p>
+      )}
+      {paymentCheckError && (
+        <p className="mt-2 text-xs text-red-700" role="alert">
+          {paymentCheckError}
+        </p>
+      )}
       <OrderReturnNote
         status={order.status}
         activeReturn={activeReturn}
@@ -494,6 +576,8 @@ function OrderCardActions({
   daysLeft,
   onCopy,
   onRequestReturn,
+  onVerifyPayment,
+  checkingPayment,
 }: {
   orderId: string;
   copied: boolean;
@@ -501,6 +585,8 @@ function OrderCardActions({
   daysLeft: number | null;
   onCopy: () => void;
   onRequestReturn: () => void;
+  onVerifyPayment?: () => void;
+  checkingPayment: boolean;
 }) {
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -517,6 +603,16 @@ function OrderCardActions({
       >
         {copied ? "Copied" : "Copy ID"}
       </button>
+      {onVerifyPayment && (
+        <button
+          type="button"
+          onClick={onVerifyPayment}
+          disabled={checkingPayment}
+          className="border-2 border-black px-3 py-2 text-xs font-bold uppercase disabled:opacity-50"
+        >
+          {checkingPayment ? "Checking payment…" : "Check payment"}
+        </button>
+      )}
       {canReturn && (
         <button
           type="button"
@@ -671,6 +767,4 @@ function ReturnCard({ request }: { request: ReturnRequestData }) {
     </article>
   );
 }
-
-
 
