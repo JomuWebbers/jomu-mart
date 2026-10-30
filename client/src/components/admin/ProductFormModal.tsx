@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from "react";
 import { XIcon, LoaderCircleIcon, UploadIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/useAuth";
-import { apiRequest } from "../../lib/api";
+import { API_BASE_URL, apiRequest } from "../../lib/api";
 import { CATEGORIES, CATEGORY_NAMES } from "../../data/categories";
 
 export type Product = {
@@ -71,7 +71,7 @@ export default function ProductFormModal({
     const formData = new FormData();
     formData.append("image", imageFile);
 
-    const res = await fetch("http://localhost:5000/api/upload", {
+    const res = await fetch(`${API_BASE_URL}/upload`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
