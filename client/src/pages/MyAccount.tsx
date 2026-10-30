@@ -2170,7 +2170,7 @@ function DeleteAccountView({
     setError("");
 
     try {
-      await apiRequest("/users/me", {
+      await apiRequest("/users/me/deletion-request", {
         method: "POST",
         token,
         body: { password },
