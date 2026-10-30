@@ -1,5 +1,6 @@
 
 {
+  "buildCommand": "npm run build && npm run db:deploy",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index" }
   ]
