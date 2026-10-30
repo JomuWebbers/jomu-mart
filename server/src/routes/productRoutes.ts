@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   getProducts,
+  getAdminProducts,
   getProductById,
   createProduct,
   updateProduct,
@@ -27,6 +28,7 @@ const router = Router()
 router.get("/", getProducts);
 
 // Specific paths must come before /:id
+router.get("/admin", protect, isAdmin, getAdminProducts);
 router.get("/pending", protect, isAdmin, getPendingListings);
 router.get("/my-listings", protect, isCustomer, getMyListings);
 router.post("/listing-fee/verify", protect, isCustomer, verifyListingFee);
@@ -47,5 +49,4 @@ router.delete("/:id", protect, isAdmin, deleteProduct);
 router.patch("/:id/review", protect, isAdmin, reviewListing);
 
 export default router
-
 

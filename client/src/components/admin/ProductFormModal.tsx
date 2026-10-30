@@ -14,6 +14,7 @@ export type Product = {
   image: string;
   category: string;
   subcategory?: string;
+  status?: string;
   // stock: string;
   stock?: number | null
 };

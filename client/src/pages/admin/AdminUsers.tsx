@@ -79,7 +79,9 @@ export default function AdminUsers() {
   const handleDeletionReview = async (id: string, approve: boolean) => {
     if (
       approve &&
-      !window.confirm('Permanently delete this account and its associated data?')
+      !window.confirm(
+        'Anonymize this account? Profile and seller-location details will be removed, listings will be archived, and orders and financial records will be retained. This cannot be undone.',
+      )
     ) {
       return
     }
@@ -91,7 +93,7 @@ export default function AdminUsers() {
         token: token ?? undefined,
         body: { approve },
       })
-      toast.success(approve ? 'Account deletion approved' : 'Deletion request rejected')
+      toast.success(approve ? 'Account anonymized' : 'Deletion request rejected')
       fetchUsers(filter)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to review deletion request')

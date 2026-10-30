@@ -2316,8 +2316,11 @@ function DeleteAccountView({
               </h3>
               <p id="delete-account-dialog-description" className="mt-2 text-sm leading-6 text-neutral-600">
                 Your request will be sent to an administrator for review. Your
-                account will not be deleted immediately, and you can cancel the
-                request while it is pending.
+                account remains active while it is pending. If approved, your
+                profile, saved addresses, and seller-location details will be
+                anonymized. Your seller listings will be archived, while order
+                and financial records will be retained. You can cancel the
+                request before it is reviewed.
               </p>
             </div>
 

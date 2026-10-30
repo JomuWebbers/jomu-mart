@@ -1,8 +1,30 @@
 
 import { Response } from 'express'
+import { randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
+import { Prisma } from '@prisma/client'
 import prisma from '../lib/prisma'
 import type { AuthRequest } from '../middleware/authMiddleware'
+
+const anonymizeReturnStatusHistory = (
+  history: Prisma.JsonValue | null,
+): Prisma.InputJsonValue => {
+  if (!Array.isArray(history)) {
+    return []
+  }
+
+  return history.flatMap((entry) => {
+    if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
+      return []
+    }
+
+    return [{
+      ...(typeof entry.status === 'string' ? { status: entry.status } : {}),
+      ...(typeof entry.timestamp === 'string' ? { timestamp: entry.timestamp } : {}),
+      ...(typeof entry.at === 'string' ? { at: entry.at } : {}),
+    }]
+  })
+}
 
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
@@ -60,11 +82,19 @@ export const requestAccountDeletion = async (req: AuthRequest, res: Response) =>
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, password: true, accountDeletionRequestedAt: true },
+      select: {
+        id: true,
+        password: true,
+        accountDeletionRequestedAt: true,
+        accountAnonymizedAt: true,
+      },
     })
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
+    }
+    if (user.accountAnonymizedAt) {
+      return res.status(409).json({ message: 'This account has already been anonymized' })
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password)
@@ -121,7 +151,7 @@ export const reviewAccountDeletion = async (req: AuthRequest, res: Response) => 
 
     const user = await prisma.user.findUnique({
       where: { id },
-      select: { id: true, accountDeletionRequestedAt: true },
+      select: { id: true, accountDeletionRequestedAt: true, accountAnonymizedAt: true },
     })
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -131,8 +161,94 @@ export const reviewAccountDeletion = async (req: AuthRequest, res: Response) => 
     }
 
     if (approve) {
-      await prisma.user.delete({ where: { id } })
-      return res.json({ message: 'Account deletion approved' })
+      const replacementPassword = await bcrypt.hash(randomBytes(32).toString('hex'), 10)
+      const anonymized = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.user.updateMany({
+          where: {
+            id,
+            accountDeletionRequestedAt: { not: null },
+            accountAnonymizedAt: null,
+          },
+          data: {
+            name: 'Deleted account',
+            email: `deleted-${id}@deleted.invalid`,
+            password: replacementPassword,
+            phone: '',
+            avatar: null,
+            linkedBankAccountNumber: null,
+            linkedBankName: null,
+            isTrustedVendor: false,
+            trustedVendorRequestStatus: 'none',
+            trustedVendorBusinessName: null,
+            trustedVendorCategories: [],
+            trustedVendorLocation: null,
+            trustedVendorDescription: null,
+            trustedVendorWebsite: null,
+            trustedVendorRequestedAt: null,
+            trustedVendorRejectionReason: null,
+            accountDeletionRequestedAt: null,
+            accountAnonymizedAt: new Date(),
+          },
+        })
+        if (claimed.count === 0) {
+          return false
+        }
+
+        await tx.address.deleteMany({ where: { userId: id } })
+        await tx.wishlist.deleteMany({ where: { userId: id } })
+        await tx.product.updateMany({
+          where: { sellerId: id },
+          data: {
+            status: 'archived',
+            sellerState: null,
+            sellerLga: null,
+            sellerAddress: null,
+          },
+        })
+        await tx.order.updateMany({
+          where: { userId: id },
+          data: {
+            shippingAddress: {
+              name: 'Deleted account',
+              phone: '',
+              address: '',
+              city: '',
+              state: '',
+              zip: '',
+            },
+          },
+        })
+        await tx.review.updateMany({
+          where: { userId: id },
+          data: { comment: '' },
+        })
+        await tx.walletTransaction.updateMany({
+          where: { userId: id },
+          data: { metadata: Prisma.DbNull },
+        })
+
+        const returnRequests = await tx.returnRequest.findMany({
+          where: { userId: id },
+          select: { id: true, statusHistory: true },
+        })
+        for (const returnRequest of returnRequests) {
+          await tx.returnRequest.update({
+            where: { id: returnRequest.id },
+            data: {
+              comments: '',
+              images: [],
+              adminNote: '',
+              statusHistory: anonymizeReturnStatusHistory(returnRequest.statusHistory),
+            },
+          })
+        }
+
+        return true
+      })
+      if (!anonymized) {
+        return res.status(409).json({ message: 'This deletion request has already been reviewed' })
+      }
+      return res.json({ message: 'Account anonymized; order and financial records retained' })
     }
 
     await prisma.user.update({
@@ -332,6 +448,7 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
     const users = await prisma.user.findMany({
       where: {
         role: 'customer',
+        accountAnonymizedAt: null,
         ...(trustedOnly === 'true' ? { isTrustedVendor: true } : {}),
         ...(pendingOnly === 'true' ? { trustedVendorRequestStatus: 'pending' } : {}),
         ...(deletionRequestedOnly === 'true'

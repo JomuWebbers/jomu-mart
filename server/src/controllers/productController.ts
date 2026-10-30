@@ -22,6 +22,19 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
+export const getAdminProducts = async (_req: Request, res: Response) => {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
+};
+
 export const getProductById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -349,7 +362,6 @@ export const getPendingListings = async (_req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Failed to fetch pending listings" });
   }
 };
-
 
 
 

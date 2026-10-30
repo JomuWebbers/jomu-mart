@@ -1,13 +1,14 @@
 
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
+import prisma from '../lib/prisma'
 
 export interface AuthRequest extends Request {
   userId?: string
   userRole?: string
 }
 
-export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -26,16 +27,31 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
     return res.status(500).json({ message: 'Server misconfiguration: missing JWT secret' })
   }
 
+  let decoded: { userId: string; role: string }
   try {
-    const decoded = jwt.verify(token, jwtSecret) as unknown as {
+    decoded = jwt.verify(token, jwtSecret) as unknown as {
       userId: string
       role: string
     }
+  } catch {
+    return res.status(401).json({ message: 'Not authorized, invalid token' })
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { accountAnonymizedAt: true },
+    })
+    if (!user || user.accountAnonymizedAt) {
+      return res.status(401).json({ message: 'This account is no longer active' })
+    }
+
     req.userId = decoded.userId
     req.userRole = decoded.role
     next()
-  } catch {
-    return res.status(401).json({ message: 'Not authorized, invalid token' })
+  } catch (error) {
+    console.error('Failed to validate authenticated account:', error)
+    return res.status(500).json({ message: 'Failed to validate account' })
   }
 }
 
@@ -72,7 +88,6 @@ export const optionalAuth = (req: AuthRequest, _res: Response, next: NextFunctio
   }
   next()
 }
-
 
 
 

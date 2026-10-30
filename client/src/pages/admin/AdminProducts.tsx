@@ -14,11 +14,11 @@ export default function AdminProducts() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    apiRequest('/products')
+    apiRequest('/products/admin', { token: token ?? undefined })
       .then(setProducts)
       .catch(() => toast.error('Failed to load products'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [token])
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
@@ -65,13 +65,14 @@ export default function AdminProducts() {
                 <th className="px-6 py-4">Category</th>
                 <th className="px-6 py-4">Price</th>
                 <th className="px-6 py-4">Stock</th>
+                <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-zinc-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-zinc-500">
                     No products yet.
                   </td>
                 </tr>
@@ -96,6 +97,7 @@ export default function AdminProducts() {
                         {p.stock ?? 0}
                       </span>
                     </td>
+                    <td className="px-6 py-4 capitalize text-zinc-600">{p.status || 'unknown'}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button
@@ -169,7 +171,6 @@ export default function AdminProducts() {
     </div>
   )
 }
-
 
 
 
