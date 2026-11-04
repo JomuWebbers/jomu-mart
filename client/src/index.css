@@ -29,6 +29,28 @@
   --shadow-card: var(--brand-card-shadow);
 }
 
+.hero-phrase {
+  display: inline-block;
+  animation: hero-phrase-in 400ms ease-out both;
+}
+
+@keyframes hero-phrase-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-phrase {
+    animation: none;
+  }
+}
+
 /* Horizontal-overflow guard. This used to live on the Layout root as
    `overflow-x-hidden`, which was the wrong element: any ancestor with a
    non-visible overflow becomes a scroll container, and a scroll container
@@ -56,7 +78,6 @@ html {
 .jm-support-chat .str-chat__avatar-stack {
   display: none;
 }
-
 
 
 
