@@ -1,7 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --vermilion: #E63312;
+  --brand-cream: #F7F3E9;
+  --brand-surface: #FFFDFA;
+  --brand-evergreen: #174C3A;
+  --brand-evergreen-strong: #10382D;
+  --brand-charcoal: #282A26;
+  --brand-muted: #6D706B;
+  --brand-border: #E5DED3;
+  --brand-accent: #E63312;
+  --brand-card-radius: 1rem;
+  --brand-control-radius: 0.625rem;
+  --brand-card-shadow: 0 8px 24px rgb(40 42 38 / 8%);
+  --vermilion: var(--brand-accent);
+}
+
+@theme inline {
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-evergreen: var(--brand-evergreen);
+  --color-brand-evergreen-strong: var(--brand-evergreen-strong);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-border: var(--brand-border);
+  --color-brand-accent: var(--brand-accent);
+  --radius-card: var(--brand-card-radius);
+  --radius-control: var(--brand-control-radius);
+  --shadow-card: var(--brand-card-shadow);
 }
 
 /* Horizontal-overflow guard. This used to live on the Layout root as
@@ -31,7 +56,6 @@ html {
 .jm-support-chat .str-chat__avatar-stack {
   display: none;
 }
-
 
 
 
