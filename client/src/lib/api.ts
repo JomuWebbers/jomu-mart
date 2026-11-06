@@ -6,6 +6,14 @@ type RequestOptions = {
   token?: string
 }
 
+function notifyUnauthorized(token?: string) {
+  if (token) {
+    window.dispatchEvent(
+      new CustomEvent('auth:unauthorized', { detail: { token } }),
+    )
+  }
+}
+
 export async function apiRequest(path: string, options: RequestOptions = {}) {
   const { method = 'GET', body, token } = options
 
@@ -17,6 +25,7 @@ export async function apiRequest(path: string, options: RequestOptions = {}) {
     },
     body: body ? JSON.stringify(body) : undefined,
   })
+  if (res.status === 401) notifyUnauthorized(token)
 
   let data
   try {
@@ -41,11 +50,11 @@ export async function apiUpload(path: string, body: FormData, token?: string) {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body,
   })
+  if (res.status === 401) notifyUnauthorized(token)
 
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || 'Upload failed')
   return data
 }
-
 
 

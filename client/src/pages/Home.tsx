@@ -251,14 +251,14 @@ export default function Homepage() {
     <>
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
       <section className="bg-brand-cream px-4 py-6 md:px-8 md:py-10">
-        <div className="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.75rem] bg-brand-evergreen text-brand-surface shadow-card md:grid-cols-2">
+        <div className="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.75rem] bg-brand-evergreen text-brand-surface shadow-card lg:grid-cols-2">
           <div className="flex flex-col items-start justify-center px-6 py-10 sm:px-10 md:px-12 md:py-14">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/85">
               <span className="size-1.5 rounded-full bg-[#F4B942]" />
               A marketplace made for you
             </span>
 
-            <h1 className="mt-6 max-w-xl text-5xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 max-w-xl text-4xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-6xl xl:text-7xl">
               Millions of deals
               <br />
               in one <span className="text-[#F4C86A]">place.</span>
@@ -296,7 +296,7 @@ export default function Homepage() {
             </div>
           </div>
 
-          <div className="grid min-h-[340px] grid-cols-2 grid-rows-2 gap-3 p-4 pt-0 sm:min-h-[440px] sm:gap-4 sm:p-5 md:min-h-full md:pl-0 md:pt-5">
+          <div className="grid min-h-[340px] grid-cols-2 grid-rows-2 gap-3 p-4 pt-0 sm:min-h-[440px] sm:gap-4 sm:p-5 lg:min-h-full lg:pl-0">
             {heroProducts.length > 0 ? (
               heroProducts.map((product, index) => (
                 <Link
