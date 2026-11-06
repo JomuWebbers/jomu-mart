@@ -47,8 +47,8 @@ const INITIAL_FORM: ListingForm = {
   deliveryFeeAmount: "",
 };
 
-const inputClass = "w-full border-2 border-black/20 px-3 py-3 text-sm outline-none focus:border-black";
-const labelClass = "mb-1.5 block text-[10px] font-bold uppercase tracking-[0.14em]";
+const inputClass = "w-full rounded-control border border-brand-border bg-brand-surface px-3.5 py-3 text-sm text-brand-charcoal outline-none transition focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15";
+const labelClass = "mb-1.5 block text-xs font-bold text-brand-charcoal";
 
 export default function SellProduct() {
   const { user, token } = useAuth();
@@ -204,11 +204,11 @@ export default function SellProduct() {
   if (!user) {
     return (
       <PageShell title="Sell on Jomu Mart" breadcrumb="SELLER CENTRE">
-        <div className="max-w-2xl border-2 border-black p-6 md:p-10">
-          <p className="text-sm text-neutral-600">Sign in or create an account to submit a product listing.</p>
+        <div className="max-w-2xl rounded-2xl border border-brand-border bg-brand-surface p-6 shadow-card md:p-10">
+          <p className="text-sm text-brand-muted">Sign in or create an account to submit a product listing.</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/login" className="bg-black px-5 py-3 text-xs font-bold uppercase tracking-widest text-white">Sign in</Link>
-            <Link to="/register" className="border-2 border-black px-5 py-3 text-xs font-bold uppercase tracking-widest">Create account</Link>
+            <Link to="/login" className="rounded-control bg-brand-evergreen px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong">Sign in</Link>
+            <Link to="/register" className="rounded-control border border-brand-border px-5 py-3 text-sm font-bold text-brand-charcoal transition-colors hover:border-brand-evergreen hover:text-brand-evergreen">Create account</Link>
           </div>
         </div>
       </PageShell>
@@ -217,26 +217,27 @@ export default function SellProduct() {
 
   return (
     <PageShell title="Sell on Jomu Mart" breadcrumb="SELLER CENTRE / NEW LISTING">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center gap-3" aria-label={`Step ${step} of 2`}>
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="min-w-0">
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-brand-border bg-brand-surface p-4 sm:p-5" aria-label={`Step ${step} of 2`}>
           {[1, 2].map((number) => (
             <div key={number} className="flex flex-1 items-center gap-3">
-              <div className={`flex size-9 shrink-0 items-center justify-center border-2 border-black text-xs font-black ${step === number ? "bg-black text-white" : number < step ? "bg-black text-white" : "bg-white"}`}>
+              <div className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-black ${number <= step ? "bg-brand-evergreen text-white" : "border border-brand-border bg-brand-surface text-brand-muted"}`}>
                 {number < step ? <CheckIcon className="size-4" /> : number}
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-[0.12em] ${step === number ? "text-black" : "text-neutral-400"}`}>
+              <span className={`text-xs font-semibold ${step === number ? "text-brand-evergreen" : "text-brand-muted"}`}>
                 {number === 1 ? "Product details" : "Delivery & review"}
               </span>
-              {number === 1 && <div className="h-px flex-1 bg-black/20" />}
+              {number === 1 && <div className="h-px flex-1 bg-brand-border" />}
             </div>
           ))}
         </div>
 
         {step === 1 ? (
-          <form onSubmit={continueToDelivery} className="space-y-7 border-2 border-black p-5 md:p-8">
+          <form onSubmit={continueToDelivery} className="space-y-7 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-card sm:p-7 md:p-8">
             <div>
-              <h2 className="text-lg font-black uppercase tracking-tight">What are you selling?</h2>
-              <p className="mt-1 text-xs text-neutral-500">Add clear details and photos so customers know exactly what to expect.</p>
+              <h2 className="text-xl font-bold tracking-tight text-brand-charcoal">What are you selling?</h2>
+              <p className="mt-1 text-sm text-brand-muted">Add clear details and photos so customers know exactly what to expect.</p>
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
@@ -274,7 +275,7 @@ export default function SellProduct() {
               </label>
               <label className="flex items-end pb-3">
                 <span className="flex items-center gap-3 text-sm">
-                  <input type="checkbox" checked={form.negotiable} onChange={(e) => update("negotiable", e.target.checked)} className="size-4 accent-black" />
+                  <input type="checkbox" checked={form.negotiable} onChange={(e) => update("negotiable", e.target.checked)} className="size-4 accent-brand-evergreen" />
                   Price is negotiable
                 </span>
               </label>
@@ -295,31 +296,31 @@ export default function SellProduct() {
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
                 {files.map((file, index) => (
-                  <div key={`${file.name}-${index}`} className="relative aspect-square border border-black/20">
+                  <div key={`${file.name}-${index}`} className="relative aspect-square overflow-hidden rounded-xl border border-brand-border bg-brand-cream">
                     <img src={previews[index]} alt={`Product photo ${index + 1}`} className="size-full object-cover" />
-                    {index === 0 && <span className="absolute bottom-0 left-0 bg-black px-2 py-1 text-[9px] font-bold uppercase text-white">Cover</span>}
-                    <button type="button" onClick={() => setFiles((current) => current.filter((_, i) => i !== index))} aria-label={`Remove photo ${index + 1}`} className="absolute right-1 top-1 flex size-7 items-center justify-center bg-white text-black shadow"><XIcon className="size-4" /></button>
+                    {index === 0 && <span className="absolute bottom-0 left-0 rounded-tr-lg bg-brand-evergreen px-2.5 py-1.5 text-[10px] font-bold text-white">Cover photo</span>}
+                    <button type="button" onClick={() => setFiles((current) => current.filter((_, i) => i !== index))} aria-label={`Remove photo ${index + 1}`} className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full bg-brand-surface text-brand-charcoal shadow"><XIcon className="size-4" /></button>
                   </div>
                 ))}
                 {files.length < MAX_IMAGES && (
-                  <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-black/30 text-center hover:border-black">
-                    <ImagePlusIcon className="size-6" />
-                    <span className="text-[10px] font-bold uppercase tracking-wide">Add photos</span>
+                  <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand-border bg-brand-cream/50 text-center text-brand-evergreen transition-colors hover:border-brand-evergreen hover:bg-brand-cream">
+                    <ImagePlusIcon className="size-7" />
+                    <span className="text-xs font-bold">Add photos</span>
                     <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { handleFiles(e.target.files); e.currentTarget.value = ""; }} />
                   </label>
                 )}
               </div>
             </div>
 
-            <button type="submit" className="flex w-full items-center justify-center gap-2 bg-black px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-white hover:bg-neutral-800">
-              Continue to delivery <ArrowRightIcon className="size-4" />
+            <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-control bg-brand-evergreen px-5 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen">
+              Continue to delivery <ArrowRightIcon aria-hidden="true" className="size-4" />
             </button>
           </form>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-7 border-2 border-black p-5 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-7 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-card sm:p-7 md:p-8">
             <div>
-              <h2 className="text-lg font-black uppercase tracking-tight">How will we collect and deliver it?</h2>
-              <p className="mt-1 text-xs text-neutral-500">Jomu Mart coordinates delivery. Choose how the item gets from you to our fulfilment network.</p>
+              <h2 className="text-xl font-bold tracking-tight text-brand-charcoal">How will we collect and deliver it?</h2>
+              <p className="mt-1 text-sm text-brand-muted">Choose how your item gets from you to our fulfilment network.</p>
             </div>
 
             <fieldset>
@@ -329,10 +330,10 @@ export default function SellProduct() {
                   ["dropoff", "I will drop it off", "You bring the item to the Jomu Mart warehouse for your state."],
                   ["pickup", "Arrange a pickup", "We arrange collection from your address before the customer delivery."],
                 ] as const).map(([value, title, description]) => (
-                  <label key={value} className={`cursor-pointer border-2 p-4 ${form.fulfillmentMethod === value ? "border-black bg-neutral-50" : "border-black/20"}`}>
+                  <label key={value} className={`cursor-pointer rounded-xl border p-4 transition-colors ${form.fulfillmentMethod === value ? "border-brand-evergreen bg-brand-cream/70" : "border-brand-border hover:border-brand-evergreen/50"}`}>
                     <span className="flex items-start gap-3">
-                      <input type="radio" name="fulfillmentMethod" value={value} checked={form.fulfillmentMethod === value} onChange={() => update("fulfillmentMethod", value)} className="mt-1 accent-black" />
-                      <span><span className="block text-sm font-bold">{title}</span><span className="mt-1 block text-xs leading-5 text-neutral-500">{description}</span></span>
+                      <input type="radio" name="fulfillmentMethod" value={value} checked={form.fulfillmentMethod === value} onChange={() => update("fulfillmentMethod", value)} className="mt-1 accent-brand-evergreen" />
+                      <span><span className="block text-sm font-bold text-brand-charcoal">{title}</span><span className="mt-1 block text-xs leading-5 text-brand-muted">{description}</span></span>
                     </span>
                   </label>
                 ))}
@@ -340,7 +341,7 @@ export default function SellProduct() {
             </fieldset>
 
             {form.fulfillmentMethod === "pickup" && (
-              <div className="grid gap-5 border-l-2 border-black pl-4 md:grid-cols-2">
+              <div className="grid gap-5 rounded-xl border-l-2 border-brand-evergreen bg-brand-cream/50 p-4 md:grid-cols-2">
                 <label>
                   <span className={labelClass}>State</span>
                   <select className={inputClass} value={form.sellerState} onChange={(e) => setForm((current) => ({ ...current, sellerState: e.target.value, sellerLga: "" }))}>
@@ -369,7 +370,7 @@ export default function SellProduct() {
               <div>
                 <span className={`${labelClass} block`}>Extra seller delivery fee</span>
                 <label className="flex min-h-12 items-center gap-3 text-sm">
-                  <input type="checkbox" checked={form.chargesDeliveryFee} onChange={(e) => update("chargesDeliveryFee", e.target.checked)} className="size-4 accent-black" />
+                  <input type="checkbox" checked={form.chargesDeliveryFee} onChange={(e) => update("chargesDeliveryFee", e.target.checked)} className="size-4 accent-brand-evergreen" />
                   I charge an additional delivery fee
                 </label>
               </div>
@@ -377,25 +378,52 @@ export default function SellProduct() {
                 <label className="md:col-span-2">
                   <span className={labelClass}>Additional fee (₦)</span>
                   <input className={inputClass} type="number" min="0" step="1" value={form.deliveryFeeAmount} onChange={(e) => update("deliveryFeeAmount", e.target.value)} required placeholder="0" />
-                  <span className="mt-1 block text-xs text-neutral-500">This amount is saved with your listing. Checkout fee calculations will be connected separately.</span>
+                  <span className="mt-1 block text-xs text-brand-muted">Buyers will see this delivery fee at checkout.</span>
                 </label>
               )}
             </div>
 
-            <div className="border-l-2 border-black bg-neutral-50 p-4 text-xs leading-5 text-neutral-600">
-              Your listing will be sent to the Jomu Mart team for review. The listing-fee payment step will be added in the next phase; no payment is taken here.
+            <div className="rounded-xl border border-brand-border bg-brand-cream/60 p-4 text-sm leading-6 text-brand-muted">
+              <p className="font-bold text-brand-charcoal">Listing fee</p>
+              <p className="mt-1">Your first five listings are free. After that, a ₦1,000 monthly seller fee applies when due and can be paid from your wallet or through Paystack.</p>
+              <p className="mt-2">Your listing is submitted for review after the required fee is confirmed.</p>
             </div>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-              <button type="button" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="flex items-center justify-center gap-2 border-2 border-black px-5 py-4 text-xs font-black uppercase tracking-[0.16em]">
+              <button type="button" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="flex items-center justify-center gap-2 rounded-control border border-brand-border px-5 py-4 text-sm font-bold text-brand-charcoal transition-colors hover:border-brand-evergreen hover:text-brand-evergreen">
                 <ArrowLeftIcon className="size-4" /> Back to product details
               </button>
-              <button type="submit" disabled={saving} className="flex items-center justify-center gap-2 bg-black px-6 py-4 text-xs font-black uppercase tracking-[0.16em] text-white disabled:opacity-60">
+              <button type="submit" disabled={saving} className="flex items-center justify-center gap-2 rounded-control bg-brand-evergreen px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong disabled:cursor-not-allowed disabled:opacity-60">
                 {saving ? <><LoaderCircleIcon className="size-4 animate-spin" /> Uploading & submitting…</> : "Submit listing for review"}
               </button>
             </div>
           </form>
         )}
+        </div>
+
+        <aside className="h-fit space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-card lg:sticky lg:top-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-evergreen">A smoother listing</p>
+            <h2 className="mt-2 text-lg font-bold text-brand-charcoal">A few things to know</h2>
+          </div>
+          <ul className="space-y-4 text-sm leading-5 text-brand-muted">
+            <li>
+              <span className="block font-semibold text-brand-charcoal">Clear photos help</span>
+              Use bright, accurate photos. Your first photo is the cover image.
+            </li>
+            <li>
+              <span className="block font-semibold text-brand-charcoal">Add the details</span>
+              Include condition, size, colour, and anything buyers should know.
+            </li>
+            <li>
+              <span className="block font-semibold text-brand-charcoal">Know the fee</span>
+              Five free listings, then ₦1,000 monthly when a listing fee is due.
+            </li>
+          </ul>
+          <div className="rounded-xl bg-brand-cream p-4 text-xs leading-5 text-brand-muted">
+            Listings are reviewed before they go live. You can go back and edit product details before submitting.
+          </div>
+        </aside>
       </div>
     </PageShell>
   );
