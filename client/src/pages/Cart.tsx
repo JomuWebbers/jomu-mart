@@ -74,15 +74,15 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <PageShell title="Shopping Cart" breadcrumb="HOME / CART">
-        <div className="mx-auto flex max-w-xl flex-col items-center rounded-lg border border-neutral-200 px-6 py-16 text-center">
-          <ShoppingBag className="mb-5 h-12 w-12 text-neutral-300" />
+        <div className="mx-auto flex max-w-xl flex-col items-center rounded-card border border-brand-border bg-brand-surface px-6 py-16 text-center shadow-card">
+          <ShoppingBag className="mb-5 h-12 w-12 text-brand-evergreen" />
           <h2 className="text-xl font-bold">Your cart is empty</h2>
-          <p className="mt-2 text-sm text-neutral-600">
+          <p className="mt-2 text-sm text-brand-muted">
             Browse the marketplace and add items you love to your cart.
           </p>
           <Link
             to="/"
-            className="mt-6 inline-flex items-center gap-2 rounded bg-[#E63312] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-black"
+            className="mt-6 inline-flex items-center gap-2 rounded-control bg-brand-evergreen px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong"
           >
             Continue shopping <ArrowRight className="h-4 w-4" />
           </Link>
@@ -97,10 +97,10 @@ export default function Cart() {
       breadcrumb={`HOME / CART · ${totalItems} ${totalItems === 1 ? "ITEM" : "ITEMS"}`}
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-brand-muted">
           {totalItems} {totalItems === 1 ? "item" : "items"} in your cart
         </p>
-        <Link to="/" className="text-sm font-semibold text-[#E63312] hover:underline">
+        <Link to="/" className="text-sm font-semibold text-brand-evergreen hover:underline">
           Continue shopping
         </Link>
       </div>
@@ -110,22 +110,22 @@ export default function Cart() {
           {items.map((item) => (
             <article
               key={item.id}
-              className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4 sm:flex-row"
+              className="flex flex-col gap-4 rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:flex-row"
             >
               <Link
                 to={`/products/${item.id}`}
                 aria-label={`View ${item.name}`}
-                className="aspect-square w-full shrink-0 overflow-hidden rounded bg-neutral-100 sm:h-28 sm:w-28"
+                className="aspect-square w-full shrink-0 overflow-hidden rounded-control bg-brand-cream sm:h-28 sm:w-28"
               >
                 {item.image ? (
                   <img
                     src={item.image}
                     alt={item.name}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain p-2"
                   />
                 ) : (
-                  <span className="flex h-full items-center justify-center text-xs text-neutral-400">
+                  <span className="flex h-full items-center justify-center text-xs text-brand-muted">
                     Image unavailable
                   </span>
                 )}
@@ -135,31 +135,31 @@ export default function Cart() {
                 <div className="min-w-0">
                   <Link
                     to={`/products/${item.id}`}
-                    className="line-clamp-2 font-semibold text-neutral-900 hover:text-[#E63312]"
+                    className="line-clamp-2 font-semibold text-brand-charcoal hover:text-brand-evergreen"
                   >
                     {item.name}
                   </Link>
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-brand-muted">
                     Ships from marketplace seller
                   </p>
                   <p className="mt-2 text-lg font-bold">{fmt(item.price)}</p>
-                  <p className="text-xs text-neutral-500">each</p>
+                  <p className="text-xs text-brand-muted">each</p>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
-                  <div className="flex items-center rounded border border-neutral-300">
+                  <div className="flex items-center overflow-hidden rounded-control border border-brand-border bg-brand-cream/50">
                     <button
                       type="button"
                       aria-label={`Decrease quantity of ${item.name}`}
                       onClick={() => updateQty(item.id, item.qty - 1)}
                       disabled={item.qty <= 1}
-                      className="px-3 py-2 font-bold hover:text-[#E63312] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="px-3 py-2 font-bold hover:text-brand-evergreen disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       −
                     </button>
                     <span
                       aria-label={`Quantity ${item.qty}`}
-                      className="min-w-10 border-x border-neutral-300 px-3 py-2 text-center text-sm font-semibold"
+                      className="min-w-10 border-x border-brand-border px-3 py-2 text-center text-sm font-semibold"
                     >
                       {item.qty}
                     </span>
@@ -167,20 +167,20 @@ export default function Cart() {
                       type="button"
                       aria-label={`Increase quantity of ${item.name}`}
                       onClick={() => updateQty(item.id, item.qty + 1)}
-                      className="px-3 py-2 font-bold hover:text-[#E63312]"
+                      className="px-3 py-2 font-bold hover:text-brand-evergreen"
                     >
                       +
                     </button>
                   </div>
                   <div className="flex items-center gap-1 text-sm font-bold">
-                    <span className="text-xs font-normal text-neutral-500">Line total</span>
+                    <span className="text-xs font-normal text-brand-muted">Line total</span>
                     {fmt(item.price * item.qty)}
                   </div>
                   <button
                     type="button"
                     onClick={() => removeFromCart(item.id)}
                     aria-label={`Remove ${item.name} from cart`}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-500 hover:text-red-600"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-brand-muted hover:text-red-600"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Remove
                   </button>
@@ -189,50 +189,50 @@ export default function Cart() {
             </article>
           ))}
 
-          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-green-700" />
-            <p className="text-xs text-neutral-600">
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brand-border bg-brand-cream p-4">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-brand-evergreen" />
+            <p className="text-xs text-brand-muted">
               Secure checkout · Buyer protection · Delivery fees are calculated by each seller at checkout.
             </p>
           </div>
         </main>
 
         <aside className="lg:col-span-4">
-          <div className="rounded-lg border border-neutral-200 bg-white p-5 lg:sticky lg:top-4">
+          <div className="rounded-card border border-brand-border bg-brand-surface p-5 shadow-card lg:sticky lg:top-4">
             <h2 className="text-lg font-bold">Order Summary</h2>
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between gap-3">
-                <span className="text-neutral-600">Items subtotal ({totalItems})</span>
+                <span className="text-brand-muted">Items subtotal ({totalItems})</span>
                 <span className="font-semibold">{fmt(subtotal)}</span>
               </div>
               <div className="flex justify-between gap-3">
-                <span className="text-neutral-600">Estimated delivery</span>
-                <span className="text-right text-xs text-neutral-500">Calculated at checkout</span>
+                <span className="text-brand-muted">Estimated delivery</span>
+                <span className="text-right text-xs text-brand-muted">Calculated at checkout</span>
               </div>
-              <div className="border-t border-neutral-200 pt-3">
+              <div className="border-t border-brand-border pt-3">
                 <div className="flex justify-between gap-3 text-base font-bold">
                   <span>Subtotal</span>
                   <span>{fmt(subtotal)}</span>
                 </div>
               </div>
             </div>
-            <p className="mt-3 text-xs leading-5 text-neutral-500">
+            <p className="mt-3 text-xs leading-5 text-brand-muted">
               Seller delivery charges, if any, will be confirmed at checkout.
             </p>
             <Link
               to="/checkout"
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded bg-[#E63312] px-4 py-3.5 text-sm font-bold text-white transition-colors hover:bg-black"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-control bg-brand-evergreen px-4 py-3.5 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong"
             >
               Proceed to checkout <ArrowRight className="h-4 w-4" />
             </Link>
-            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-500">
-              <Truck className="h-4 w-4" /> Secure payment options at checkout
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-brand-muted">
+              <Truck className="h-4 w-4 text-brand-evergreen" /> Secure payment options at checkout
             </div>
           </div>
         </aside>
       </div>
 
-      <section className="mt-12 border-t border-neutral-200 pt-8">
+      <section className="mt-12 border-t border-brand-border pt-8">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <MicroLabel>Keep browsing</MicroLabel>
@@ -248,21 +248,21 @@ export default function Cart() {
             {suggestions.map((product) => (
               <article
                 key={product.id}
-                className="overflow-hidden rounded-lg border border-neutral-200 bg-white"
+                className="overflow-hidden rounded-card border border-brand-border bg-brand-surface shadow-card"
               >
                 <Link
                   to={`/products/${product.id}`}
-                  className="block aspect-square overflow-hidden bg-neutral-100"
+                  className="block aspect-square overflow-hidden bg-brand-cream"
                 >
                   {product.image ? (
                     <img
                       src={product.image}
                       alt={product.name}
                       loading="lazy"
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain p-3"
                     />
                   ) : (
-                    <span className="flex h-full items-center justify-center text-xs text-neutral-400">
+                    <span className="flex h-full items-center justify-center text-xs text-brand-muted">
                       Image unavailable
                     </span>
                   )}
@@ -270,7 +270,7 @@ export default function Cart() {
                 <div className="p-3">
                   <Link
                     to={`/products/${product.id}`}
-                    className="line-clamp-2 min-h-10 text-sm font-semibold hover:text-[#E63312]"
+                    className="line-clamp-2 min-h-10 text-sm font-semibold text-brand-charcoal hover:text-brand-evergreen"
                   >
                     {product.name}
                   </Link>
@@ -279,7 +279,7 @@ export default function Cart() {
                     type="button"
                     onClick={() => handleAddSuggestion(product)}
                     disabled={user?.id === product.sellerId}
-                    className="mt-3 w-full rounded border border-neutral-300 px-3 py-2 text-xs font-bold hover:border-[#E63312] hover:text-[#E63312] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-3 w-full rounded-control border border-brand-border px-3 py-2 text-xs font-bold text-brand-evergreen hover:border-brand-evergreen hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Add to cart
                   </button>

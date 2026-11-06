@@ -423,9 +423,9 @@ export default function ProductDetail() {
     >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
         <section className="lg:col-span-6">
-          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
+          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-card border border-brand-border bg-brand-surface shadow-card">
             {hasDiscount && (
-              <span className="absolute left-3 top-3 z-10 rounded bg-[#E63312] px-3 py-1.5 text-xs font-bold text-white">
+              <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
                 Save {pct(product.price, product.originalPrice!)}%
               </span>
             )}
@@ -436,7 +436,7 @@ export default function ProductDetail() {
                 className="h-full w-full object-contain"
               />
             ) : (
-              <span className="text-xs font-bold uppercase text-neutral-400">
+              <span className="text-xs font-bold uppercase text-brand-muted">
                 No product image
               </span>
             )}
@@ -451,14 +451,14 @@ export default function ProductDetail() {
                 onClick={() => setActiveImage(image)}
                 aria-label={`Show product image ${index + 1}`}
                 aria-pressed={activeImage === image}
-                className={`aspect-square overflow-hidden rounded border-2 bg-neutral-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] ${
-                  activeImage === image ? "border-[#E63312]" : "border-neutral-200"
+                className={`aspect-square overflow-hidden rounded-xl border-2 bg-brand-surface transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen ${
+                  activeImage === image ? "border-brand-evergreen" : "border-brand-border"
                 }`}
               >
                 <img
                   src={image}
                   alt={`${product.name}, image ${index + 1}`}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full bg-brand-surface object-contain p-2"
                 />
               </button>
             ))}
@@ -476,12 +476,12 @@ export default function ProductDetail() {
           )}
         </section>
 
-        <section className="flex flex-col rounded-lg border border-neutral-200 bg-white p-4 sm:p-6 lg:col-span-6">
+        <section className="flex flex-col rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-6 lg:col-span-6">
           <MicroLabel>
             {product.category}{product.subcategory ? ` / ${product.subcategory}` : ""}
           </MicroLabel>
           <div className="mt-2 flex items-start justify-between gap-4">
-            <h1 className="text-xl font-bold leading-tight text-neutral-950 sm:text-2xl">
+            <h1 className="text-xl font-bold leading-tight text-brand-charcoal sm:text-2xl">
               {product.name}
             </h1>
             <button
@@ -492,7 +492,7 @@ export default function ProductDetail() {
                 isSaved ? "Remove from saved items" : "Save item"
               }
               aria-pressed={isSaved}
-              className="shrink-0 rounded-full border border-neutral-200 p-3 text-neutral-700 transition-colors hover:border-[#E63312] hover:text-[#E63312] disabled:opacity-50"
+              className="shrink-0 rounded-full border border-brand-border p-3 text-brand-muted transition-colors hover:border-brand-accent hover:text-brand-accent disabled:opacity-50"
             >
               <Heart
                 className={`h-5 w-5 ${isSaved ? "fill-[#E63312] text-[#E63312]" : ""}`}
@@ -508,23 +508,23 @@ export default function ProductDetail() {
                   {"☆".repeat(5 - Math.max(0, Math.min(5, Math.round(rating))))}
                 </span>
                 <span className="font-bold">{rating.toFixed(1)}</span>
-                <a href="#reviews" className="text-neutral-500 underline underline-offset-2">
+                <a href="#reviews" className="text-brand-muted underline underline-offset-2">
                   ({reviewCount} ratings)
                 </a>
               </>
             ) : (
-              <span className="text-neutral-500">No ratings yet</span>
+              <span className="text-brand-muted">No ratings yet</span>
             )}
           </div>
 
           <div className="mt-5 flex flex-wrap items-baseline gap-3">
-            <span className="text-3xl font-black text-neutral-950">{fmt(product.price)}</span>
+            <span className="text-3xl font-black text-brand-charcoal">{fmt(product.price)}</span>
             {hasDiscount && (
               <>
-                <span className="text-sm text-neutral-500 line-through">
+                <span className="text-sm text-brand-muted line-through">
                   {fmt(product.originalPrice!)}
                 </span>
-                <span className="rounded bg-red-50 px-2 py-1 text-xs font-bold text-[#E63312]">
+                <span className="rounded-full bg-brand-cream px-2.5 py-1 text-xs font-bold text-brand-evergreen">
                   Save {fmt(product.originalPrice! - product.price)} ({pct(product.price, product.originalPrice!)}%)
                 </span>
               </>
@@ -534,39 +534,39 @@ export default function ProductDetail() {
             <p className="mt-2 text-sm font-semibold">Price is negotiable</p>
           )}
 
-          <div className="mt-5 rounded-lg bg-neutral-50 p-4">
+          <div className="mt-5 rounded-xl bg-brand-cream p-4">
             <div className="mb-3 flex items-center gap-2">
-              <Truck className="h-5 w-5 text-[#E63312]" />
+              <Truck className="h-5 w-5 text-brand-evergreen" />
               <h2 className="font-bold">Delivery &amp; fulfilment</h2>
             </div>
             <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-neutral-600">Availability</span>
-              <span className={`text-sm font-bold ${outOfStock ? "text-red-600" : "text-green-700"}`}>
+              <span className="text-sm text-brand-muted">Availability</span>
+              <span className={`text-sm font-bold ${outOfStock ? "text-red-600" : "text-brand-evergreen"}`}>
                 {outOfStock ? "Out of stock" : product.stock == null ? "Available" : `${product.stock} available`}
               </span>
             </div>
             <div className="flex items-start justify-between gap-4">
-              <span className="text-sm text-neutral-600">Ships from</span>
+              <span className="text-sm text-brand-muted">Ships from</span>
               <span className="text-right text-sm font-semibold">
                 {[product.sellerLga, product.sellerState].filter(Boolean).join(", ") || "Location provided after order"}
               </span>
             </div>
             <div className="flex items-start justify-between gap-4">
-              <span className="text-sm text-neutral-600">Fulfilment</span>
+              <span className="text-sm text-brand-muted">Fulfilment</span>
               <span className="text-right text-sm font-semibold">
                 {product.fulfillmentMethod === "pickup" ? "Pickup from seller" : "Seller delivery"}
               </span>
             </div>
             {product.deliveryDays != null && (
               <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-neutral-600">Estimated delivery</span>
+                <span className="text-sm text-brand-muted">Estimated delivery</span>
                 <span className="text-sm font-semibold">About {product.deliveryDays} day{product.deliveryDays === 1 ? "" : "s"}</span>
               </div>
             )}
             {product.chargesDeliveryFee && (
               <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-neutral-600">Seller delivery fee</span>
+                <span className="text-sm text-brand-muted">Seller delivery fee</span>
                 <span className="text-sm font-semibold">{fmt(product.deliveryFeeAmount || 0)}</span>
               </div>
             )}
@@ -575,21 +575,21 @@ export default function ProductDetail() {
 
           <div className="flex flex-wrap items-center justify-between gap-4 py-5">
             <span className="text-sm font-semibold">Quantity</span>
-            <div className="flex items-center rounded border border-neutral-300">
+            <div className="flex items-center overflow-hidden rounded-control border border-brand-border bg-brand-cream/50">
               <button
                 type="button"
                 onClick={() => setQty((current) => Math.max(1, current - 1))}
                 disabled={qty <= 1}
                 aria-label="Decrease quantity"
-                className="px-4 py-2.5 font-bold hover:text-[#E63312] disabled:opacity-40"
+                className="px-4 py-2.5 font-bold hover:text-brand-evergreen disabled:opacity-40"
               >−</button>
-              <span className="min-w-12 border-x border-neutral-300 px-4 py-2.5 text-center font-bold">{qty}</span>
+              <span className="min-w-12 border-x border-brand-border px-4 py-2.5 text-center font-bold">{qty}</span>
               <button
                 type="button"
                 onClick={() => setQty((current) => Math.min(maxQty, current + 1))}
                 disabled={qty >= maxQty}
                 aria-label="Increase quantity"
-                className="px-4 py-2.5 font-bold hover:text-[#E63312] disabled:opacity-40"
+                className="px-4 py-2.5 font-bold hover:text-brand-evergreen disabled:opacity-40"
               >+</button>
             </div>
           </div>
@@ -604,18 +604,18 @@ export default function ProductDetail() {
               type="button"
               onClick={addProductToCart}
               disabled={isOwnListing || outOfStock}
-              className="flex items-center justify-center gap-2 rounded border border-black py-3.5 text-sm font-bold transition-colors hover:border-[#E63312] hover:text-[#E63312] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center justify-center gap-2 rounded-control border border-brand-evergreen py-3.5 text-sm font-bold text-brand-evergreen transition-colors hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-40"
             ><ShoppingCart className="h-4 w-4" /> Add to Cart</button>
             <button
               type="button"
               onClick={buyNow}
               disabled={isOwnListing || outOfStock}
-              className="rounded bg-[#E63312] py-3.5 text-sm font-bold transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-control bg-brand-evergreen py-3.5 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong disabled:cursor-not-allowed disabled:opacity-40"
             >Buy Now</button>
           </div>
 
-          <div className="mt-5 flex items-center gap-2 border-t border-neutral-200 pt-4 text-xs text-neutral-600">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-green-700" />
+          <div className="mt-5 flex items-center gap-2 border-t border-brand-border pt-4 text-xs text-brand-muted">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-brand-evergreen" />
             <span>Secure checkout · Order tracking · Customer support</span>
           </div>
         </section>
@@ -623,7 +623,7 @@ export default function ProductDetail() {
 
       <nav
         aria-label="Product information"
-        className="sticky top-0 z-20 mt-10 flex gap-6 overflow-x-auto border-b border-neutral-200 bg-white px-1"
+        className="sticky top-0 z-20 mt-10 flex gap-6 overflow-x-auto border-b border-brand-border bg-brand-cream px-1"
       >
         {[
           { label: "Product details", href: "#description" },
@@ -633,23 +633,23 @@ export default function ProductDetail() {
           <a
             key={item.href}
             href={item.href}
-            className="shrink-0 border-b-2 border-transparent py-4 text-sm font-semibold text-neutral-600 transition-colors hover:border-[#E63312] hover:text-[#E63312]"
+            className="shrink-0 border-b-2 border-transparent py-4 text-sm font-semibold text-neutral-600 transition-colors hover:border-brand-evergreen hover:text-brand-evergreen"
           >
             {item.label}
           </a>
         ))}
       </nav>
 
-      <section className="grid gap-8 border-b border-neutral-200 py-8 lg:grid-cols-3">
+      <section className="grid gap-8 border-b border-brand-border py-8 lg:grid-cols-3">
         <div id="description" className="scroll-mt-20 lg:col-span-2">
           <h2 className="text-lg font-bold">Product description</h2>
-          <div className="mt-3 whitespace-pre-line text-sm leading-7 text-neutral-700">
+          <div className="mt-3 whitespace-pre-line text-sm leading-7 text-brand-charcoal">
             {product.description?.trim() || "The seller has not added a description yet."}
           </div>
         </div>
-        <div id="specifications" className="scroll-mt-20 rounded-lg border border-neutral-200 p-5">
+        <div id="specifications" className="scroll-mt-20 rounded-card border border-brand-border bg-brand-surface p-5">
           <h2 className="text-lg font-bold">Specifications</h2>
-          <dl className="mt-4 divide-y divide-neutral-100 text-sm">
+          <dl className="mt-4 divide-y divide-brand-border text-sm">
             <div className="flex justify-between gap-3 py-3">
               <dt className="text-neutral-500">Category</dt>
               <dd className="text-right font-semibold">{product.category}</dd>
@@ -672,7 +672,7 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      <section id="reviews" className="scroll-mt-20 border-b border-neutral-200 py-8">
+      <section id="reviews" className="scroll-mt-20 border-b border-brand-border py-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold">Customer reviews</h2>
@@ -723,7 +723,7 @@ export default function ProductDetail() {
           </div>
         )}
         {token && canReview ? (
-          <form onSubmit={submitReview} className="mt-5 rounded-lg border border-neutral-200 p-5">
+          <form onSubmit={submitReview} className="mt-5 rounded-card border border-brand-border bg-brand-surface p-5">
             <h3 className="font-bold">
               {currentReviewData?.alreadyReviewed ? "Update your review" : "Review this product"}
             </h3>
@@ -763,7 +763,7 @@ export default function ProductDetail() {
               required
               rows={5}
               placeholder="Share your experience with this product…"
-              className="mt-2 w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+              className="mt-2 w-full rounded-control border border-brand-border bg-white p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-1 focus:ring-brand-evergreen"
             />
             <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <span className="text-xs text-neutral-500">
@@ -772,7 +772,7 @@ export default function ProductDetail() {
               <button
                 type="submit"
                 disabled={submittingReview}
-                className="rounded bg-[#E63312] px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-black disabled:opacity-50"
+                className="rounded-control bg-brand-evergreen px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-brand-evergreen-strong disabled:opacity-50"
               >
                 {submittingReview ? "Saving…" : "Submit review"}
               </button>
@@ -784,12 +784,12 @@ export default function ProductDetail() {
             )}
           </form>
         ) : !token ? (
-          <p className="mt-4 rounded border border-neutral-200 p-5 text-sm text-neutral-600">
+          <p className="mt-4 rounded-card border border-brand-border bg-brand-surface p-5 text-sm text-neutral-600">
             <Link to="/login" className="font-bold underline">Sign in</Link> and
             complete delivery of this product to leave a verified review.
           </p>
         ) : (
-          <p className="mt-4 rounded border border-neutral-200 p-5 text-sm text-neutral-600">
+          <p className="mt-4 rounded-card border border-brand-border bg-brand-surface p-5 text-sm text-neutral-600">
             Reviews are open to customers after an order containing this product is marked delivered.
           </p>
         )}
@@ -836,7 +836,7 @@ export default function ProductDetail() {
           </div>
           <Link
             to={`/?q=${encodeURIComponent(product.category)}`}
-            className="shrink-0 text-sm font-semibold text-[#E63312] hover:underline"
+            className="shrink-0 text-sm font-semibold text-brand-evergreen hover:underline"
           >
             See all
           </Link>
@@ -876,7 +876,7 @@ export default function ProductDetail() {
                     )}
                   </div>
                   <div className="p-3">
-                    <p className="line-clamp-2 min-h-10 text-sm font-medium group-hover:text-[#E63312]">
+                    <p className="line-clamp-2 min-h-10 text-sm font-medium group-hover:text-brand-evergreen">
                       {related.name}
                     </p>
                     <div className="mt-2 flex flex-wrap items-baseline gap-2">

@@ -74,32 +74,32 @@ export default function Layout() {
 
   return (
     <div
-      className="bg-white text-black min-h-screen"
+      className="min-h-screen bg-brand-cream text-brand-charcoal"
       style={{ fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif" }}
     >
       {/* Announcement Bar */}
-      <div className="bg-black text-white py-2 px-4 md:px-8">
+      <div className="bg-brand-evergreen text-white py-2 px-4 md:px-8">
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
           <span className="text-[9px] md:text-[10px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-semibold">
-            <span className="text-[#E63312]">●</span> Free delivery on orders above ₦50,000
+            <span className="text-[#F4C86A]">●</span> Free delivery on orders above ₦50,000
           </span>
         </div>
       </div>
 
       {/* Header */}
-      <header className="border-b border-black/15 bg-white px-4 md:px-8 py-4 md:py-5">
+      <header className="border-b border-brand-border bg-brand-surface px-4 py-4 md:px-8 md:py-5">
         {/* Mobile header row — WF-06: ☰ · logo · account · cart */}
         <div className="lg:hidden max-w-screen-2xl mx-auto flex items-center gap-3">
           <button
             ref={mobileMenuButtonRef}
             onClick={() => setMobileMenuOpen(true)}
-            className="w-9 h-9 border border-black flex flex-col items-center justify-center gap-1 hover:border-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+            className="flex h-9 w-9 flex-col items-center justify-center gap-1 rounded-control border border-brand-border hover:border-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
             aria-label="Menu"
             aria-expanded={mobileMenuOpen}
           >
-            <span className="w-4 h-0.5 bg-black" />
-            <span className="w-4 h-0.5 bg-black" />
-            <span className="w-4 h-0.5 bg-black" />
+            <span className="h-0.5 w-4 bg-brand-charcoal" />
+            <span className="h-0.5 w-4 bg-brand-charcoal" />
+            <span className="h-0.5 w-4 bg-brand-charcoal" />
           </button>
           <Link
             to="/"
@@ -109,18 +109,18 @@ export default function Layout() {
             Jomu Mart
           </Link>
           <span className="flex-1" />
-          <Link to={user ? (user.role === "admin" ? "/admin" : "/my-account") : "/login"} className="text-[13px] font-bold hover:text-[#E63312]">
+          <Link to={user ? (user.role === "admin" ? "/admin" : "/my-account") : "/login"} className="text-[13px] font-bold hover:text-brand-evergreen">
             {user ? (user.role === "admin" ? "Admin" : "👤 Account") : "👤 Login"}
           </Link>
           {user?.role !== "admin" && (
             <Link
               to="/cart"
               aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
-              className="relative flex h-9 w-9 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+              className="relative flex h-9 w-9 items-center justify-center hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
             >
               <ShoppingCart aria-hidden="true" className="h-5 w-5" />
               {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E63312] px-1 text-[10px] font-bold leading-none text-white">
+                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-accent px-1 text-[10px] font-bold leading-none text-white">
                   {totalItems}
                 </span>
               )}
@@ -143,7 +143,7 @@ export default function Layout() {
           {user?.role !== "admin" && (
             <Link
               to="/sell"
-              className="hidden xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold hover:opacity-70"
+              className="hidden xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold text-brand-evergreen hover:text-brand-evergreen-strong"
             >
               🏷 Sell on Jomu Mart
             </Link>
@@ -157,7 +157,7 @@ export default function Layout() {
           </span>
 
           <form
-            className="hidden lg:flex flex-1 min-w-0 border border-black focus-within:border-[#E63312]"
+            className="hidden lg:flex flex-1 min-w-0 overflow-hidden rounded-control border border-brand-border bg-white focus-within:border-brand-evergreen focus-within:ring-2 focus-within:ring-brand-evergreen/10"
             onSubmit={(e) => {
               e.preventDefault();
               navigate(
@@ -169,11 +169,11 @@ export default function Layout() {
             <input
               type="text"
               placeholder="Search products, brands and categories…"
-              className="flex-1 min-w-0 px-4 py-2.5 text-sm outline-none bg-transparent"
+              className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-sm outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button type="submit" className="px-6 py-2.5 bg-[#E63312] text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0 hover:bg-black transition-colors">
+            <button type="submit" className="shrink-0 bg-brand-evergreen px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand-evergreen-strong">
               Search
             </button>
           </form>
@@ -181,16 +181,16 @@ export default function Layout() {
             <div className="relative group hidden xl:block shrink-0">
               <button
                 type="button"
-                className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+                className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
               >
                 ▦ Download App ▾
               </button>
               <div className="invisible absolute right-0 top-full z-50 pt-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                <div className="bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] w-[250px] p-4">
+                <div className="w-[250px] rounded-xl border border-brand-border bg-brand-surface p-4 shadow-card">
                   <p className="text-[10px] tracking-[0.2em] uppercase font-bold mb-2">
                     Scan QR to download
                   </p>
-                  <div className="h-28 border border-dashed border-neutral-300 flex items-center justify-center text-[10px] text-neutral-400 uppercase tracking-widest">
+                  <div className="flex h-28 items-center justify-center rounded-lg border border-dashed border-brand-border text-[10px] uppercase tracking-widest text-brand-muted">
                     QR Code — soon
                   </div>
                   <p className="mt-3 text-[11px] font-bold">▶ Google Play <span className="text-neutral-400 font-medium">(coming soon)</span></p>
@@ -202,17 +202,17 @@ export default function Layout() {
   <div className="relative group hidden lg:block shrink-0">
   <button
     type="button"
-    className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+    className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
   >
     ( ? ) Help ▾
   </button>
   <div className="invisible absolute right-0 top-full z-50 pt-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-    <div className="bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] min-w-[250px] py-1">
+    <div className="min-w-[250px] rounded-xl border border-brand-border bg-brand-surface py-1 shadow-card">
       {HELP_LINKS.map((link) => (
         <Link
           key={link.to}
           to={link.to}
-          className="block px-4 py-2 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+          className="block border-b border-brand-border px-4 py-2 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
         >
           {link.label}
         </Link>
@@ -230,7 +230,7 @@ export default function Layout() {
               <button
                 ref={accountButtonRef}
                 type="button"
-                className="flex items-center gap-1.5 text-[11px] tracking-[0.14em] uppercase font-semibold cursor-pointer hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63312]"
+                className="flex cursor-pointer items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-evergreen"
                 aria-expanded={accountOpen}
                 aria-haspopup="true"
                 aria-controls={accountMenuId}
@@ -250,25 +250,25 @@ export default function Layout() {
               >
                 <div
                   id={accountMenuId}
-                  className="max-h-[calc(100vh-6rem)] w-80 max-w-[calc(100vw-2rem)] overflow-x-hidden overflow-y-auto border-2 border-black bg-white shadow-[6px_6px_0_rgba(0,0,0,0.15)]"
+                  className="max-h-[calc(100vh-6rem)] w-80 max-w-[calc(100vw-2rem)] overflow-x-hidden overflow-y-auto rounded-xl border border-brand-border bg-brand-surface shadow-card"
                 >
                   {user?.role === "admin" ? (
                     <>
-                      <div className="border-b border-black/10 px-4 py-3">
+                      <div className="border-b border-brand-border px-4 py-3">
                         <p className="text-[12px] font-bold">{user.name}</p>
                         <p className="text-[10px] text-neutral-400">{user.email}</p>
                       </div>
                       <Link
                         to="/admin"
                         onClick={() => setAccountOpen(false)}
-                        className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         Admin Dashboard
                       </Link>
                       <Link
                         to="/"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                        className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         View Store
                       </Link>
@@ -286,39 +286,39 @@ export default function Layout() {
                     </>
                   ) : user ? (
                     <>
-                      <div className="px-4 py-3 border-b border-black/10">
+                      <div className="border-b border-brand-border px-4 py-3">
                         <p className="text-[12px] font-bold">{user.name}</p>
                         <p className="text-[10px] text-neutral-400">
                           {user.email}
                         </p>
                       </div>
-                      <div className="border-b border-black/10 py-2">
+                      <div className="border-b border-brand-border py-2">
                         <p className="mb-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
                           Account
                         </p>
                         <Link
                           to="/my-account"
                           onClick={() => setAccountOpen(false)}
-                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                          className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                         >
                           My Account
                         </Link>
                         <Link
                           to="/my-account/orders"
                           onClick={() => setAccountOpen(false)}
-                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                          className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                         >
                           My Orders
                         </Link>
                         <Link
                           to="/saved-items"
                           onClick={() => setAccountOpen(false)}
-                          className="block border-b border-black/10 px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                          className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                         >
                           <span className="flex items-center justify-between">
                             Saved Items
                             {savedCount !== null && savedCount > 0 && (
-                              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E63312] px-1.5 text-[10px] font-bold text-white">
+                              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-accent px-1.5 text-[10px] font-bold text-white">
                                 {savedCount}
                               </span>
                             )}
@@ -327,7 +327,7 @@ export default function Layout() {
                         <Link
                           to="/track-order"
                           onClick={() => setAccountOpen(false)}
-                          className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-neutral-50"
+                          className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                         >
                           Track My Order
                         </Link>
@@ -353,35 +353,35 @@ export default function Layout() {
                       <Link
                         to="/login"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                        className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         Login / Signup
                       </Link>
                       <Link
                         to="/login"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                        className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         My Account
                       </Link>
                       <Link
                         to="/my-account/orders"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                        className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         My Orders
                       </Link>
                       <Link
                         to="/saved-items"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50 border-b border-black/10"
+                        className="block border-b border-brand-border px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         Saved Items
                       </Link>
                       <Link
                         to="/track-order"
                         onClick={() => setAccountOpen(false)}
-                        className="block px-4 py-3 text-[11px] uppercase font-bold tracking-wide hover:bg-neutral-50"
+                        className="block px-4 py-3 text-[11px] font-bold uppercase tracking-wide hover:bg-brand-cream"
                       >
                         Track My Order
                       </Link>
@@ -395,7 +395,7 @@ export default function Layout() {
               <Link
                 to="/cart"
                 aria-label={`Shopping cart, ${totalItems} ${totalItems === 1 ? "item" : "items"}`}
-                className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
               >
                 <ShoppingCart aria-hidden="true" className="h-5 w-5" />
                 {totalItems > 0 && (
@@ -409,7 +409,7 @@ export default function Layout() {
 
         </div>
 
-        <div className="lg:hidden max-w-screen-2xl mx-auto mt-3 flex border border-black focus-within:border-[#E63312]">
+        <div className="mx-auto mt-3 flex max-w-screen-2xl overflow-hidden rounded-control border border-brand-border bg-white focus-within:border-brand-evergreen focus-within:ring-2 focus-within:ring-brand-evergreen/10 lg:hidden">
             <form
               className="flex flex-1"
               onSubmit={(e) => {
@@ -424,7 +424,7 @@ export default function Layout() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button type="submit" className="px-4 py-2 bg-[#E63312] text-white text-[10px] tracking-[0.2em] uppercase font-bold shrink-0 hover:bg-black transition-colors">
+          <button type="submit" className="shrink-0 bg-brand-evergreen px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand-evergreen-strong">
             Go
           </button>
           </form>
@@ -434,18 +434,18 @@ export default function Layout() {
       </header>
 
       {/* Category Nav — desktop: mega menu + quick links · mobile: Home + tabs */}
-      <nav aria-label="Product categories" className="border-b border-black/15 bg-neutral-50 px-4 md:px-8">
+      <nav aria-label="Product categories" className="border-b border-brand-border bg-brand-cream px-4 md:px-8">
         <div className="max-w-screen-2xl mx-auto flex items-center">
           {/* All Categories mega menu (desktop only) */}
           <div className="relative group/cat-trigger hidden lg:block shrink-0">
             <button
               type="button"
-              className="border-r border-black/10 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+              className="border-r border-brand-border px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-evergreen"
             >
               ☰ All Categories ▾
             </button>
             <div className="invisible absolute left-0 top-full z-50 opacity-0 group-hover/cat-trigger:visible group-hover/cat-trigger:opacity-100 group-focus-within/cat-trigger:visible group-focus-within/cat-trigger:opacity-100">
-              <div className="w-[260px] bg-white border-2 border-black shadow-[6px_6px_0_rgba(0,0,0,0.15)] py-2">
+              <div className="w-[260px] rounded-xl border border-brand-border bg-brand-surface py-2 shadow-card">
                 {CATEGORY_NAMES.map((cat) => (
                   <div
                     key={cat}
@@ -453,17 +453,17 @@ export default function Layout() {
                   >
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-[12px] font-semibold hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-[12px] font-semibold hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-evergreen"
                     >
                       {cat} <span aria-hidden="true">▸</span>
                     </button>
-                    <div className="invisible absolute left-full top-[-8px] z-50 w-[280px] border-2 border-black bg-white p-4 opacity-0 shadow-[6px_6px_0_rgba(0,0,0,0.15)] group-hover/cat:visible group-hover/cat:opacity-100 group-focus-within/cat:visible group-focus-within/cat:opacity-100">
+                    <div className="invisible absolute left-full top-[-8px] z-50 w-[280px] rounded-xl border border-brand-border bg-brand-surface p-4 opacity-0 shadow-card group-hover/cat:visible group-hover/cat:opacity-100 group-focus-within/cat:visible group-focus-within/cat:opacity-100">
                       {CATEGORIES[cat].map((sub) => (
                         <button
                           key={sub}
                           type="button"
                           onClick={() => setActiveNav(cat)}
-                          className="block w-full py-2 text-left text-[12px] font-medium hover:font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+                          className="block w-full py-2 text-left text-[12px] font-medium hover:font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-evergreen"
                         >
                           {sub}
                         </button>
@@ -482,7 +482,7 @@ export default function Layout() {
             aria-pressed={activeNav === "All"}
             className={`lg:hidden shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 ${
               activeNav === "All"
-                ? "border-[#E63312] text-[#E63312]"
+                ? "border-brand-evergreen text-brand-evergreen"
                 : "border-transparent text-neutral-500"
             }`}
           >
@@ -499,8 +499,8 @@ export default function Layout() {
                 aria-pressed={activeNav === cat}
                 className={`shrink-0 px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-semibold border-b-2 whitespace-nowrap ${
                   activeNav === cat
-                    ? "border-[#E63312] text-[#E63312]"
-                    : "border-transparent text-neutral-500 hover:text-black"
+                    ? "border-brand-evergreen text-brand-evergreen"
+                    : "border-transparent text-brand-muted hover:text-brand-charcoal"
                 }`}
               >
                 {cat}

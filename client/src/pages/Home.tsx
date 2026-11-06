@@ -353,7 +353,7 @@ export default function Homepage() {
       </section>
 
       {/* ── Category Showcase — 2 cols mobile, 3 sm, 4 from md up ────────── */}
-      <section className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
+      <section className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline gap-4 mb-6">
             <MicroLabel>Browse By</MicroLabel>
@@ -364,7 +364,7 @@ export default function Homepage() {
               Category
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 border-l-2 border-t-2 border-black">
+          <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-brand-border bg-brand-border sm:grid-cols-3 md:grid-cols-4">
             {categoryTiles.map((sc) => (
               <button
                 key={sc.label}
@@ -373,7 +373,7 @@ export default function Homepage() {
                   selectCategory(sc.isViewAll ? "All" : sc.label);
                   if (sc.isViewAll) scrollTo("product-grid");
                 }}
-                className="border-r-2 border-b-2 border-black p-4 text-left hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#E63312]"
+                className="border-b border-r border-brand-border bg-brand-surface p-4 text-left transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-evergreen"
               >
                 <Wire h="h-17 sm:h-20" />
                 <div className="mt-3">
@@ -391,7 +391,7 @@ export default function Homepage() {
       {/* ── Flash Sale — 2 cols mobile, 4 from sm up ─────────────────────── */}
       <section
         id="flash-sale"
-        className="border-t-2 border-b-2 border-black bg-neutral-50 px-4 md:px-8 py-10 md:py-12"
+        className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-12"
       >
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -406,7 +406,7 @@ export default function Homepage() {
             </div>
             <button
               onClick={() => scrollTo("product-grid")}
-              className="text-[10px] tracking-[0.2em] uppercase font-black border border-black px-6 py-3 hover:bg-[#E63312] hover:border-[#E63312] hover:text-white transition-colors self-start sm:self-auto"
+              className="self-start rounded-control border border-brand-evergreen px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen transition-colors hover:bg-brand-evergreen hover:text-white sm:self-auto"
             >
               Browse products
             </button>
@@ -430,7 +430,7 @@ export default function Homepage() {
 
       <section
         id="product-grid"
-        className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15"
+        className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12"
       >
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
@@ -458,7 +458,7 @@ export default function Homepage() {
             </div>
             <button
               onClick={() => selectCategory("All")}
-              className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5"
+              className="border-b-2 border-brand-evergreen pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen"
             >
               View All
             </button>
@@ -474,7 +474,7 @@ export default function Homepage() {
               <button
                 type="button"
                 onClick={retryProducts}
-                className="rounded bg-black px-5 py-2.5 text-sm font-bold text-white hover:bg-[#E63312]"
+                className="rounded-control bg-brand-evergreen px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-evergreen-strong"
               >
                 Try again
               </button>
@@ -494,7 +494,7 @@ export default function Homepage() {
       </section>
 
       {/* ── Deal callout — based on live product discounts ───────────────── */}
-      <section className="border-t-2 border-b-2 border-black bg-neutral-50 px-4 md:px-8 py-10 md:py-16">
+      <section className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-16">
         <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           <div className="md:col-span-7">
             <MicroLabel>Current marketplace deals</MicroLabel>
@@ -523,7 +523,7 @@ export default function Homepage() {
             <button
               type="button"
               onClick={() => scrollTo("flash-sale")}
-              className="w-full bg-[#E63312] py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-black"
+              className="w-full rounded-control bg-brand-evergreen py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-brand-evergreen-strong"
             >
               Explore current deals
             </button>
@@ -532,7 +532,7 @@ export default function Homepage() {
       </section>
 
       {/* ── New Arrivals — 2 cols mobile, 4 from sm up ───────────────────── */}
-      <section className="px-4 md:px-8 py-10 md:py-12 border-b border-black/15">
+      <section className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-baseline justify-between mb-6">
             <h2
@@ -543,7 +543,7 @@ export default function Homepage() {
             </h2>
             <button
               onClick={() => selectCategory("All")}
-              className="text-[10px] tracking-[0.2em] uppercase font-black border-b-2 border-black pb-0.5"
+              className="border-b-2 border-brand-evergreen pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen"
             >
               View All New
             </button>
@@ -563,12 +563,12 @@ export default function Homepage() {
       </section>
 
       {/* ── Brand Strip — wraps into 4 cols mobile, single row from md up ── */}
-      <section className="border-t-2 border-b-2 border-black px-4 md:px-8 py-8 bg-neutral-50">
+      <section className="border-y border-brand-border bg-brand-cream px-4 py-8 md:px-8">
         <div className="max-w-screen-2xl mx-auto">
           <div className="flex items-center gap-8 mb-5">
             <MicroLabel>Official Brand Stores</MicroLabel>
           </div>
-          <div className="flex flex-wrap items-center gap-0 border-l-2 border-t-2 border-black">
+          <div className="flex flex-wrap items-center overflow-hidden rounded-xl border border-brand-border bg-brand-border">
             {[
               "SAMSUNG",
               "APPLE",
@@ -581,7 +581,7 @@ export default function Homepage() {
             ].map((b) => (
               <div
                 key={b}
-                className="w-1/2 sm:w-1/4 md:flex-1 border-r-2 border-b-2 border-black h-16 flex items-center justify-center cursor-pointer hover:bg-white transition-colors"
+                className="flex h-16 w-1/2 cursor-pointer items-center justify-center border-b border-r border-brand-border bg-brand-surface transition-colors hover:bg-white sm:w-1/4 md:flex-1"
               >
                 <span className="text-[10px] md:text-[11px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-black text-neutral-400">
                   {b}
@@ -593,7 +593,7 @@ export default function Homepage() {
       </section>
 
       {/* ── Footer — stacked/columns adapt across breakpoints ────────────── */}
-      <footer className="bg-black text-white px-4 md:px-8 pt-10 md:pt-14 pb-8">
+      <footer className="bg-brand-evergreen px-4 pb-8 pt-10 text-white md:px-8 md:pb-8 md:pt-14">
         <div className="max-w-screen-2xl mx-auto">
           {/* Top grid — 2 cols mobile, 3 sm, 5 from md up */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-12 mb-12 pb-12 border-b border-white/10">

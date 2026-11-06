@@ -81,15 +81,15 @@ export default function Checkout() {
 
   if (hasStaleMirror) {
     return (
-      <div className="p-10 text-center">
-        <p className="font-bold mb-4">
+      <div className="mx-auto max-w-xl rounded-card border border-brand-border bg-brand-surface p-10 text-center shadow-card">
+        <p className="mb-4 font-bold text-brand-charcoal">
           Your Buy Now session has expired — it was never checked out, and
           your cart was not touched.
         </p>
         <button
           type="button"
           onClick={cancelBuyNow}
-          className="underline font-bold"
+          className="font-bold text-brand-evergreen underline underline-offset-2"
         >
           Continue with your cart
         </button>
@@ -99,8 +99,8 @@ export default function Checkout() {
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="p-10 text-center">
-        <p className="font-bold mb-4">
+      <div className="mx-auto max-w-xl rounded-card border border-brand-border bg-brand-surface p-10 text-center shadow-card">
+        <p className="mb-4 font-bold text-brand-charcoal">
           Your cart is empty — nothing to check out.
         </p>
       </div>
@@ -328,31 +328,31 @@ export default function Checkout() {
     <PageShell title="Checkout" breadcrumb="HOME / CART / CHECKOUT">
       {/* Responsive: form stacks full width on mobile, order summary sits beside it from lg up */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-brand-muted">
           Secure checkout · Review your delivery and payment details.
         </p>
-        <Link to="/cart" className="inline-flex items-center gap-2 text-sm font-semibold text-[#E63312] hover:underline">
+        <Link to="/cart" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-evergreen hover:underline">
           <ArrowLeft className="h-4 w-4" /> Edit cart
         </Link>
       </div>
       <ol className="mb-8 flex items-center gap-2 text-xs font-semibold sm:gap-4">
-        <li className="flex items-center gap-2 text-green-700">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green-50"><Check className="h-4 w-4" /></span>
+        <li className="flex items-center gap-2 text-brand-evergreen">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-evergreen/10"><Check className="h-4 w-4" /></span>
           Cart
         </li>
-        <li aria-hidden className="h-px flex-1 bg-neutral-200" />
-        <li className="flex items-center gap-2 text-[#E63312]" aria-current="step">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E63312] text-white">2</span>
+        <li aria-hidden className="h-px flex-1 bg-brand-border" />
+        <li className="flex items-center gap-2 text-brand-evergreen" aria-current="step">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-evergreen text-white">2</span>
           Checkout
         </li>
-        <li aria-hidden className="h-px flex-1 bg-neutral-200" />
-        <li className="flex items-center gap-2 text-neutral-400">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100">3</span>
+        <li aria-hidden className="h-px flex-1 bg-brand-border" />
+        <li className="flex items-center gap-2 text-brand-muted">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-surface">3</span>
           Confirmation
         </li>
       </ol>
       {isBuyNow && activeBuyNowItem && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-border bg-brand-surface p-4">
           <p className="text-[13px] font-bold">
             Buy Now: {activeBuyNowItem.name} × {activeBuyNowItem.qty} — only
             this item will be ordered.
@@ -364,7 +364,7 @@ export default function Checkout() {
           <button
             type="button"
             onClick={cancelBuyNow}
-            className="text-sm font-bold text-[#E63312] underline underline-offset-2"
+            className="text-sm font-bold text-brand-evergreen underline underline-offset-2"
           >
             Cancel Buy Now
           </button>
@@ -374,28 +374,28 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="space-y-5 lg:col-span-8">
             {/* ── Delivery address ──────────────────────────────────── */}
-            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+            <section className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-6">
               <div className="mb-4 flex items-start gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">1</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-evergreen text-sm font-bold text-white">1</span>
                 <div>
                   <h2 className="font-bold">Delivery address</h2>
-                  <p className="mt-1 text-xs text-neutral-500">Where should we deliver your order?</p>
+                  <p className="mt-1 text-xs text-brand-muted">Where should we deliver your order?</p>
                 </div>
               </div>
               <div className="space-y-3">
                 <label className="block">
-                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Full name</span>
+                  <span className="mb-1 block text-xs font-semibold text-brand-charcoal">Full name</span>
                 <input
                   placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoComplete="name"
                   required
-                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+                  className="w-full rounded-control border border-brand-border bg-brand-surface p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15"
                 />
                 </label>
                 <label className="block">
-                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Phone number</span>
+                  <span className="mb-1 block text-xs font-semibold text-brand-charcoal">Phone number</span>
                 <input
                   placeholder="Phone Number"
                   type="tel"
@@ -403,31 +403,31 @@ export default function Checkout() {
                   onChange={(e) => setPhone(e.target.value)}
                   autoComplete="tel"
                   required
-                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+                  className="w-full rounded-control border border-brand-border bg-brand-surface p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15"
                 />
                 </label>
                 <label className="block">
-                  <span className="mb-1 block text-xs font-semibold text-neutral-700">Street address</span>
+                  <span className="mb-1 block text-xs font-semibold text-brand-charcoal">Street address</span>
                 <input
                   placeholder="Street Address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   autoComplete="street-address"
                   required
-                  className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+                  className="w-full rounded-control border border-brand-border bg-brand-surface p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15"
                 />
                 </label>
 
                 {/* Responsive: two columns from sm up, stacked on mobile */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className="block">
-                    <span className="mb-1 block text-xs font-semibold text-neutral-700">LGA / City</span>
+                    <span className="mb-1 block text-xs font-semibold text-brand-charcoal">LGA / City</span>
                   <select
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     required
                     autoComplete="address-level2"
-                    className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+                    className="w-full rounded-control border border-brand-border bg-brand-surface p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15"
                   >
                     <option value="" disabled>
                       Select LGA
@@ -439,7 +439,7 @@ export default function Checkout() {
                   </label>
 
                   <label className="block">
-                    <span className="mb-1 block text-xs font-semibold text-neutral-700">State</span>
+                    <span className="mb-1 block text-xs font-semibold text-brand-charcoal">State</span>
                   <select
                     value={state}
                     onChange={(e) => {
@@ -448,7 +448,7 @@ export default function Checkout() {
                     }}
                     autoComplete="address-level1"
                     required
-                    className="w-full rounded border border-neutral-300 p-3 text-sm outline-none focus:border-[#E63312] focus:ring-1 focus:ring-[#E63312]"
+                    className="w-full rounded-control border border-brand-border bg-brand-surface p-3 text-sm outline-none focus:border-brand-evergreen focus:ring-2 focus:ring-brand-evergreen/15"
                   >
                     {STATES.map((s) => (
                       <option key={s}>{s}</option>
@@ -456,19 +456,19 @@ export default function Checkout() {
                   </select>
                   </label>
                 </div>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-brand-muted">
                   Delivery tracking is available in Osun, Lagos, and Oyo states.
                 </p>
               </div>
             </section>
 
             {/* ── Payment method ────────────────────────────────────── */}
-            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+            <section className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-6">
               <div className="mb-4 flex items-start gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">2</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-evergreen text-sm font-bold text-white">2</span>
                 <div>
                   <h2 className="font-bold">Payment method</h2>
-                  <p className="mt-1 text-xs text-neutral-500">Choose how you would like to pay.</p>
+                  <p className="mt-1 text-xs text-brand-muted">Choose how you would like to pay.</p>
                 </div>
               </div>
               <div className="mt-3 space-y-2">
@@ -476,7 +476,7 @@ export default function Checkout() {
                   <label
                     key={m}
                     className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors ${
-                      payment === m ? "border-[#E63312] bg-red-50/40" : "border-neutral-200 hover:border-neutral-400"
+                      payment === m ? "border-brand-evergreen bg-brand-cream" : "border-brand-border hover:border-brand-evergreen/50"
                     }`}
                   >
                     <input
@@ -484,44 +484,44 @@ export default function Checkout() {
                       checked={payment === m}
                       onChange={() => setPayment(m)}
                       name="payment-method"
-                      className="accent-[#E63312]"
+                      className="accent-brand-evergreen"
                     />
                     <span className="flex-1 text-sm font-semibold">{m}</span>
-                    {m === "Bank Transfer" && <span className="text-xs text-neutral-500">Account details after order</span>}
-                    {m === "Pay on Delivery" && <span className="text-xs text-neutral-500">Where available</span>}
-                    {m === "Card (Paystack)" && <span className="text-xs text-neutral-500">Secure payment</span>}
+                    {m === "Bank Transfer" && <span className="text-xs text-brand-muted">Account details after order</span>}
+                    {m === "Pay on Delivery" && <span className="text-xs text-brand-muted">Where available</span>}
+                    {m === "Card (Paystack)" && <span className="text-xs text-brand-muted">Secure payment</span>}
                   </label>
                 ))}
               </div>
             </section>
 
             {/* ── Order items review ────────────────────────────────── */}
-            <section className="rounded-lg border border-neutral-200 bg-white p-4 sm:p-6">
+            <section className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-6">
               <div className="mb-4 flex items-start gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-bold text-white">3</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-evergreen text-sm font-bold text-white">3</span>
                 <div>
                   <h2 className="font-bold">Review items</h2>
-                  <p className="mt-1 text-xs text-neutral-500">Confirm quantities and items before placing your order.</p>
+                  <p className="mt-1 text-xs text-brand-muted">Confirm quantities and items before placing your order.</p>
                 </div>
               </div>
               <div className="mt-3 space-y-3">
                 {checkoutItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 rounded border border-neutral-200 p-3"
+                    className="flex items-center gap-4 rounded-xl border border-brand-border bg-brand-cream/40 p-3"
                   >
                     {item.image ? (
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="h-16 w-16 rounded object-cover"
+                        className="h-16 w-16 rounded-lg bg-white object-contain p-1"
                       />
                     ) : (
                       <Wire h="h-16 w-16" />
                     )}
                     <div className="flex-1">
                       <p className="text-sm font-bold">{item.name}</p>
-                      <p className="mt-1 text-xs text-neutral-500">
+                      <p className="mt-1 text-xs text-brand-muted">
                         Qty {item.qty} · {fmt(item.price)} each
                       </p>
                     </div>
@@ -534,22 +534,22 @@ export default function Checkout() {
 
           {/* ── Order total + place order ──────────────────────────── */}
           <div className="lg:col-span-4">
-            <div className="sticky top-4 rounded-lg border border-neutral-200 bg-white p-5">
+            <div className="sticky top-4 rounded-card border border-brand-border bg-brand-surface p-5 shadow-card">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold">Order summary</h2>
-                <Link to="/cart" className="text-xs font-semibold text-[#E63312] hover:underline">Edit</Link>
+                <Link to="/cart" className="text-xs font-semibold text-brand-evergreen hover:underline">Edit</Link>
               </div>
-              <div className="mt-4 max-h-64 space-y-3 overflow-y-auto border-b border-neutral-200 pb-4">
+              <div className="mt-4 max-h-64 space-y-3 overflow-y-auto border-b border-brand-border pb-4">
                 {checkoutItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
                     {item.image ? (
-                      <img src={item.image} alt="" className="h-12 w-12 rounded object-cover" />
+                      <img src={item.image} alt="" className="h-12 w-12 rounded-lg bg-brand-cream object-contain p-1" />
                     ) : (
                       <Wire h="h-12 w-12" />
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="line-clamp-2 text-xs font-semibold">{item.name}</p>
-                      <p className="mt-1 text-xs text-neutral-500">Qty: {item.qty}</p>
+                      <p className="mt-1 text-xs text-brand-muted">Qty: {item.qty}</p>
                     </div>
                     <span className="shrink-0 text-xs font-bold">{fmt(item.price * item.qty)}</span>
                   </div>
@@ -557,11 +557,11 @@ export default function Checkout() {
               </div>
               <div className="mt-4 space-y-3 text-[13px] font-semibold">
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">Subtotal</span>
+                  <span className="text-brand-muted">Subtotal</span>
                   <span>{fmt(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">
+                  <span className="text-brand-muted">
                     Delivery{deliveryFee === null ? " (calculated at checkout)" : ""}
                   </span>
                   <span>{deliveryFee === null ? "—" : fmt(deliveryFee)}</span>
@@ -575,12 +575,12 @@ export default function Checkout() {
               <button
                 type="submit"
                 disabled={placing}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded bg-[#E63312] py-4 text-sm font-bold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-control bg-brand-evergreen py-4 text-sm font-bold text-white transition-colors hover:bg-brand-evergreen-strong disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <LockKeyhole className="h-4 w-4" />
                 {placing ? "Placing order…" : `Place order · ${fmt(total)}`}
               </button>
-              <p className="mt-3 text-center text-[11px] leading-5 text-neutral-500">
+              <p className="mt-3 text-center text-[11px] leading-5 text-brand-muted">
                 Your order is protected. Delivery is charged based on seller settings.
               </p>
             </div>

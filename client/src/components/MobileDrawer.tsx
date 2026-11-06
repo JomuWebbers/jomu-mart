@@ -83,7 +83,7 @@ export default function MobileDrawer({
       {/* Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-brand-charcoal/45 lg:hidden"
           onClick={onClose}
           aria-hidden
         />
@@ -91,7 +91,7 @@ export default function MobileDrawer({
       {/* Drawer — slides from the left (WF-06 frame B) */}
       <aside
         ref={drawerRef}
-        className={`fixed top-0 left-0 bottom-0 w-[85%] max-w-[330px] bg-white z-50 lg:hidden overflow-y-auto transform transition-transform duration-200 ease-out ${
+        className={`fixed bottom-0 left-0 top-0 z-50 w-[85%] max-w-[330px] transform overflow-y-auto bg-brand-surface transition-transform duration-200 ease-out lg:hidden ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
         role={open ? "dialog" : undefined}
@@ -102,7 +102,7 @@ export default function MobileDrawer({
         onKeyDown={handleKeyDown}
       >
         {/* Header: logo + close */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-black/15">
+        <div className="flex items-center justify-between border-b border-brand-border bg-brand-cream px-4 py-3">
           <Link
             to="/"
             onClick={onClose}
@@ -114,7 +114,7 @@ export default function MobileDrawer({
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="w-9 h-9 border border-black flex items-center justify-center text-lg leading-none hover:border-[#E63312] hover:text-[#E63312] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312]"
+            className="flex h-9 w-9 items-center justify-center rounded-control border border-brand-border text-lg leading-none hover:border-brand-evergreen hover:text-brand-evergreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
           >
             ✕
           </button>
@@ -124,7 +124,7 @@ export default function MobileDrawer({
         <Link
           to="/help"
           onClick={onClose}
-          className="flex items-center justify-between px-4 py-4 text-[15px] font-bold border-b border-black/5"
+          className="flex items-center justify-between border-b border-brand-border px-4 py-4 text-[15px] font-bold hover:bg-brand-cream"
         >
           Need Help? <span>›</span>
         </Link>
@@ -137,14 +137,14 @@ export default function MobileDrawer({
               : "/login"
           }
           onClick={onClose}
-          className="flex items-center justify-between px-4 py-4 text-[15px] font-bold border-b border-black/5"
+          className="flex items-center justify-between border-b border-brand-border px-4 py-4 text-[15px] font-bold hover:bg-brand-cream"
         >
           {user?.role === "admin" ? "Admin Dashboard" : "My Account"} <span>›</span>
         </Link>
 
         {/* Account block */}
         {user ? (
-          <div className="px-4 py-3 border-b border-black/5">
+          <div className="border-b border-brand-border px-4 py-3">
             <p className="text-[13px] font-bold">{user.name}</p>
             <p className="text-[11px] text-neutral-400">{user.email}</p>
             {user.role === "admin" && (
@@ -187,14 +187,14 @@ export default function MobileDrawer({
             <Link
               to="/login"
               onClick={onClose}
-              className="block px-4 py-4 text-[14px] font-bold border-b border-black/5"
+              className="block border-b border-brand-border px-4 py-4 text-[14px] font-bold text-brand-evergreen"
             >
               ↗ Login / Signup
             </Link>
             <Link
               to="/register"
               onClick={onClose}
-              className="block px-4 py-3.5 text-[13px] font-semibold border-b border-black/5"
+              className="block border-b border-brand-border px-4 py-3.5 text-[13px] font-semibold"
             >
               Register
             </Link>
@@ -206,7 +206,7 @@ export default function MobileDrawer({
             key={item.label}
             to={item.to}
             onClick={onClose}
-            className={`block px-4 py-3.5 text-[13px] font-semibold border-b border-black/5 hover:bg-neutral-50 hover:text-[#E63312] ${
+            className={`block border-b border-brand-border px-4 py-3.5 text-[13px] font-semibold hover:bg-brand-cream hover:text-brand-evergreen ${
               item.soon ? "opacity-50" : ""
             }`}
           >
@@ -216,7 +216,7 @@ export default function MobileDrawer({
         ))}
 
         {/* Our Categories */}
-        <p className="px-4 pt-5 pb-2 text-[10px] tracking-[0.2em] uppercase font-bold text-neutral-500">
+        <p className="px-4 pb-2 pt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-evergreen">
           Our Categories
         </p>
         {CATEGORY_NAMES.map((cat) => (
@@ -226,7 +226,7 @@ export default function MobileDrawer({
               onCategory(cat);
               onClose();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-[13px] font-semibold border-b border-black/5 text-left hover:bg-neutral-50"
+            className="flex w-full items-center gap-3 border-b border-brand-border px-4 py-3.5 text-left text-[13px] font-semibold hover:bg-brand-cream"
           >
             <span>{CAT_ICONS[cat] ?? "🏷"}</span> {cat}
           </button>
@@ -235,7 +235,7 @@ export default function MobileDrawer({
         <Link
           to="/"
           onClick={onClose}
-          className="block px-4 py-3.5 text-[13px] font-semibold border-b border-black/5 opacity-70"
+          className="block border-b border-brand-border px-4 py-3.5 text-[13px] font-semibold text-brand-muted"
         >
           ▦ Download App (soon)
         </Link>
