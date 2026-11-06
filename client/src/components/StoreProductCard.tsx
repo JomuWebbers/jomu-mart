@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, Star, Truck } from "lucide-react";
+import { Heart, ImageIcon, ShoppingCart, Star, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fmt, pct } from "./wireframe-helpers";
 
@@ -40,29 +40,35 @@ export default function StoreProductCard({
   const reviewCount = product.reviewCount ?? 0;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white transition-shadow hover:shadow-md">
-      <div className="relative">
+    <article className="group flex h-full flex-col overflow-hidden rounded-card border border-brand-border bg-brand-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+      <div className="relative p-2 pb-0 sm:p-3 sm:pb-0">
         <Link
           to={`/products/${product.id}`}
           aria-label={`View ${product.name}`}
-          className="block aspect-square overflow-hidden bg-neutral-100"
+          className="relative block aspect-square overflow-hidden rounded-xl bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen"
         >
           {product.image ? (
             <img
               src={product.image}
               alt={product.name}
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              className="size-full object-contain p-3 transition-transform duration-300 group-hover:scale-105 sm:p-5"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-neutral-400">
-              Product image unavailable
+            <div className="flex size-full flex-col items-center justify-center gap-2 text-brand-muted">
+              <ImageIcon aria-hidden="true" className="size-8 stroke-[1.5]" />
+              <span className="text-xs">Image coming soon</span>
             </div>
+          )}
+          {outOfStock && (
+            <span className="absolute inset-x-0 bottom-0 bg-brand-charcoal/80 px-3 py-2 text-center text-xs font-bold text-white">
+              Currently unavailable
+            </span>
           )}
         </Link>
         {hasDiscount && (
-          <span className="absolute left-2 top-2 rounded bg-[#E63312] px-2 py-1 text-[10px] font-bold text-white">
-            -{pct(product.price, originalPrice)}%
+          <span className="absolute left-4 top-4 rounded-full bg-brand-accent px-2.5 py-1 text-[10px] font-bold text-white sm:left-5 sm:top-5">
+            Save {pct(product.price, originalPrice)}%
           </span>
         )}
         <button
@@ -73,50 +79,53 @@ export default function StoreProductCard({
             saved ? " from" : " to"
           } saved items`}
           aria-pressed={saved}
-          className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-neutral-700 shadow-sm transition-colors hover:text-[#E63312] disabled:opacity-50"
+          className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-full bg-brand-surface/95 text-brand-charcoal shadow-sm transition-colors hover:text-brand-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen disabled:opacity-50 sm:right-5 sm:top-5"
         >
           <Heart
-            className={`h-5 w-5 ${saved ? "fill-[#E63312] text-[#E63312]" : ""}`}
+            aria-hidden="true"
+            className={`size-5 ${saved ? "fill-brand-accent text-brand-accent" : ""}`}
           />
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col p-3">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-brand-evergreen">
           {product.category}
         </span>
         <Link
           to={`/products/${product.id}`}
-          className="mt-1 line-clamp-2 min-h-10 text-sm font-medium leading-5 text-neutral-900 hover:text-[#E63312]"
+          className="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-brand-charcoal transition-colors hover:text-brand-evergreen focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-evergreen"
         >
           {product.name}
         </Link>
 
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="text-base font-bold text-neutral-950">
+        <div className="mt-3 flex min-h-11 flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="text-lg font-black tracking-tight text-brand-charcoal sm:text-xl">
             {fmt(product.price)}
           </span>
           {hasDiscount && (
-            <span className="text-xs text-neutral-500 line-through">
+            <span className="text-xs text-brand-muted line-through">
               {fmt(originalPrice)}
             </span>
           )}
         </div>
 
-        <div className="mt-2 flex min-h-5 items-center gap-1 text-xs text-neutral-600">
+        <div className="mt-1 flex min-h-5 items-center gap-1 text-xs text-brand-muted">
           {rating > 0 ? (
             <>
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+              <Star aria-hidden="true" className="size-3.5 fill-[#E7B342] text-[#9A6B13]" />
               <span className="font-semibold">{rating.toFixed(1)}</span>
-              <span>({reviewCount})</span>
+              <span>
+                ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+              </span>
             </>
           ) : (
-            <span className="text-neutral-400">No reviews yet</span>
+            <span className="text-brand-muted">No reviews yet</span>
           )}
         </div>
 
-        <div className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500">
-          <Truck className="h-3.5 w-3.5 shrink-0" />
+        <div className="mt-3 flex items-center gap-1.5 border-t border-brand-border pt-3 text-[11px] text-brand-muted">
+          <Truck aria-hidden="true" className="size-3.5 shrink-0 text-brand-evergreen" />
           <span>Delivery options at checkout</span>
         </div>
 
@@ -124,9 +133,9 @@ export default function StoreProductCard({
           type="button"
           onClick={() => onAddToCart(product)}
           disabled={outOfStock || isOwnListing}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded bg-black px-3 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#E63312] disabled:cursor-not-allowed disabled:bg-neutral-300"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-control bg-brand-evergreen px-3 py-3 text-xs font-bold text-white transition-colors hover:bg-brand-evergreen-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen disabled:cursor-not-allowed disabled:bg-brand-border disabled:text-brand-muted"
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart aria-hidden="true" className="size-4" />
           {outOfStock
             ? "Out of stock"
             : isOwnListing
