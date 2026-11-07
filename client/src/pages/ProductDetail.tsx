@@ -420,10 +420,11 @@ export default function ProductDetail() {
     <PageShell
       title=""
       breadcrumb={`Home / ${product.category}${product.subcategory ? ` / ${product.subcategory}` : ""} / ${product.name}`}
+      containerClassName="max-w-6xl"
     >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
-        <section className="lg:col-span-6">
-          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-card border border-brand-border bg-brand-surface shadow-card">
+      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12 xl:gap-5">
+        <section className="md:col-span-1 xl:col-span-4">
+          <div className="relative flex aspect-square max-h-[460px] items-center justify-center overflow-hidden rounded-card border border-brand-border bg-brand-surface shadow-card">
             {hasDiscount && (
               <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
                 Save {pct(product.price, product.originalPrice!)}%
@@ -476,7 +477,7 @@ export default function ProductDetail() {
           )}
         </section>
 
-        <section className="flex flex-col rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-6 lg:col-span-6">
+        <section className="flex flex-col rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-5 md:col-span-1 xl:col-span-4">
           <MicroLabel>
             {product.category}{product.subcategory ? ` / ${product.subcategory}` : ""}
           </MicroLabel>
@@ -534,45 +535,6 @@ export default function ProductDetail() {
             <p className="mt-2 text-sm font-semibold">Price is negotiable</p>
           )}
 
-          <div className="mt-5 rounded-xl bg-brand-cream p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <Truck className="h-5 w-5 text-brand-evergreen" />
-              <h2 className="font-bold">Delivery &amp; fulfilment</h2>
-            </div>
-            <div className="space-y-3">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-brand-muted">Availability</span>
-              <span className={`text-sm font-bold ${outOfStock ? "text-red-600" : "text-brand-evergreen"}`}>
-                {outOfStock ? "Out of stock" : product.stock == null ? "Available" : `${product.stock} available`}
-              </span>
-            </div>
-            <div className="flex items-start justify-between gap-4">
-              <span className="text-sm text-brand-muted">Ships from</span>
-              <span className="text-right text-sm font-semibold">
-                {[product.sellerLga, product.sellerState].filter(Boolean).join(", ") || "Location provided after order"}
-              </span>
-            </div>
-            <div className="flex items-start justify-between gap-4">
-              <span className="text-sm text-brand-muted">Fulfilment</span>
-              <span className="text-right text-sm font-semibold">
-                {product.fulfillmentMethod === "pickup" ? "Pickup from seller" : "Seller delivery"}
-              </span>
-            </div>
-            {product.deliveryDays != null && (
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-brand-muted">Estimated delivery</span>
-                <span className="text-sm font-semibold">About {product.deliveryDays} day{product.deliveryDays === 1 ? "" : "s"}</span>
-              </div>
-            )}
-            {product.chargesDeliveryFee && (
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-brand-muted">Seller delivery fee</span>
-                <span className="text-sm font-semibold">{fmt(product.deliveryFeeAmount || 0)}</span>
-              </div>
-            )}
-            </div>
-          </div>
-
           <div className="flex flex-wrap items-center justify-between gap-4 py-5">
             <span className="text-sm font-semibold">Quantity</span>
             <div className="flex items-center overflow-hidden rounded-control border border-brand-border bg-brand-cream/50">
@@ -619,6 +581,51 @@ export default function ProductDetail() {
             <span>Secure checkout · Order tracking · Customer support</span>
           </div>
         </section>
+
+        <aside className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-5 md:col-span-2 xl:col-span-4">
+          <div className="mb-4 flex items-center gap-2 border-b border-brand-border pb-3">
+            <Truck aria-hidden="true" className="h-5 w-5 text-brand-evergreen" />
+            <h2 className="font-bold">Delivery &amp; fulfilment</h2>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Truck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
+              <div>
+                <p className="text-sm font-semibold">Delivery</p>
+                <p className="mt-1 text-xs leading-5 text-brand-muted">
+                  {product.deliveryDays != null
+                    ? `Estimated delivery in about ${product.deliveryDays} day${product.deliveryDays === 1 ? "" : "s"}.`
+                    : "Delivery timing is confirmed with the seller after order."}
+                </p>
+                {product.chargesDeliveryFee && (
+                  <p className="mt-1 text-xs text-brand-muted">
+                    Seller delivery fee: {fmt(product.deliveryFeeAmount || 0)}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-start gap-3 border-t border-brand-border pt-4">
+              <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
+              <div>
+                <p className="text-sm font-semibold">Availability &amp; fulfilment</p>
+                <p className={`mt-1 text-xs font-semibold ${outOfStock ? "text-red-600" : "text-brand-evergreen"}`}>
+                  {outOfStock ? "Out of stock" : product.stock == null ? "Available" : `${product.stock} available`}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-brand-muted">
+                  {product.fulfillmentMethod === "pickup"
+                    ? "Pickup from seller"
+                    : "Seller delivery"}
+                  {" · "}
+                  {[product.sellerLga, product.sellerState].filter(Boolean).join(", ") ||
+                    "Location provided after order"}
+                </p>
+              </div>
+            </div>
+            <div className="border-t border-brand-border pt-4 text-xs leading-5 text-brand-muted">
+              Seller fulfilment details are provided for this listing. Delivery options can be confirmed during checkout.
+            </div>
+          </div>
+        </aside>
       </div>
 
       <nav

@@ -26,10 +26,20 @@ export function Divider({ thick = false }: { thick?: boolean }) {
   return <div className={`w-full ${thick ? 'border-t-2 border-brand-border' : 'border-t border-brand-border'}`} />
 }
 
-export function PageShell({ title, breadcrumb, children }: { title: string; breadcrumb: string; children: React.ReactNode }) {
+export function PageShell({
+  title,
+  breadcrumb,
+  children,
+  containerClassName = "max-w-screen-2xl",
+}: {
+  title: string;
+  breadcrumb: string;
+  children: React.ReactNode;
+  containerClassName?: string;
+}) {
   return (
     <div className="min-h-[60vh] bg-brand-cream px-4 py-8 text-brand-charcoal md:px-8 md:py-12">
-      <div className="max-w-screen-2xl mx-auto">
+      <div className={`mx-auto ${containerClassName}`}>
         {breadcrumb && <MicroLabel>{breadcrumb}</MicroLabel>}
         {title && (
           <h1 className="mt-2 mb-8 font-black leading-none tracking-tight text-brand-charcoal" style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', letterSpacing: '-0.03em' }}>
@@ -41,4 +51,3 @@ export function PageShell({ title, breadcrumb, children }: { title: string; brea
     </div>
   )
 }
-
