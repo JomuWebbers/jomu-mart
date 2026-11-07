@@ -259,7 +259,8 @@ export default function Homepage() {
     .slice(0, 3);
 
   return (
-    <>
+    <div className="min-h-screen bg-[#171916]">
+      <main className="mx-auto min-h-screen max-w-[1120px] bg-brand-cream">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
       <section className="bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
@@ -614,7 +615,7 @@ export default function Homepage() {
 
       {/* ── Brand Strip — wraps into 4 cols mobile, single row from md up ── */}
       <section className="border-y border-brand-border bg-brand-cream px-4 py-8 md:px-8">
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-[1120px]">
           <div className="flex items-center gap-8 mb-5">
             <MicroLabel>Official Brand Stores</MicroLabel>
           </div>
@@ -641,9 +642,10 @@ export default function Homepage() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* ── Footer — stacked/columns adapt across breakpoints ────────────── */}
-      <footer className="bg-brand-evergreen px-4 pb-8 pt-10 text-white md:px-8 md:pb-8 md:pt-14">
+      <footer className="mx-auto max-w-[1120px] bg-brand-evergreen px-4 pb-8 pt-10 text-white md:px-8 md:pb-8 md:pt-14">
         <div className="max-w-screen-2xl mx-auto">
           {/* Top grid — 2 cols mobile, 3 sm, 5 from md up */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-12 mb-12 pb-12 border-b border-white/10">
@@ -739,6 +741,6 @@ export default function Homepage() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }

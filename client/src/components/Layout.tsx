@@ -78,8 +78,8 @@ export default function Layout() {
       style={{ fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif" }}
     >
       {/* Announcement Bar */}
-      <div className="bg-brand-evergreen text-white py-2 px-4 md:px-8">
-        <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
+      <div className="bg-brand-evergreen px-4 py-2 text-white md:px-0">
+        <div className="mx-auto flex max-w-[1120px] items-center justify-between">
           <span className="text-[9px] md:text-[10px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-semibold">
             <span className="text-[#F4C86A]">●</span> Free delivery on orders above ₦50,000
           </span>
@@ -87,9 +87,9 @@ export default function Layout() {
       </div>
 
       {/* Header */}
-      <header className="border-b border-brand-border bg-brand-surface px-4 py-4 md:px-8 md:py-5">
+      <header className="border-b border-brand-border bg-brand-surface px-4 py-4 md:px-0 md:py-5">
         {/* Mobile header row — WF-06: ☰ · logo · account · cart */}
-        <div className="lg:hidden max-w-screen-2xl mx-auto flex items-center gap-3">
+        <div className="mx-auto flex max-w-[1120px] items-center gap-3 lg:hidden">
           <button
             ref={mobileMenuButtonRef}
             onClick={() => setMobileMenuOpen(true)}
@@ -129,7 +129,7 @@ export default function Layout() {
         </div>
 
         {/* Desktop row */}
-        <div className="hidden lg:flex max-w-screen-2xl mx-auto items-center justify-between lg:justify-start gap-4 lg:gap-6">
+        <div className="mx-auto hidden max-w-[1120px] items-center justify-between gap-4 lg:flex lg:justify-start lg:gap-6">
           <Link to="/" className="shrink-0 flex flex-col">
             <span
               className="font-black uppercase leading-none"
@@ -151,7 +151,7 @@ export default function Layout() {
 
           <span
             title="Coming soon"
-            className="hidden 2xl:block shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold opacity-50 cursor-not-allowed select-none"
+            className="hidden shrink-0 text-[11px] tracking-[0.15em] uppercase font-semibold opacity-50 cursor-not-allowed select-none"
           >
             🏪 Jomu Mart Outlets
           </span>
@@ -409,7 +409,7 @@ export default function Layout() {
 
         </div>
 
-        <div className="mx-auto mt-3 flex max-w-screen-2xl overflow-hidden rounded-control border border-brand-border bg-white focus-within:border-brand-evergreen focus-within:ring-2 focus-within:ring-brand-evergreen/10 lg:hidden">
+        <div className="mx-auto mt-3 flex max-w-[1120px] overflow-hidden rounded-control border border-brand-border bg-white focus-within:border-brand-evergreen focus-within:ring-2 focus-within:ring-brand-evergreen/10 lg:hidden">
             <form
               className="flex flex-1"
               onSubmit={(e) => {
@@ -434,8 +434,8 @@ export default function Layout() {
       </header>
 
       {/* Category Nav — desktop: mega menu + quick links · mobile: Home + tabs */}
-      <nav aria-label="Product categories" className="border-b border-brand-border bg-brand-cream px-4 md:px-8">
-        <div className="max-w-screen-2xl mx-auto flex items-center">
+      <nav aria-label="Product categories" className="border-b border-brand-border bg-brand-cream px-4 md:px-0">
+        <div className="mx-auto flex max-w-[1120px] items-center">
           {/* All Categories mega menu (desktop only) */}
           <div className="relative group/cat-trigger hidden lg:block shrink-0">
             <button
