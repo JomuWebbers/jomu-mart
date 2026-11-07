@@ -232,20 +232,10 @@ export default function Homepage() {
     />
   );
 
-  const categoryTiles = [
-    ...CATEGORY_NAMES.map((name) => ({
-      label: name,
-      count: loading
-        ? null
-        : products.filter((p) => p.category === name).length,
-      isViewAll: false,
-    })),
-    {
-      label: "View All",
-      count: loading ? null : products.length,
-      isViewAll: true,
-    },
-  ];
+  const categoryTiles = CATEGORY_NAMES.map((name) => ({
+    label: name,
+    count: loading ? null : products.filter((p) => p.category === name).length,
+  }));
 
   // Deals are based on actual current prices and available stock.
   const discountedProducts = products.filter(
@@ -259,11 +249,11 @@ export default function Homepage() {
         ((b.originalPrice ?? 0) - b.price) / (b.originalPrice ?? 1) -
         ((a.originalPrice ?? 0) - a.price) / (a.originalPrice ?? 1),
     )
-    .slice(0, 4);
+    .slice(0, 5);
 
   // New arrivals = newest approved products first (API already sorts createdAt
   // desc), in stock only, max 4
-  const newArrivals = products.filter((p) => (p.stock ?? 0) > 0).slice(0, 4);
+  const newArrivals = products.filter((p) => (p.stock ?? 0) > 0).slice(0, 5);
   const heroProducts = products
     .filter((product) => product.image && (product.stock == null || product.stock > 0))
     .slice(0, 3);
@@ -271,74 +261,123 @@ export default function Homepage() {
   return (
     <>
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
-      <section className="bg-brand-cream px-4 py-6 md:px-8 md:py-10">
-        <div className="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.75rem] bg-brand-evergreen text-brand-surface shadow-card lg:grid-cols-2">
-          <div className="flex flex-col items-start justify-center px-6 py-10 sm:px-10 md:px-12 md:py-14">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/85">
+      <section className="bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
+        <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
+          <div className="relative flex min-h-[230px] flex-col items-start justify-center overflow-hidden rounded-2xl bg-brand-evergreen px-5 py-6 text-brand-surface shadow-card sm:min-h-[270px] sm:px-8 sm:py-8 lg:col-start-1 lg:row-start-1 lg:min-h-[320px] lg:px-10 lg:py-6">
+            <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-20 size-64 rounded-full border-[32px] border-white/5 sm:size-80" />
+            <span aria-hidden="true" className="pointer-events-none absolute bottom-[-8rem] right-[22%] size-64 rounded-full bg-white/5 blur-3xl" />
+            <span className="relative inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/85">
               <span className="size-1.5 rounded-full bg-[#F4B942]" />
               A marketplace made for you
             </span>
 
-            <h1 className="mt-6 max-w-xl text-4xl font-black leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-6xl xl:text-7xl">
+            <h1 className="relative mt-5 max-w-xl text-4xl font-black leading-[0.98] tracking-[-0.055em] sm:mt-6 sm:text-5xl lg:max-w-none lg:text-6xl">
               Millions of deals
               <br />
               in one <span className="text-[#F4C86A]">place.</span>
             </h1>
 
-            <div className="mt-5 min-h-7 text-lg font-semibold text-white/90 sm:text-xl">
+            <div className="relative mt-4 min-h-7 text-base font-semibold text-white/90 sm:mt-5 sm:text-xl">
               <span key={heroPhraseIndex} className="hero-phrase">
                 {HERO_PHRASES[heroPhraseIndex]}
               </span>
             </div>
-            <p className="mt-2 max-w-md text-sm leading-6 text-white/70 sm:text-base">
+            <p className="relative mt-2 max-w-md text-sm leading-6 text-white/70 sm:text-base">
               Discover electronics, style, and home essentials from sellers
               across Nigeria.
             </p>
 
-            <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="relative mt-5 flex w-full flex-col gap-3 min-[370px]:flex-row sm:mt-6 sm:w-auto">
               <button
                 onClick={() => scrollTo("product-grid")}
-                className="rounded-control bg-brand-surface px-7 py-3.5 text-sm font-bold text-brand-evergreen transition-colors hover:bg-[#F4C86A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-control bg-brand-surface px-4 py-3 text-sm font-bold text-brand-evergreen transition-colors hover:bg-[#F4C86A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[370px]:flex-1 sm:px-6"
               >
                 Shop products
               </button>
               <button
                 onClick={() => scrollTo("flash-sale")}
-                className="rounded-control border border-white/35 px-7 py-3.5 text-sm font-bold text-white transition-colors hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-control border border-white/35 px-4 py-3 text-sm font-bold text-white transition-colors hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[370px]:flex-1 sm:px-6"
               >
                 Explore deals
               </button>
             </div>
+          </div>
 
-            <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/20 pt-5 text-xs font-medium text-white/75">
-              <span>Secure checkout</span>
-              <span>Seller variety</span>
-              <span>Delivery options at checkout</span>
+          <div className="lg:col-span-2 lg:row-start-2">
+            <div className="mx-auto max-w-screen-2xl rounded-2xl border border-brand-border bg-brand-surface px-3 py-3 shadow-card sm:px-4">
+              <div className="mb-2 flex items-center justify-between gap-4">
+                <h2 className="text-sm font-black tracking-tight text-brand-charcoal sm:text-base">
+                  Browse by category
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => selectCategory("All")}
+                  className="shrink-0 rounded-control px-2 py-1.5 text-[11px] font-bold text-brand-evergreen transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-evergreen"
+                >
+                  View all
+                </button>
+              </div>
+              <nav
+                aria-label="Browse by category"
+                className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain"
+              >
+                {categoryTiles.map((sc) => {
+                  const Icon = CATEGORY_ICONS[sc.label] ?? ShoppingBag;
+                  const selected = activeNav === sc.label;
+
+                  return (
+                    <button
+                      key={sc.label}
+                      type="button"
+                      onClick={() => selectCategory(sc.label)}
+                      aria-pressed={selected}
+                      className={`group flex min-h-20 min-w-28 flex-1 snap-start flex-col items-center justify-center gap-1.5 rounded-control border px-2 py-2 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen sm:min-h-24 sm:min-w-32 sm:gap-2 sm:rounded-card sm:px-3 sm:py-3 ${
+                        selected
+                          ? "border-brand-evergreen bg-brand-cream"
+                          : "border-transparent bg-brand-surface hover:border-brand-border hover:bg-brand-cream"
+                      }`}
+                    >
+                      <span className="flex size-8 items-center justify-center rounded-full bg-brand-cream text-brand-evergreen transition-colors group-hover:bg-white sm:size-9">
+                        <Icon
+                          aria-hidden="true"
+                          className="size-4 stroke-[1.8] sm:size-[18px]"
+                        />
+                      </span>
+                      <span className="line-clamp-2 min-h-7 text-[10px] font-bold leading-3.5 text-brand-charcoal sm:text-[11px] sm:leading-4">
+                        {sc.label}
+                      </span>
+                      <span className="text-[9px] text-brand-muted sm:text-[10px]">
+                        {sc.count === null ? "Loading…" : `${sc.count} items`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
           </div>
 
-          <div className="grid min-h-[340px] grid-cols-2 grid-rows-2 gap-3 p-4 pt-0 sm:min-h-[440px] sm:gap-4 sm:p-5 lg:min-h-full lg:pl-0">
+          <div className="grid grid-cols-2 grid-rows-2 gap-2 sm:gap-3 lg:col-start-2 lg:row-start-1 lg:grid-cols-2 lg:grid-rows-2">
             {heroProducts.length > 0 ? (
               heroProducts.map((product, index) => (
                 <Link
                   key={product.id}
                   to={`/products/${product.id}`}
                   aria-label={`View ${product.name}, ${fmt(product.price)}`}
-                  className={`group relative min-h-0 overflow-hidden rounded-2xl bg-brand-cream ${
-                    index === 0 ? "row-span-2" : ""
+                  className={`group relative min-h-28 overflow-hidden rounded-2xl shadow-card sm:min-h-36 lg:min-h-0 ${
+                    index === 0 ? "row-span-2 bg-[#E8C994]" : "bg-brand-surface"
                   }`}
                 >
                   <img
                     src={product.image ?? ""}
                     alt=""
                     loading={index === 0 ? "eager" : "lazy"}
-                    className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-4 pt-12 text-white">
-                    <span className="block line-clamp-1 text-xs font-semibold sm:text-sm">
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-10 text-white sm:px-4 sm:pb-4">
+                    <span className="block line-clamp-1 text-[11px] font-semibold sm:text-sm">
                       {product.name}
                     </span>
-                    <span className="mt-1 block text-sm font-black sm:text-base">
+                    <span className="mt-1 block text-sm font-black">
                       {fmt(product.price)}
                     </span>
                   </span>
@@ -346,26 +385,26 @@ export default function Homepage() {
               ))
             ) : (
               <>
-                <div className="row-span-2 flex flex-col justify-between rounded-2xl bg-[#E8C994] p-6 text-brand-charcoal sm:p-8">
-                  <ShoppingBag aria-hidden="true" className="size-10 stroke-[1.5]" />
+                <div className="relative row-span-2 flex min-h-28 flex-col justify-between overflow-hidden rounded-2xl bg-[#E8C994] p-4 text-brand-charcoal shadow-card sm:min-h-36 sm:p-6">
+                  <ShoppingBag aria-hidden="true" className="size-7 stroke-[1.5] sm:size-10" />
                   <div>
                     <span className="text-xs font-bold uppercase tracking-[0.15em]">
                       Find your next favorite
                     </span>
-                    <span className="mt-2 block text-3xl font-black leading-tight sm:text-4xl">
+                    <span className="mt-2 block text-2xl font-black leading-tight sm:text-4xl">
                       Good things,
                       <br />
                       all together.
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col justify-between rounded-2xl bg-[#D9E5D7] p-4 text-brand-evergreen sm:p-5">
-                  <Smartphone aria-hidden="true" className="size-8 stroke-[1.5]" />
-                  <span className="text-sm font-bold">Tech &amp; gadgets</span>
+                <div className="flex min-h-28 flex-col justify-between rounded-2xl bg-[#D9E5D7] p-3 text-brand-evergreen shadow-card sm:min-h-36 sm:p-5">
+                  <Smartphone aria-hidden="true" className="size-6 stroke-[1.5] sm:size-8" />
+                  <span className="text-xs font-bold sm:text-sm">Tech &amp; gadgets</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-2xl bg-[#F1D9CE] p-4 text-brand-charcoal sm:p-5">
-                  <House aria-hidden="true" className="size-8 stroke-[1.5]" />
-                  <span className="text-sm font-bold">Home &amp; living</span>
+                <div className="flex min-h-28 flex-col justify-between rounded-2xl bg-[#F1D9CE] p-3 text-brand-charcoal shadow-card sm:min-h-36 sm:p-5">
+                  <House aria-hidden="true" className="size-6 stroke-[1.5] sm:size-8" />
+                  <span className="text-xs font-bold sm:text-sm">Home &amp; living</span>
                 </div>
               </>
             )}
@@ -373,61 +412,29 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* ── Compact horizontal category rail ─────────────────────────────── */}
-      <section className="border-b border-brand-border bg-brand-surface px-4 py-5 md:px-8 md:py-6">
-        <div className="mx-auto max-w-screen-2xl">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <MicroLabel>Find your next favorite</MicroLabel>
-              <h2 className="mt-1 text-lg font-black tracking-tight sm:text-xl">
-                Browse categories
-              </h2>
-            </div>
+      <section className="bg-brand-cream px-3 pb-4 sm:px-4 md:px-8">
+        <div className="mx-auto grid max-w-screen-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+          {[
+            { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles, tone: "bg-[#D9E5D7] text-brand-evergreen" },
+            { title: "Seller Spotlights", copy: "Meet trusted local sellers", icon: House, tone: "bg-[#E8C994] text-brand-charcoal" },
+            { title: "Everyday Essentials", copy: "Useful things for every day", icon: ShoppingBag, tone: "bg-[#F1D9CE] text-brand-charcoal" },
+            { title: "Deals Worth a Look", copy: "Fresh offers from the market", icon: Coffee, tone: "bg-brand-evergreen text-white" },
+          ].map(({ title, copy, icon: Icon, tone }) => (
             <button
+              key={title}
               type="button"
-              onClick={() => selectCategory("All")}
-              className="shrink-0 rounded-control px-2 py-2 text-xs font-bold text-brand-evergreen transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-evergreen"
+              onClick={() => scrollTo(title === "Deals Worth a Look" ? "flash-sale" : "product-grid")}
+              className={`flex min-h-24 items-center gap-3 rounded-card p-3 text-left transition-transform hover:-translate-y-0.5 sm:min-h-28 sm:gap-4 sm:p-4 ${tone}`}
             >
-              View all
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/60 sm:size-11">
+                <Icon aria-hidden="true" className="size-5 sm:size-6" />
+              </span>
+              <span>
+                <span className="block text-xs font-black sm:text-sm">{title}</span>
+                <span className="mt-1 block text-[10px] leading-4 opacity-75 sm:text-xs">{copy}</span>
+              </span>
             </button>
-          </div>
-          <nav
-            aria-label="Browse product categories"
-            className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2"
-          >
-            {categoryTiles.map((sc) => {
-              const Icon = CATEGORY_ICONS[sc.label] ?? ShoppingBag;
-              const selected = sc.isViewAll
-                ? activeNav === "All"
-                : activeNav === sc.label;
-
-              return (
-                <button
-                  key={sc.label}
-                  type="button"
-                  onClick={() =>
-                    selectCategory(sc.isViewAll ? "All" : sc.label)
-                  }
-                  aria-pressed={selected}
-                  className={`group flex min-h-28 min-w-32 snap-start flex-col items-center justify-center gap-2 rounded-card border px-3 py-3 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen sm:min-w-36 ${
-                    selected
-                      ? "border-brand-evergreen bg-brand-cream"
-                      : "border-brand-border bg-white hover:border-brand-evergreen/50 hover:bg-brand-cream"
-                  }`}
-                >
-                  <span className="flex size-10 items-center justify-center rounded-full bg-brand-cream text-brand-evergreen transition-colors group-hover:bg-white">
-                    <Icon aria-hidden="true" className="size-5 stroke-[1.8]" />
-                  </span>
-                  <span className="line-clamp-2 min-h-8 text-xs font-bold leading-4 text-brand-charcoal">
-                    {sc.label}
-                  </span>
-                  <span className="text-[10px] text-brand-muted">
-                    {sc.count === null ? "Loading…" : `${sc.count} items`}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
+          ))}
         </div>
       </section>
 
@@ -436,7 +443,7 @@ export default function Homepage() {
         id="flash-sale"
         className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-12"
       >
-        <div className="max-w-screen-2xl mx-auto">
+        <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <MicroLabel>Currently discounted products</MicroLabel>
@@ -455,7 +462,7 @@ export default function Homepage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-5">
             {flashDeals.length === 0 ? (
               <p className="col-span-full text-center text-neutral-500 py-10">
                 {loading
@@ -475,7 +482,7 @@ export default function Homepage() {
         id="product-grid"
         className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12"
       >
-        <div className="max-w-screen-2xl mx-auto">
+        <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
             <div>
               <MicroLabel>
@@ -529,7 +536,7 @@ export default function Homepage() {
                 : "No products are available yet."}
             </p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-5">
               {filtered.map(renderProductCard)}
             </div>
           )}
@@ -538,7 +545,7 @@ export default function Homepage() {
 
       {/* ── Deal callout — based on live product discounts ───────────────── */}
       <section className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-16">
-        <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
             <MicroLabel>Current marketplace deals</MicroLabel>
             <p
@@ -576,7 +583,7 @@ export default function Homepage() {
 
       {/* ── New Arrivals — 2 cols mobile, 4 from sm up ───────────────────── */}
       <section className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12">
-        <div className="max-w-screen-2xl mx-auto">
+        <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
             <h2
               className="font-black uppercase"
@@ -591,7 +598,7 @@ export default function Homepage() {
               View All New
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-5">
             {newArrivals.length === 0 ? (
               <p className="col-span-full text-center text-neutral-400 py-10">
                 {loading
@@ -607,7 +614,7 @@ export default function Homepage() {
 
       {/* ── Brand Strip — wraps into 4 cols mobile, single row from md up ── */}
       <section className="border-y border-brand-border bg-brand-cream px-4 py-8 md:px-8">
-        <div className="max-w-screen-2xl mx-auto">
+        <div className="mx-auto max-w-[1200px]">
           <div className="flex items-center gap-8 mb-5">
             <MicroLabel>Official Brand Stores</MicroLabel>
           </div>
