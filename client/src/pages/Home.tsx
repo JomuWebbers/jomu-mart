@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiRequest } from "../lib/api";
-import { Wire, MicroLabel } from "../components/wireframe-primitives";
+import { MicroLabel } from "../components/wireframe-primitives";
 import {
   Link,
   useNavigate,
@@ -9,7 +9,17 @@ import {
 } from "react-router-dom";
 import { CATEGORY_NAMES } from "../data/categories";
 import { fmt } from "../components/wireframe-helpers";
-import { House, Smartphone, ShoppingBag } from "lucide-react";
+import {
+  Baby,
+  Coffee,
+  House,
+  Shirt,
+  ShoppingBag,
+  Smartphone,
+  Sparkles,
+  Tv,
+  type LucideIcon,
+} from "lucide-react";
 import StoreProductCard, {
   type StoreProduct,
 } from "../components/StoreProductCard";
@@ -79,6 +89,17 @@ const HERO_PHRASES = [
   "Good deals, close to home.",
   "Everything on your list, together.",
 ];
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  "Phones & Tablets": Smartphone,
+  Electronics: Tv,
+  "Home, Furniture & Appliances": House,
+  Fashion: Shirt,
+  "Baby & Kids": Baby,
+  "Beauty & Personal Care": Sparkles,
+  "Food & Beverages": Coffee,
+  "View All": ShoppingBag,
+};
 
 // ─── Homepage ──────────────────────────────────────────────────────────────
 
@@ -352,39 +373,61 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* ── Category Showcase — 2 cols mobile, 3 sm, 4 from md up ────────── */}
-      <section className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className="flex items-baseline gap-4 mb-6">
-            <MicroLabel>Browse By</MicroLabel>
-            <h2
-              className="font-black uppercase"
-              style={{ fontSize: 18, letterSpacing: "-0.03em" }}
+      {/* ── Compact horizontal category rail ─────────────────────────────── */}
+      <section className="border-b border-brand-border bg-brand-surface px-4 py-5 md:px-8 md:py-6">
+        <div className="mx-auto max-w-screen-2xl">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div>
+              <MicroLabel>Find your next favorite</MicroLabel>
+              <h2 className="mt-1 text-lg font-black tracking-tight sm:text-xl">
+                Browse categories
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => selectCategory("All")}
+              className="shrink-0 rounded-control px-2 py-2 text-xs font-bold text-brand-evergreen transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-evergreen"
             >
-              Category
-            </h2>
+              View all
+            </button>
           </div>
-          <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-brand-border bg-brand-border sm:grid-cols-3 md:grid-cols-4">
-            {categoryTiles.map((sc) => (
-              <button
-                key={sc.label}
-                type="button"
-                onClick={() => {
-                  selectCategory(sc.isViewAll ? "All" : sc.label);
-                  if (sc.isViewAll) scrollTo("product-grid");
-                }}
-                className="border-b border-r border-brand-border bg-brand-surface p-4 text-left transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand-evergreen"
-              >
-                <Wire h="h-17 sm:h-20" />
-                <div className="mt-3">
-                  <MicroLabel>{sc.label}</MicroLabel>
-                  <p className="text-[10px] tracking-widest uppercase text-neutral-300 font-medium mt-0.5">
-                    {sc.count === null ? "…" : `${sc.count} items`}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
+          <nav
+            aria-label="Browse product categories"
+            className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2"
+          >
+            {categoryTiles.map((sc) => {
+              const Icon = CATEGORY_ICONS[sc.label] ?? ShoppingBag;
+              const selected = sc.isViewAll
+                ? activeNav === "All"
+                : activeNav === sc.label;
+
+              return (
+                <button
+                  key={sc.label}
+                  type="button"
+                  onClick={() =>
+                    selectCategory(sc.isViewAll ? "All" : sc.label)
+                  }
+                  aria-pressed={selected}
+                  className={`group flex min-h-28 min-w-32 snap-start flex-col items-center justify-center gap-2 rounded-card border px-3 py-3 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen sm:min-w-36 ${
+                    selected
+                      ? "border-brand-evergreen bg-brand-cream"
+                      : "border-brand-border bg-white hover:border-brand-evergreen/50 hover:bg-brand-cream"
+                  }`}
+                >
+                  <span className="flex size-10 items-center justify-center rounded-full bg-brand-cream text-brand-evergreen transition-colors group-hover:bg-white">
+                    <Icon aria-hidden="true" className="size-5 stroke-[1.8]" />
+                  </span>
+                  <span className="line-clamp-2 min-h-8 text-xs font-bold leading-4 text-brand-charcoal">
+                    {sc.label}
+                  </span>
+                  <span className="text-[10px] text-brand-muted">
+                    {sc.count === null ? "Loading…" : `${sc.count} items`}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
       </section>
 

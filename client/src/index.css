@@ -34,6 +34,15 @@
   animation: hero-phrase-in 400ms ease-out both;
 }
 
+.horizontal-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.horizontal-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes hero-phrase-in {
   from {
     opacity: 0;
@@ -78,7 +87,6 @@ html {
 .jm-support-chat .str-chat__avatar-stack {
   display: none;
 }
-
 
 
 
