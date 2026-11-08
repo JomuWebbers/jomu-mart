@@ -77,6 +77,7 @@ export default function Layout() {
       className="min-h-screen bg-brand-cream text-brand-charcoal"
       style={{ fontFamily: "'Barlow', 'Helvetica Neue', Arial, sans-serif" }}
     >
+      <div className="sticky top-0 z-40">
       {/* Announcement Bar */}
       <div className="bg-brand-evergreen px-4 py-2 text-white md:px-0">
         <div className="mx-auto flex max-w-[1120px] items-center justify-between">
@@ -509,6 +510,7 @@ export default function Layout() {
           </div>
         </div>
       </nav>
+      </div>
       <MobileDrawer
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
