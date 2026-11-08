@@ -260,9 +260,9 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen bg-[#171916]">
-      <main className="mx-auto min-h-screen max-w-[1120px] bg-brand-cream">
+      <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-[#171916] px-3 py-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:py-6">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
-      <section className="bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
           <div className="relative flex min-h-[230px] flex-col items-start justify-center overflow-hidden rounded-2xl bg-brand-evergreen px-5 py-6 text-brand-surface shadow-card sm:min-h-[270px] sm:px-8 sm:py-8 lg:col-start-1 lg:row-start-1 lg:min-h-[320px] lg:px-10 lg:py-6">
             <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-20 size-64 rounded-full border-[32px] border-white/5 sm:size-80" />
@@ -413,7 +413,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section className="bg-brand-cream px-3 pb-4 sm:px-4 md:px-8">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-4 sm:px-4 md:px-8">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {[
             { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles, tone: "bg-[#D9E5D7] text-brand-evergreen" },
@@ -442,7 +442,7 @@ export default function Homepage() {
       {/* ── Flash Sale — 2 cols mobile, 4 from sm up ─────────────────────── */}
       <section
         id="flash-sale"
-        className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-12"
+        className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-10 md:px-8 md:py-12"
       >
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -481,7 +481,7 @@ export default function Homepage() {
 
       <section
         id="product-grid"
-        className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12"
+        className="overflow-hidden rounded-2xl bg-brand-surface px-4 py-10 md:px-8 md:py-12"
       >
         <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
@@ -545,7 +545,7 @@ export default function Homepage() {
       </section>
 
       {/* ── Deal callout — based on live product discounts ───────────────── */}
-      <section className="border-y border-brand-border bg-brand-cream px-4 py-10 md:px-8 md:py-16">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-10 md:px-8 md:py-16">
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
             <MicroLabel>Current marketplace deals</MicroLabel>
@@ -583,7 +583,7 @@ export default function Homepage() {
       </section>
 
       {/* ── New Arrivals — 2 cols mobile, 4 from sm up ───────────────────── */}
-      <section className="border-b border-brand-border bg-brand-surface px-4 py-10 md:px-8 md:py-12">
+      <section className="overflow-hidden rounded-2xl bg-brand-surface px-4 py-10 md:px-8 md:py-12">
         <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
             <h2
@@ -614,7 +614,7 @@ export default function Homepage() {
       </section>
 
       {/* ── Brand Strip — wraps into 4 cols mobile, single row from md up ── */}
-      <section className="border-y border-brand-border bg-brand-cream px-4 py-8 md:px-8">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-8 md:px-8">
         <div className="mx-auto max-w-[1120px]">
           <div className="flex items-center gap-8 mb-5">
             <MicroLabel>Official Brand Stores</MicroLabel>
@@ -645,7 +645,7 @@ export default function Homepage() {
       </main>
 
       {/* ── Footer — stacked/columns adapt across breakpoints ────────────── */}
-      <footer className="mx-auto max-w-[1120px] bg-brand-evergreen px-4 pb-8 pt-10 text-white md:px-8 md:pb-8 md:pt-14">
+      <footer className="mx-auto mt-4 max-w-[1120px] overflow-hidden rounded-2xl bg-brand-evergreen px-4 pb-8 pt-10 text-white sm:mt-5 md:mt-6 md:px-8 md:pb-8 md:pt-14">
         <div className="max-w-screen-2xl mx-auto">
           {/* Top grid — 2 cols mobile, 3 sm, 5 from md up */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-12 mb-12 pb-12 border-b border-white/10">
