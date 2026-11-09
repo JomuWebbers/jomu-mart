@@ -123,7 +123,7 @@ const SIDE_CAMPAIGNS: SideCampaign[] = [
     destination: "products",
     category: "Electronics",
     icon: Smartphone,
-    colors: "from-[#174C3A] via-[#10382D] to-[#171916]",
+    colors: "from-[#101713] via-[#090B0A] to-[#171916]",
   },
   {
     eyebrow: "Fresh on Jomu Mart",
@@ -133,7 +133,7 @@ const SIDE_CAMPAIGNS: SideCampaign[] = [
     action: "See products",
     destination: "products",
     icon: Sparkles,
-    colors: "from-[#703B2A] via-[#3F2823] to-[#171916]",
+    colors: "from-[#171513] via-[#0B0A09] to-[#171916]",
   },
   {
     eyebrow: "Grow with Jomu Mart",
@@ -143,7 +143,7 @@ const SIDE_CAMPAIGNS: SideCampaign[] = [
     action: "Start selling",
     destination: "sell",
     icon: House,
-    colors: "from-[#573B73] via-[#342640] to-[#171916]",
+    colors: "from-[#151319] via-[#09090B] to-[#171916]",
   },
   {
     eyebrow: "Made for local business",
@@ -153,7 +153,7 @@ const SIDE_CAMPAIGNS: SideCampaign[] = [
     action: "Join as a seller",
     destination: "sell",
     icon: ShoppingBag,
-    colors: "from-[#8B4A13] via-[#4D321D] to-[#171916]",
+    colors: "from-[#19160F] via-[#0B0A08] to-[#171916]",
   },
   {
     eyebrow: "Good finds, better prices",
@@ -163,7 +163,7 @@ const SIDE_CAMPAIGNS: SideCampaign[] = [
     action: "Explore deals",
     destination: "deals",
     icon: Coffee,
-    colors: "from-[#8D174E] via-[#4B1E3D] to-[#171916]",
+    colors: "from-[#191016] via-[#0B090B] to-[#171916]",
   },
 ];
 
@@ -410,13 +410,14 @@ export default function Homepage() {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#171916]">
+    <div className="relative min-h-screen bg-[#171916]">
       <aside
         aria-label="Featured campaigns"
-        className="fixed bottom-3 top-[184px] z-10 hidden min-[1440px]:block"
+        className="absolute top-0 z-10 hidden min-[1440px]:block"
         style={{
-          left: "max(12px, calc(50vw - 832px))",
-          width: "min(260px, calc((100vw - 1120px) / 2 - 24px))",
+          left: "max(0px, calc(50vw - 840px))",
+          width: "min(280px, calc(50vw - 560px))",
+          height: "min(1100px, calc(100vh + 180px))",
         }}
       >
         <SideCampaignBanner
@@ -426,10 +427,11 @@ export default function Homepage() {
       </aside>
       <aside
         aria-label="More featured campaigns"
-        className="fixed bottom-3 top-[184px] z-10 hidden min-[1440px]:block"
+        className="absolute top-0 z-10 hidden min-[1440px]:block"
         style={{
-          right: "max(12px, calc(50vw - 832px))",
-          width: "min(260px, calc((100vw - 1120px) / 2 - 24px))",
+          right: "max(0px, calc(50vw - 840px))",
+          width: "min(280px, calc(50vw - 560px))",
+          height: "min(1100px, calc(100vh + 180px))",
         }}
       >
         <SideCampaignBanner
