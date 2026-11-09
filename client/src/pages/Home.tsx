@@ -101,6 +101,139 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "View All": ShoppingBag,
 };
 
+type SideCampaign = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  artwork: string;
+  action: string;
+  destination: "products" | "deals" | "sell";
+  category?: string;
+  icon: LucideIcon;
+  colors: string;
+};
+
+const SIDE_CAMPAIGNS: SideCampaign[] = [
+  {
+    eyebrow: "Jomu Mart · Brand Day",
+    title: "Tech finds. Smarter buys.",
+    description: "Explore laptops, phones, and accessories from marketplace sellers.",
+    artwork: "TECH",
+    action: "Shop electronics",
+    destination: "products",
+    category: "Electronics",
+    icon: Smartphone,
+    colors: "from-[#174C3A] via-[#10382D] to-[#171916]",
+  },
+  {
+    eyebrow: "Fresh on Jomu Mart",
+    title: "Meet your next favorite.",
+    description: "Discover new finds for your home, wardrobe, and everyday life.",
+    artwork: "JUST IN",
+    action: "See products",
+    destination: "products",
+    icon: Sparkles,
+    colors: "from-[#703B2A] via-[#3F2823] to-[#171916]",
+  },
+  {
+    eyebrow: "Grow with Jomu Mart",
+    title: "Your business belongs here.",
+    description: "Bring your products online and connect with shoppers across Nigeria.",
+    artwork: "SELL",
+    action: "Start selling",
+    destination: "sell",
+    icon: House,
+    colors: "from-[#573B73] via-[#342640] to-[#171916]",
+  },
+  {
+    eyebrow: "Made for local business",
+    title: "Take your next step.",
+    description: "Build your presence and grow your business in a marketplace made for you.",
+    artwork: "GROW",
+    action: "Join as a seller",
+    destination: "sell",
+    icon: ShoppingBag,
+    colors: "from-[#8B4A13] via-[#4D321D] to-[#171916]",
+  },
+  {
+    eyebrow: "Good finds, better prices",
+    title: "Deals worth a look.",
+    description: "Browse current price drops across products available now.",
+    artwork: "DEALS",
+    action: "Explore deals",
+    destination: "deals",
+    icon: Coffee,
+    colors: "from-[#8D174E] via-[#4B1E3D] to-[#171916]",
+  },
+];
+
+function getSideCampaigns(): [SideCampaign, SideCampaign] {
+  const shuffled = [...SIDE_CAMPAIGNS];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [
+      shuffled[swapIndex],
+      shuffled[index],
+    ];
+  }
+  return [shuffled[0], shuffled[1]];
+}
+
+function SideCampaignBanner({
+  campaign,
+  onAction,
+}: {
+  campaign: SideCampaign;
+  onAction: (campaign: SideCampaign) => void;
+}) {
+  const Icon = campaign.icon;
+
+  return (
+    <div
+      className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-b ${campaign.colors} p-3 text-white shadow-xl`}
+    >
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-16 top-20 size-48 rounded-full border-[20px] border-white/10"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-12 -left-12 size-40 rounded-full bg-[#F4C86A]/10 blur-2xl"
+      />
+      <p className="relative text-[9px] font-black uppercase leading-4 tracking-[0.12em] text-[#F4C86A]">
+        {campaign.eyebrow}
+      </p>
+      <div className="relative my-5 flex min-h-32 flex-1 items-center justify-center">
+        <div className="absolute size-28 rotate-[-12deg] rounded-[2rem] border border-white/20 bg-white/10 shadow-2xl" />
+        <div className="relative flex size-24 rotate-[7deg] flex-col items-center justify-center rounded-[1.75rem] border border-white/25 bg-black/20 text-center shadow-xl backdrop-blur-sm">
+          <Icon aria-hidden="true" className="mb-1 size-8 text-[#F4C86A]" />
+          <span className="text-[11px] font-black uppercase tracking-[0.12em]">
+            {campaign.artwork}
+          </span>
+        </div>
+      </div>
+      <div className="relative">
+        <h2 className="text-lg font-black leading-tight tracking-tight sm:text-xl">
+          {campaign.title}
+        </h2>
+        <p className="mt-2 text-[11px] leading-5 text-white/75">
+          {campaign.description}
+        </p>
+        <button
+          type="button"
+          onClick={() => onAction(campaign)}
+          className="mt-4 w-full rounded-control bg-[#F4C86A] px-2 py-2.5 text-[10px] font-black leading-4 text-brand-charcoal transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          {campaign.action}
+        </button>
+      </div>
+      <p className="relative mt-5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/45">
+        Jomu Mart
+      </p>
+    </div>
+  );
+}
+
 // ─── Homepage ──────────────────────────────────────────────────────────────
 
 export default function Homepage() {
@@ -119,6 +252,7 @@ export default function Homepage() {
   const [reloadProducts, setReloadProducts] = useState(0);
   const [savingIds, setSavingIds] = useState<string[]>([]);
   const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
+  const [sideCampaigns] = useState(getSideCampaigns);
 
   useEffect(() => {
     apiRequest("/products")
@@ -166,6 +300,23 @@ export default function Homepage() {
     setLoading(true);
     setLoadError("");
     setReloadProducts((current) => current + 1);
+  };
+
+  const handleSideCampaignAction = (campaign: SideCampaign) => {
+    if (campaign.destination === "sell") {
+      navigate("/sell");
+      return;
+    }
+
+    if (campaign.destination === "deals") {
+      scrollTo("flash-sale");
+      return;
+    }
+
+    if (campaign.category) {
+      setActiveNav(campaign.category);
+    }
+    scrollTo("product-grid");
   };
 
   const addProductToCart = (product: StoreProduct) => {
@@ -260,6 +411,32 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen bg-[#171916]">
+      <aside
+        aria-label="Featured campaigns"
+        className="fixed bottom-3 top-[184px] z-10 hidden min-[1440px]:block"
+        style={{
+          left: "max(12px, calc(50vw - 832px))",
+          width: "min(260px, calc((100vw - 1120px) / 2 - 24px))",
+        }}
+      >
+        <SideCampaignBanner
+          campaign={sideCampaigns[0]}
+          onAction={handleSideCampaignAction}
+        />
+      </aside>
+      <aside
+        aria-label="More featured campaigns"
+        className="fixed bottom-3 top-[184px] z-10 hidden min-[1440px]:block"
+        style={{
+          right: "max(12px, calc(50vw - 832px))",
+          width: "min(260px, calc((100vw - 1120px) / 2 - 24px))",
+        }}
+      >
+        <SideCampaignBanner
+          campaign={sideCampaigns[1]}
+          onAction={handleSideCampaignAction}
+        />
+      </aside>
       <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-[#171916] px-3 pt-0 pb-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:pt-0 md:pb-6">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
       <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
