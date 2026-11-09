@@ -415,8 +415,8 @@ export default function Homepage() {
         aria-label="Featured campaigns"
         className="absolute top-0 z-10 hidden min-[1440px]:block"
         style={{
-          left: "max(0px, calc(50vw - 840px))",
-          width: "min(280px, calc(50vw - 560px))",
+          left: "max(12px, calc(50vw - 772px))",
+          width: "min(200px, calc(50vw - 584px))",
           height: "min(1100px, calc(100vh + 180px))",
         }}
       >
@@ -429,8 +429,8 @@ export default function Homepage() {
         aria-label="More featured campaigns"
         className="absolute top-0 z-10 hidden min-[1440px]:block"
         style={{
-          right: "max(0px, calc(50vw - 840px))",
-          width: "min(280px, calc(50vw - 560px))",
+          right: "max(12px, calc(50vw - 772px))",
+          width: "min(200px, calc(50vw - 584px))",
           height: "min(1100px, calc(100vh + 180px))",
         }}
       >
@@ -441,7 +441,7 @@ export default function Homepage() {
       </aside>
       <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-[#171916] px-3 pt-0 pb-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:pt-0 md:pb-6">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
-      <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
+      <section className="overflow-hidden bg-[#171916] px-3 py-3 sm:px-4 md:px-8 md:py-5">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
           <div className="relative flex min-h-[230px] flex-col items-start justify-center overflow-hidden rounded-2xl bg-brand-evergreen px-5 py-6 text-brand-surface shadow-card sm:min-h-[270px] sm:px-8 sm:py-8 lg:col-start-1 lg:row-start-1 lg:min-h-[320px] lg:px-10 lg:py-6">
             <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-20 size-64 rounded-full border-[32px] border-white/5 sm:size-80" />
@@ -484,15 +484,15 @@ export default function Homepage() {
           </div>
 
           <div className="lg:col-span-2 lg:row-start-2">
-            <div className="mx-auto max-w-screen-2xl rounded-2xl border border-brand-border bg-brand-surface px-3 py-3 shadow-card sm:px-4">
+            <div className="mx-auto max-w-screen-2xl px-3 py-3 sm:px-4">
               <div className="mb-2 flex items-center justify-between gap-4">
-                <h2 className="text-sm font-black tracking-tight text-brand-charcoal sm:text-base">
+                <h2 className="text-sm font-black tracking-tight text-white sm:text-base">
                   Browse by category
                 </h2>
                 <button
                   type="button"
                   onClick={() => selectCategory("All")}
-                  className="shrink-0 rounded-control px-2 py-1.5 text-[11px] font-bold text-brand-evergreen transition-colors hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-evergreen"
+                  className="shrink-0 rounded-control px-2 py-1.5 text-[11px] font-bold text-[#F4C86A] transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F4C86A]"
                 >
                   View all
                 </button>
@@ -513,20 +513,20 @@ export default function Homepage() {
                       aria-pressed={selected}
                       className={`group flex min-h-20 min-w-28 flex-1 snap-start flex-col items-center justify-center gap-1.5 rounded-control border px-2 py-2 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen sm:min-h-24 sm:min-w-32 sm:gap-2 sm:rounded-card sm:px-3 sm:py-3 ${
                         selected
-                          ? "border-brand-evergreen bg-brand-cream"
-                          : "border-transparent bg-brand-surface hover:border-brand-border hover:bg-brand-cream"
+                          ? "border-[#F4C86A] bg-white/10"
+                          : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
                       }`}
                     >
-                      <span className="flex size-8 items-center justify-center rounded-full bg-brand-cream text-brand-evergreen transition-colors group-hover:bg-white sm:size-9">
+                      <span className="flex size-8 items-center justify-center rounded-full bg-white/10 text-[#F4C86A] transition-colors group-hover:bg-white/20 sm:size-9">
                         <Icon
                           aria-hidden="true"
                           className="size-4 stroke-[1.8] sm:size-[18px]"
                         />
                       </span>
-                      <span className="line-clamp-2 min-h-7 text-[10px] font-bold leading-3.5 text-brand-charcoal sm:text-[11px] sm:leading-4">
+                      <span className="line-clamp-2 min-h-7 text-[10px] font-bold leading-3.5 text-white sm:text-[11px] sm:leading-4">
                         {sc.label}
                       </span>
-                      <span className="text-[9px] text-brand-muted sm:text-[10px]">
+                      <span className="text-[9px] text-white/55 sm:text-[10px]">
                         {sc.count === null ? "Loading…" : `${sc.count} items`}
                       </span>
                     </button>
