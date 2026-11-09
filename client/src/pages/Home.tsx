@@ -260,7 +260,7 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen bg-[#171916]">
-      <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-[#171916] px-3 py-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:py-6">
+      <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-[#171916] px-3 pt-0 pb-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:pt-0 md:pb-6">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
       <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-3 sm:px-4 md:px-8 md:py-5">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
