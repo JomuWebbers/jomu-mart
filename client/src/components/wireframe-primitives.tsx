@@ -14,9 +14,15 @@ export function Wire({ h = 'h-44', label = '' }: { h?: string; label?: string })
   )
 }
 
-export function MicroLabel({ children }: { children: React.ReactNode }) {
+export function MicroLabel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <span className="text-[9px] tracking-[0.2em] uppercase font-semibold text-brand-evergreen">
+    <span className={`text-[9px] tracking-[0.2em] uppercase font-semibold text-brand-evergreen ${className}`}>
       {children}
     </span>
   )
