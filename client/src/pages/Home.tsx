@@ -575,8 +575,8 @@ export default function Homepage() {
           </div>
         </div>
       </section>
-
-      <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-4 sm:px-4 md:px-8">
+      
+      <section className="overflow-hidden rounded-2xl bg-black py-4 sm:px-4 md:px-8">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {[
             { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles, tone: "bg-[#D9E5D7] text-brand-evergreen" },
