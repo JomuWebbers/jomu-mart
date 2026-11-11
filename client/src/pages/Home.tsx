@@ -396,7 +396,7 @@ export default function Homepage() {
     .slice(0, 3);
 
   return (
-    <div className="relative min-h-screen bg-brand-cream text-brand-charcoal">
+    <div className="relative min-h-screen bg-black text-brand-charcoal">
       <aside
         aria-label="Featured campaigns"
         className="absolute top-0 z-10 hidden min-[1440px]:block"
