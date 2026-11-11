@@ -79,7 +79,7 @@ export default function Layout() {
     >
       <div className="sticky top-0 z-40">
       {/* Announcement Bar */}
-      <div className="bg-black px-4 py-2 text-white md:px-0">
+      <div className="bg-brand-evergreen px-4 py-2 text-white md:px-0">
         <div className="mx-auto flex max-w-[1120px] items-center justify-between">
           <span className="text-[9px] md:text-[10px] tracking-[0.15em] md:tracking-[0.2em] uppercase font-semibold">
             <span className="text-[#F4C86A]">●</span> Free delivery on orders above ₦50,000

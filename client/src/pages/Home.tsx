@@ -396,7 +396,7 @@ export default function Homepage() {
     .slice(0, 3);
 
   return (
-    <div className="relative min-h-screen bg-black text-white">
+    <div className="relative min-h-screen bg-brand-cream text-brand-charcoal">
       <aside
         aria-label="Featured campaigns"
         className="absolute top-0 z-10 hidden min-[1440px]:block"
@@ -425,9 +425,9 @@ export default function Homepage() {
           onAction={handleSideCampaignAction}
         />
       </aside>
-      <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 bg-black px-3 pt-0 pb-4 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:pt-0 md:pb-6">
+      <main className="mx-auto min-h-screen max-w-[1120px] space-y-4 px-3 pb-4 pt-0 sm:space-y-5 sm:px-4 md:space-y-6 md:px-0 md:pb-6 md:pt-0">
       {/* ── Hero — fixed brand headline with gently rotating support copy ── */}
-      <section className="overflow-hidden bg-black px-3 py-3 sm:px-4 md:px-8 md:py-5">
+      <section className="overflow-hidden bg-black px-3 py-3 text-white sm:px-4 md:px-8 md:py-5">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 items-stretch gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(190px,0.82fr)]">
           <div className="relative flex min-h-[230px] flex-col items-start justify-center overflow-hidden rounded-2xl bg-black px-5 py-6 text-white sm:min-h-[270px] sm:px-8 sm:py-8 lg:col-start-1 lg:row-start-1 lg:min-h-[320px] lg:px-10 lg:py-6">
             <span className="relative inline-flex items-center gap-2 rounded-full border border-white bg-black px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
@@ -527,8 +527,8 @@ export default function Homepage() {
                   key={product.id}
                   to={`/products/${product.id}`}
                   aria-label={`View ${product.name}, ${fmt(product.price)}`}
-                  className={`group relative min-h-28 overflow-hidden rounded-2xl bg-black sm:min-h-36 lg:min-h-0 ${
-                    index === 0 ? "row-span-2" : ""
+                  className={`group relative min-h-28 overflow-hidden rounded-2xl shadow-card sm:min-h-36 lg:min-h-0 ${
+                    index === 0 ? "row-span-2 bg-[#E8C994]" : "bg-brand-surface"
                   }`}
                 >
                   <img
@@ -537,7 +537,7 @@ export default function Homepage() {
                     loading={index === 0 ? "eager" : "lazy"}
                     className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute inset-x-0 bottom-0 bg-black px-3 py-3 text-white sm:px-4 sm:py-4">
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-10 text-white sm:px-4 sm:pb-4">
                     <span className="block line-clamp-1 text-[11px] font-semibold sm:text-sm">
                       {product.name}
                     </span>
@@ -549,7 +549,7 @@ export default function Homepage() {
               ))
             ) : (
               <>
-                <div className="relative row-span-2 flex min-h-28 flex-col justify-between overflow-hidden rounded-2xl border border-white bg-black p-4 text-white sm:min-h-36 sm:p-6">
+                <div className="relative row-span-2 flex min-h-28 flex-col justify-between overflow-hidden rounded-2xl bg-[#E8C994] p-4 text-brand-charcoal shadow-card sm:min-h-36 sm:p-6">
                   <ShoppingBag aria-hidden="true" className="size-7 stroke-[1.5] sm:size-10" />
                   <div>
                     <span className="text-xs font-bold uppercase tracking-[0.15em]">
@@ -562,11 +562,11 @@ export default function Homepage() {
                     </span>
                   </div>
                 </div>
-                <div className="flex min-h-28 flex-col justify-between rounded-2xl border border-white bg-black p-3 text-white sm:min-h-36 sm:p-5">
+                <div className="flex min-h-28 flex-col justify-between rounded-2xl bg-[#D9E5D7] p-3 text-brand-evergreen shadow-card sm:min-h-36 sm:p-5">
                   <Smartphone aria-hidden="true" className="size-6 stroke-[1.5] sm:size-8" />
                   <span className="text-xs font-bold sm:text-sm">Tech &amp; gadgets</span>
                 </div>
-                <div className="flex min-h-28 flex-col justify-between rounded-2xl border border-white bg-black p-3 text-white sm:min-h-36 sm:p-5">
+                <div className="flex min-h-28 flex-col justify-between rounded-2xl bg-[#F1D9CE] p-3 text-brand-charcoal shadow-card sm:min-h-36 sm:p-5">
                   <House aria-hidden="true" className="size-6 stroke-[1.5] sm:size-8" />
                   <span className="text-xs font-bold sm:text-sm">Home &amp; living</span>
                 </div>
@@ -576,26 +576,26 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl bg-black px-3 py-4 sm:px-4 md:px-8">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-3 py-4 sm:px-4 md:px-8">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {[
-            { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles },
-            { title: "Seller Spotlights", copy: "Meet trusted local sellers", icon: House },
-            { title: "Everyday Essentials", copy: "Useful things for every day", icon: ShoppingBag },
-            { title: "Deals Worth a Look", copy: "Fresh offers from the market", icon: Coffee },
-          ].map(({ title, copy, icon: Icon }) => (
+            { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles, tone: "bg-[#D9E5D7] text-brand-evergreen" },
+            { title: "Seller Spotlights", copy: "Meet trusted local sellers", icon: House, tone: "bg-[#E8C994] text-brand-charcoal" },
+            { title: "Everyday Essentials", copy: "Useful things for every day", icon: ShoppingBag, tone: "bg-[#F1D9CE] text-brand-charcoal" },
+            { title: "Deals Worth a Look", copy: "Fresh offers from the market", icon: Coffee, tone: "bg-brand-evergreen text-white" },
+          ].map(({ title, copy, icon: Icon, tone }) => (
             <button
               key={title}
               type="button"
               onClick={() => scrollTo(title === "Deals Worth a Look" ? "flash-sale" : "product-grid")}
-              className="flex min-h-24 items-center gap-3 rounded-card border border-white bg-black p-3 text-left text-white transition-transform hover:-translate-y-0.5 sm:min-h-28 sm:gap-4 sm:p-4"
+              className={`flex min-h-24 items-center gap-3 rounded-card p-3 text-left transition-transform hover:-translate-y-0.5 sm:min-h-28 sm:gap-4 sm:p-4 ${tone}`}
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-white bg-black sm:size-11">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/60 sm:size-11">
                 <Icon aria-hidden="true" className="size-5 sm:size-6" />
               </span>
               <span>
                 <span className="block text-xs font-black sm:text-sm">{title}</span>
-                <span className="mt-1 block text-[10px] leading-4 sm:text-xs">{copy}</span>
+                <span className="mt-1 block text-[10px] leading-4 opacity-75 sm:text-xs">{copy}</span>
               </span>
             </button>
           ))}
@@ -605,12 +605,12 @@ export default function Homepage() {
       {/* ── Flash Sale — 2 cols mobile, 4 from sm up ─────────────────────── */}
       <section
         id="flash-sale"
-        className="overflow-hidden rounded-2xl bg-black px-4 py-10 text-white md:px-8 md:py-12"
+        className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-10 md:px-8 md:py-12"
       >
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <MicroLabel className="!text-[#F4C86A]">Currently discounted products</MicroLabel>
+              <MicroLabel>Currently discounted products</MicroLabel>
               <h2
                 className="font-black uppercase leading-none mt-1"
                 style={{ fontSize: 20, letterSpacing: "-0.03em" }}
@@ -620,7 +620,7 @@ export default function Homepage() {
             </div>
             <button
               onClick={() => scrollTo("product-grid")}
-              className="self-start rounded-control border border-white px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-black sm:self-auto"
+              className="self-start rounded-control border border-brand-evergreen px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen transition-colors hover:bg-brand-evergreen hover:text-white sm:self-auto"
             >
               Browse products
             </button>
@@ -628,7 +628,7 @@ export default function Homepage() {
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-5">
             {flashDeals.length === 0 ? (
-              <p className="col-span-full py-10 text-center text-white">
+              <p className="col-span-full py-10 text-center text-neutral-500">
                 {loading
                   ? "Loading deals…"
                   : "No discounted products are available right now."}
@@ -644,12 +644,12 @@ export default function Homepage() {
 
       <section
         id="product-grid"
-        className="overflow-hidden rounded-2xl bg-black px-4 py-10 text-white md:px-8 md:py-12"
+        className="overflow-hidden rounded-2xl bg-brand-surface px-4 py-10 md:px-8 md:py-12"
       >
         <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
             <div>
-              <MicroLabel className="!text-[#F4C86A]">
+              <MicroLabel>
                 {activeNav === "All" ? "All Categories" : activeNav}
               </MicroLabel>
               <h2
@@ -663,7 +663,7 @@ export default function Homepage() {
                     : `${activeNav} Products`}
               </h2>
               {!loading && !loadError && (
-                <p className="mt-1 text-xs text-white">
+                <p className="mt-1 text-xs text-neutral-500">
                   {filtered.length}{" "}
                   {filtered.length === 1 ? "product" : "products"}
                   {q ? ` matching “${searchParams.get("q")?.trim()}”` : ""}
@@ -672,29 +672,29 @@ export default function Homepage() {
             </div>
             <button
               onClick={() => selectCategory("All")}
-              className="border-b-2 border-[#F4C86A] pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#F4C86A]"
+              className="border-b-2 border-brand-evergreen pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen"
             >
               View All
             </button>
           </div>
 
           {loading ? (
-            <p className="py-10 text-center text-white">
+            <p className="py-10 text-center text-neutral-400">
               Loading products…
             </p>
           ) : loadError ? (
             <div className="py-10 text-center" role="alert">
-              <p className="mb-4 text-white">{loadError}</p>
+              <p className="mb-4 text-neutral-600">{loadError}</p>
               <button
                 type="button"
                 onClick={retryProducts}
-                className="rounded-control bg-[#F4C86A] px-5 py-2.5 text-sm font-bold text-black hover:bg-white"
+                className="rounded-control bg-brand-evergreen px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-evergreen-strong"
               >
                 Try again
               </button>
             </div>
           ) : filtered.length === 0 ? (
-            <p className="py-10 text-center text-white">
+            <p className="py-10 text-center text-neutral-400">
               {q || activeNav !== "All"
                 ? "No products match this selection."
                 : "No products are available yet."}
@@ -708,10 +708,10 @@ export default function Homepage() {
       </section>
 
       {/* ── Deal callout — based on live product discounts ───────────────── */}
-      <section className="overflow-hidden rounded-2xl bg-black px-4 py-10 text-white md:px-8 md:py-16">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-10 md:px-8 md:py-16">
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
-            <MicroLabel className="!text-[#F4C86A]">Current marketplace deals</MicroLabel>
+            <MicroLabel>Current marketplace deals</MicroLabel>
             <p
               className="font-black uppercase leading-none mt-3"
               style={{
@@ -723,7 +723,7 @@ export default function Homepage() {
               <br />
               AVAILABLE NOW
             </p>
-            <p className="mt-4 text-[14px] font-medium leading-relaxed text-white">
+            <p className="mt-4 text-[14px] font-medium leading-relaxed text-neutral-600">
               {loading
                 ? "Checking current discounts…"
                 : `${discountedProducts.length} in-stock ${
@@ -737,7 +737,7 @@ export default function Homepage() {
             <button
               type="button"
               onClick={() => scrollTo("flash-sale")}
-              className="w-full rounded-control bg-[#F4C86A] py-4 text-[10px] font-black uppercase tracking-[0.25em] text-black transition-colors hover:bg-white"
+              className="w-full rounded-control bg-brand-evergreen py-4 text-[10px] font-black uppercase tracking-[0.25em] text-white transition-colors hover:bg-brand-evergreen-strong"
             >
               Explore current deals
             </button>
@@ -746,7 +746,7 @@ export default function Homepage() {
       </section>
 
       {/* ── New Arrivals — 2 cols mobile, 4 from sm up ───────────────────── */}
-      <section className="overflow-hidden rounded-2xl bg-black px-4 py-10 text-white md:px-8 md:py-12">
+      <section className="overflow-hidden rounded-2xl bg-brand-surface px-4 py-10 md:px-8 md:py-12">
         <div className="mx-auto max-w-[1200px]">
           <div className="flex items-baseline justify-between mb-6">
             <h2
@@ -757,14 +757,14 @@ export default function Homepage() {
             </h2>
             <button
               onClick={() => selectCategory("All")}
-              className="border-b-2 border-[#F4C86A] pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#F4C86A]"
+              className="border-b-2 border-brand-evergreen pb-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand-evergreen"
             >
               View All New
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-5">
             {newArrivals.length === 0 ? (
-              <p className="col-span-full py-10 text-center text-white">
+              <p className="col-span-full py-10 text-center text-neutral-400">
                 {loading
                   ? "Loading new arrivals…"
                   : "No new arrivals yet — check back soon."}
@@ -777,12 +777,12 @@ export default function Homepage() {
       </section>
 
       {/* ── Brand Strip — wraps into 4 cols mobile, single row from md up ── */}
-      <section className="overflow-hidden rounded-2xl bg-black px-4 py-8 text-white md:px-8">
+      <section className="overflow-hidden rounded-2xl bg-brand-cream px-4 py-8 md:px-8">
         <div className="mx-auto max-w-[1120px]">
           <div className="flex items-center gap-8 mb-5">
-            <MicroLabel className="!text-[#F4C86A]">Official Brand Stores</MicroLabel>
+            <MicroLabel>Official Brand Stores</MicroLabel>
           </div>
-          <div className="flex flex-wrap items-center overflow-hidden rounded-xl border border-white bg-black">
+          <div className="flex flex-wrap items-center overflow-hidden rounded-xl border border-brand-border bg-brand-border">
             {[
               "SAMSUNG",
               "APPLE",
@@ -795,9 +795,9 @@ export default function Homepage() {
             ].map((b) => (
               <div
                 key={b}
-                className="flex h-16 w-1/2 cursor-pointer items-center justify-center border-b border-r border-white bg-black transition-colors hover:bg-black sm:w-1/4 md:flex-1"
+                className="flex h-16 w-1/2 cursor-pointer items-center justify-center border-b border-r border-brand-border bg-brand-surface transition-colors hover:bg-white sm:w-1/4 md:flex-1"
               >
-                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white md:text-[11px] md:tracking-[0.2em]">
+                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-400 md:text-[11px] md:tracking-[0.2em]">
                   {b}
                 </span>
               </div>
@@ -808,7 +808,7 @@ export default function Homepage() {
       </main>
 
       {/* ── Footer — stacked/columns adapt across breakpoints ────────────── */}
-      <footer className="mx-auto mt-4 max-w-[1120px] overflow-hidden rounded-2xl bg-black px-4 pb-8 pt-10 text-white sm:mt-5 md:mt-6 md:px-8 md:pb-8 md:pt-14">
+      <footer className="mx-auto mt-4 max-w-[1120px] overflow-hidden rounded-2xl bg-brand-evergreen px-4 pb-8 pt-10 text-white sm:mt-5 md:mt-6 md:px-8 md:pb-8 md:pt-14">
         <div className="max-w-screen-2xl mx-auto">
           {/* Top grid — 2 cols mobile, 3 sm, 5 from md up */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 md:gap-12 mb-12 pb-12 border-b border-white/10">
