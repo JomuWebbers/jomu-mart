@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { apiRequest } from "../lib/api";
 import { MicroLabel } from "../components/wireframe-primitives";
 import {
@@ -11,6 +11,8 @@ import { CATEGORY_NAMES } from "../data/categories";
 import { fmt } from "../components/wireframe-helpers";
 import {
   Baby,
+  ChevronLeft,
+  ChevronRight,
   Coffee,
   House,
   Shirt,
@@ -99,6 +101,16 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "Beauty & Personal Care": Sparkles,
   "Food & Beverages": Coffee,
   "View All": ShoppingBag,
+};
+
+const CATEGORY_IMAGE_PATHS: Record<string, string> = {
+  "Phones & Tablets": "",
+  Electronics: "",
+  "Home, Furniture & Appliances": "",
+  Fashion: "",
+  "Baby & Kids": "",
+  "Beauty & Personal Care": "",
+  "Food & Beverages": "",
 };
 
 type SideCampaign = {
@@ -239,6 +251,7 @@ export default function Homepage() {
   const [savingIds, setSavingIds] = useState<string[]>([]);
   const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
   const [sideCampaigns] = useState(getSideCampaigns);
+  const categoryCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     apiRequest("/products")
@@ -468,26 +481,29 @@ export default function Homepage() {
           </div>
 
           <div className="lg:col-span-2 lg:row-start-2">
-            <div className="mx-auto max-w-screen-2xl px-3 py-3 sm:px-4">
-              <div className="mb-2 flex items-center justify-between gap-4">
-                <h2 className="text-sm font-black tracking-tight text-white sm:text-base">
-                  Browse by category
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => selectCategory("All")}
-                  className="shrink-0 rounded-control px-2 py-1.5 text-[11px] font-bold text-[#F4C86A] transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F4C86A]"
-                >
-                  View all
-                </button>
-              </div>
+            <div className="relative mx-auto max-w-screen-2xl rounded-xl bg-white px-2 py-3 sm:px-4 sm:py-4">
+              <button
+                type="button"
+                aria-label="Scroll categories left"
+                onClick={() =>
+                  categoryCarouselRef.current?.scrollBy({
+                    left: -240,
+                    behavior: "smooth",
+                  })
+                }
+                className="absolute left-1 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-neutral-700 shadow-md hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E63312]"
+              >
+                <ChevronLeft aria-hidden="true" className="size-5" />
+              </button>
               <nav
-                aria-label="Browse by category"
-                className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain"
+                ref={categoryCarouselRef}
+                aria-label="Shop by category"
+                className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-10"
               >
                 {categoryTiles.map((sc) => {
                   const Icon = CATEGORY_ICONS[sc.label] ?? ShoppingBag;
                   const selected = activeNav === sc.label;
+                  const imagePath = CATEGORY_IMAGE_PATHS[sc.label] ?? "";
 
                   return (
                     <button
@@ -495,28 +511,46 @@ export default function Homepage() {
                       type="button"
                       onClick={() => selectCategory(sc.label)}
                       aria-pressed={selected}
-                      className={`group flex min-h-20 min-w-28 flex-1 snap-start flex-col items-center justify-center gap-1.5 rounded-control border px-2 py-2 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-evergreen sm:min-h-24 sm:min-w-32 sm:gap-2 sm:rounded-card sm:px-3 sm:py-3 ${
-                        selected
-                          ? "border-[#F4C86A] bg-black"
-                          : "border-white bg-black hover:border-[#F4C86A]"
+                      className={`group flex w-32 shrink-0 snap-start flex-col items-center gap-2 rounded-lg p-1 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] sm:w-36 ${
+                        selected ? "text-[#E63312]" : "text-neutral-800"
                       }`}
                     >
-                      <span className="flex size-8 items-center justify-center rounded-full border border-white bg-black text-[#F4C86A] sm:size-9">
-                        <Icon
-                          aria-hidden="true"
-                          className="size-4 stroke-[1.8] sm:size-[18px]"
-                        />
+                      <span className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-100">
+                        {imagePath ? (
+                          <img
+                            src={imagePath}
+                            alt=""
+                            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <span className="flex size-full items-center justify-center text-neutral-500">
+                            <Icon
+                              aria-hidden="true"
+                              className="size-10 stroke-[1.5]"
+                            />
+                          </span>
+                        )}
                       </span>
-                      <span className="line-clamp-2 min-h-7 text-[10px] font-bold leading-3.5 text-white sm:text-[11px] sm:leading-4">
+                      <span className="min-h-10 text-sm font-medium leading-5 sm:text-base">
                         {sc.label}
-                      </span>
-                      <span className="text-[9px] text-white sm:text-[10px]">
-                        {sc.count === null ? "Loading…" : `${sc.count} items`}
                       </span>
                     </button>
                   );
                 })}
               </nav>
+              <button
+                type="button"
+                aria-label="Scroll categories right"
+                onClick={() =>
+                  categoryCarouselRef.current?.scrollBy({
+                    left: 240,
+                    behavior: "smooth",
+                  })
+                }
+                className="absolute right-1 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-neutral-700 shadow-md hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E63312]"
+              >
+                <ChevronRight aria-hidden="true" className="size-5" />
+              </button>
             </div>
           </div>
 
