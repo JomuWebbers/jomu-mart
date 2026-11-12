@@ -1,0 +1,191 @@
+CHAPTER ONE
+
+INTRODUCTION
+
+1.1 Background of the Study
+
+Across Osun State, small-scale trading is a familiar part of everyday life. In markets and roadside stalls in towns such as Osogbo, Ile-Ife and Ilesa, traders sell groceries, clothing, electronics and other everyday goods to local customers. Many businesses combine in-person sales and word of mouth with social media or messaging apps; the mix varies from trader to trader.
+
+At the same time, the way people buy and sell things in Nigeria more broadly has been shifting online. Nigeria's e-commerce revenue was estimated at 6.2 billion dollars by the end of 2022, and with a compound annual growth rate of around 11.7 percent, it was projected to keep climbing steadily in the years after (Oxford Business Group, 2024). Platforms like Jumia have played a big role in making online shopping normal for a lot of Nigerians, handling everything from product listings to payment and delivery in one place.
+
+Many small-scale businesses in Osun State participate in the shift online, but participation does not always mean they have a dedicated system. A GSMA survey conducted in 2023 found that 56 percent of micro, small and medium enterprises in Nigeria sell online only through social media, without a proper website or dedicated platform (GSMA, 2023). For a trader in Osogbo, for example, WhatsApp may help share stock updates with existing contacts, while product information, stock, orders, payment records and delivery arrangements may still be handled across separate conversations or notebooks.
+
+This matters because a business confined to its physical location and its existing circle of contacts has a hard ceiling on how far it can grow. A customer who has moved to another part of town, a relative buying on someone's behalf from elsewhere, or simply a new customer who has never visited the stall in person, has no real way to discover what a small business sells or to place an order without physically showing up. Uploading a business's goods onto a proper web-based platform changes that: it gives the business a presence that exists independently of its physical stall, reachable by anyone with an internet connection, browsable at any time of day, and backed by an actual order and delivery process rather than a string of back-and-forth messages.
+
+Research on SMEs in Nigeria supports this: adopting structured e-commerce strategies such as organized online selling, digital advertising, and electronic payment tends to have a measurable positive effect on business performance (Onwuka et al., 2024). However, setting up a dedicated e-commerce platform takes money, technical skills and time that many small traders may not have. Others already use social media or established marketplaces, but may still lack one simple place to manage listings, stock, orders, payments and delivery. A locally relevant system should therefore complement existing selling habits and reduce the effort of coordinating these tasks, rather than assume that all small businesses are offline.
+
+This is the gap this project is trying to close. Jomu Mart is a shared online marketplace where multiple small-scale sellers can submit products for administrator review, while customers browse listings, place orders and follow their status. The project focuses on making these core marketplace processes accessible to small businesses, including those in Osun State. The system uses the PERN stack: PostgreSQL, Express.js, React.js and Node.js. Tailwind CSS is used for styling, Prisma for database access, Neon for hosted PostgreSQL, and Vercel for deployment.
+
+1.2 Case Study Context
+
+To ground the project in its local context, this section describes an illustrative operating scenario for a small-scale trader in Osun State. It draws on the issues discussed in the literature and common forms of local trade; it is not a report of interviews with specific businesses, and it should not be taken to describe every trader in the state.
+
+A small business may operate from a market stall, a shop along a busy road or a kiosk in a residential area. Some customers are walk-ins or regulars; some traders also use WhatsApp or Facebook to share products and stock updates. These channels can help maintain customer relationships, but they may not provide a central catalogue or a consistent record of orders and stock.
+
+When orders are taken through calls or messages, details such as product choice, quantity, price and delivery arrangements can be spread across a conversation. Payment may be made by transfer or on delivery, and a trader may arrange dispatch directly or use a local rider. The exact process varies between businesses; the example illustrates why an organized order record and clear status updates can be useful.
+
+Record keeping varies between businesses. Some traders may use notebooks, spreadsheets, messaging histories or manual stock counts; these methods can make it difficult to maintain a consistent record of past orders, customer purchases and current stock as activity grows.
+
+These ways of operating can work for individual businesses, but managing sales through separate conversations, memory and manual records can make it harder to keep stock and order information consistent as activity grows. The project uses this scenario to identify requirements for a shared platform; local user testing is needed to establish how well those requirements fit particular businesses.
+
+1.3 Statement of the Problem
+
+Many small-scale businesses in Nigeria use social media to reach customers, but may not have a dedicated system that connects product availability, order records, payments and delivery updates. A GSMA survey carried out in 2023 found that 56 percent of micro, small and medium enterprises in Nigeria sell online only through social media platforms, with no website or dedicated system supporting them (GSMA, 2023). This suggests that some business activity is coordinated manually across conversations and other records, which can make it harder to check stock, retrieve order details or give customers consistent status updates.
+
+This creates a number of problems that are easy to overlook until they start costing the business money. Stock control becomes guesswork, so a business owner may either run out of a popular item without realizing it or tie up money in stock that is not moving. Payments are handled outside any structured system, and research on Nigerian SMEs has shown that where digital payment systems are properly adopted and tracked, cash management improves significantly, reducing the kind of inefficiencies that come with handling money informally (Ihenyen et al., 2025). Without that structure, a lot of small businesses are left exposed to lost records, unclear cash flow, and difficulty telling at a glance how the business is actually performing.
+
+There is also a matter of trust. A customer buying from an Instagram page or a WhatsApp broadcast has no real way of knowing whether the seller is reliable, whether the product will arrive as described, or whether there is any recourse if something goes wrong. Studies on e-commerce strategies among Nigerian SMEs have found that structured approaches, including organized online selling and proper payment systems, tend to have a measurable positive effect on business performance (Onwuka et al., 2024), which suggests that the absence of that structure is not a small inconvenience but an actual barrier to growth.
+
+Large platforms such as Jumia show how product listings, payments and delivery can be coordinated at scale, but a small business may face fees, competition and limited control over its presence on a large marketplace. The project addresses a related need by building a shared marketplace focused on small-scale sellers, with listing review and order-management features. It does not provide each seller with an independent, self-contained storefront.
+
+This project responds to the identified gap by designing and building Jomu Mart, a web-based marketplace where multiple small-scale sellers can submit listings, manage product stock and receive orders through a shared customer-facing storefront. Customers can browse products, use a cart and checkout, and view order-status updates. Listings are subject to administrator review. The platform is intended to reduce the need for each business to build and maintain a separate e-commerce website; it is not a single-vendor store.
+
+1.4 Aim and Objectives of the Study
+
+Aim
+
+The aim of this project is to design and implement Jomu Mart, an integrated web-based marketplace that enables multiple small-scale businesses, with Osun State as the study context, to submit product listings and manage stock and orders through a shared platform inspired by the core operations of larger e-commerce services.
+
+Objectives
+
+To achieve this aim, the project sets out to do the following:
+
+1. Study the existing manual, informal system used by small-scale businesses, of the kind reviewed in the case study above, to identify the specific requirements the system to be computerized must address.
+
+2. Develop authentication and role-based access for customers, sellers and administrators, so each user can access the functions relevant to their role.
+
+3. Develop seller product-listing and inventory functions, with administrator review of submitted listings and stock-level tracking.
+
+4. Develop a customer facing storefront that supports product browsing, searching, and a functioning shopping cart.
+
+5. Build order management and checkout functions that allow customers to place orders and view their status, with a map-based display of stored delivery locations for supported areas. The prototype does not provide continuous driver GPS tracking.
+
+6. Integrate a secure payment mechanism into the checkout process.
+
+7. Provide an administrator dashboard for reviewing product listings and overseeing orders, users and delivery-partner assignments.
+
+8. Test the completed system to confirm that it functions correctly and is reasonably easy for customers, sellers and administrators to use.
+
+1.5 Significance of the Study
+
+This project is not just an academic exercise; it has practical value for several people connected to it in different ways.
+
+For small-scale business owners, the platform provides a shared place to submit products, monitor stock and receive orders, instead of coordinating every detail across separate messages or building a standalone website. Listings are reviewed by an administrator. The prototype has a free-listing allowance followed by a monthly listing fee; it does not use a per-sale commission model.
+
+For customers, the platform offers a more reliable shopping experience. Instead of messaging a business page and hoping for the best, a customer can browse products properly, see what is available, place an order through a clear process, and follow that order from confirmation through to delivery. That kind of structure builds a level of trust that informal selling struggles to provide.
+
+For the department and the wider academic community, this project adds to work on web-based e-commerce systems, particularly those built using the PERN stack. The platform and its documentation may serve as a reference for students and developers exploring related marketplace systems. Its fit for businesses in Osun State should be evaluated with feedback from actual local sellers and customers.
+
+For the researcher, this project is an opportunity to move beyond theory and actually build something functional from the ground up. It brings together system design, database structuring, front end and backend development, and testing; all applied to a real-world problem rather than a hypothetical one. That kind of hands-on experience is difficult to replace with classroom learning alone.
+
+1.6 Scope of the Study
+
+This project focuses on designing and building Jomu Mart, a multi-vendor e-commerce marketplace for small-scale businesses, with Osun State as its primary study context. The system uses PostgreSQL, Express.js, React.js and Node.js (PERN), with Tailwind CSS, Prisma, Neon and Vercel. Inngest is not implemented and is therefore not included in the system architecture.
+
+The system will cover the following core areas:
+
+1. User registration and authentication for customers and sellers, with administrator access to management functions.
+
+2. Seller product listings and inventory management, with administrator review and approval before listings appear in the storefront.
+
+3. Product browsing and searching, allowing customers to view products, filter by category, and search for specific items.
+
+4. Shopping cart and checkout, enabling customers to select products, review their order, and proceed to payment.
+
+5. Order management and status tracking from placement through delivery. A map view can show stored delivery locations in supported areas, including Osun, Ogun, Lagos and Oyo; it does not continuously track a driver by GPS.
+
+6. Administrator dashboard for reviewing listings and overseeing products, orders, users and delivery-partner assignments.
+
+7. Checkout payment options for the Nigerian context, including Paystack card payment, bank transfer and pay on delivery.
+
+Jomu Mart is a shared marketplace: multiple sellers can submit listings under their own accounts, subject to administrator review. This differs from a single-vendor online store, which presents products from only one business.
+
+This project does not cover continuous live GPS tracking of delivery vehicles, integration with external third-party courier APIs, native mobile applications, artificial intelligence-based product recommendations, or advanced analytics and business intelligence reporting. The responsive web platform manages orders and delivery status internally, but does not connect to a courier provider’s tracking system.
+
+These exclusions reflect a decision to keep the project achievable within the available time and resources. They define the prototype’s boundaries; user testing is needed to determine how well its included features address the requirements identified in Chapter One.
+
+1.7 Limitations of the Study
+
+While this project sets out to build a fully functional e commerce platform, it is carried out within certain constraints that are worth stating clearly upfront.
+
+Time constraint: The project is being developed within the timeframe of an academic semester, which limits how deep certain features can go. There simply isn't enough time to build, test, and refine every possible feature a commercial e commerce platform might have, so the focus stays on delivering the core functionality properly rather than spreading effort too thin.
+
+Financial constraint: Building and hosting a web application often comes with costs, from premium hosting plans to certain payment gateway services that charge full access. Given the limited budget available for a student project, the system will rely on more accessible or free tier tools and services where possible, which may affect certain aspects such as hosting performance or the range of payment options available.
+
+Data constraint: Since this is not being built for an already running business, the platform will be tested using sample or demo data rather than real transactions, real customers, or real inventory. This is necessary for demonstrating that the system works, but it does mean the testing environment will not fully reflect the pressures of an actual, live business.
+
+Infrastructure constraint: The platform will be deployed on a basic hosting environment suited for testing and demonstration purposes, rather than a production grade infrastructure built to handle high traffic or large-scale usage. This means performance under heavy load will not be a focus of this project, since that kind of stress testing falls outside what is achievable within the current scope.
+
+These limitations do not take away from the project's core goal. They simply set realistic boundaries around what can be delivered, while still producing a working system that addresses the problem identified in Chapter One.
+
+1.8 Definition of Terms
+
+To make sure certain terms used throughout this project are clearly understood, this section defines the key technical and domain specific words that appear in the chapters ahead.
+
+E-commerce: The buying and selling of goods or services over the internet, along with the transfer of money and data needed to complete those transactions.
+
+Web based application: A software application that runs inside a web browser rather than being installed directly on a computer or phone, meaning it can be accessed from any device with internet access and a browser.
+
+Integrated system: A system made up of different parts, such as product management, order processing, and payment handling, that are connected and work together as one unified platform rather than as separate, disconnected tools.
+
+Small scale business: A business that operates with limited capital, a small number of staff, and a relatively modest scope of operations, typically owned and runs independently rather than as part of a larger corporate structure.
+
+PERN stack: A set of four technologies, PostgreSQL, Express.js, React.js, and Node.js, used together to build full stack web applications, covering everything from the database to the user interface.
+
+PostgreSQL: An open-source relational database system that stores data in structured tables with defined relationships, known for its reliability and strong support for complex queries.
+
+Express.js: A lightweight framework built on Node.js that simplifies the process of building the back end and handling requests between the client and the server.
+
+React.js: A JavaScript library used for building user interfaces, particularly for creating interactive, component-based front-end experiences.
+
+Node.js: A runtime environment that allows JavaScript to run outside a web browser, commonly used to build the server-side logic of a web application.
+
+Tailwind CSS: A utility first CSS framework that provides a set of pre-built styling classes, allowing a responsive user interface to be built quickly and consistently without writing custom stylesheets from scratch.
+
+Prisma: An object relational mapping tool that provides a type safe, structured way for the application to read from and write to the PostgreSQL database, without writing raw SQL queries by hand.
+
+Neon: A serverless PostgreSQL hosting platform that manages the underlying database infrastructure automatically, allowing the database to scale and remain available without manual server administration.
+
+Vercel: A cloud platform used to deploy and host the application, automatically building and publishing new versions of the system whenever changes are made.
+
+Cloudinary: A cloud-based media management service used to store, optimize, and deliver the product images used throughout the platform.
+
+Front end: The part of an application that users see and interact with directly, including the layout, design, and interactive elements.
+
+Back end: The part of an application that runs on the server, handling logic, data processing, and communication with the database, largely unseen by the user.
+
+Database: An organized collection of data stored electronically, structured in a way that allows it to be easily accessed, managed, and updated.
+
+Admin dashboard: An interface designed specifically for the business owner or administrator, providing tools to manage products, orders, and customer information from a central location.
+
+Payment gateway: A service that securely processes and verifies online payment transactions between a customer and a business. Examples relevant to this project include Paystack and Flutterwave, both widely used and well suited to the Nigerian context.
+
+Shopping cart: A feature within an e-commerce platform that allows customers to select and hold products they intend to purchase before proceeding to checkout.
+
+Checkout: The final step in the online purchasing process, where a customer confirms their order details and completes payment.
+
+DESIGN AND IMPLEMENTATION OF AN INTEGRATED WEB BASED E-COMMERCE PLATFORM FOR SMALL SCALE BUSINESS OPERATIONS (INSPIRED BY JUMIA).
+
+SAMUEL MATHEW JOMU
+
+SW20240115815
+
+SUPERVISED BY:
+
+ALH. KAWONISE
+
+DEPARTMENT OF SOFTWARE AND WEB DEVELOPMENT
+
+SCHOOL OF COMPUTING TECHNOLOGY
+
+FEDERAL POLYTECHNIC EDE
+
+References
+
+GSMA. (2023). E-commerce in Africa: Unleashing the opportunity for MSMEs. GSMA.
+
+Ihenyen, J. C., Perekeme, P. P., Inamuna, B. A., & Raymond, T. (2025). Influence of digital payment systems on cash management of small and medium scale enterprises (SMEs) in Nigeria. Journal of Humanities and Social Policy, 11(4), 48–60. https://doi.org/10.56201/jhsp.vol.11.no4.2025.pg48.60
+
+Onwuka, I. N., Awuzie, E. I., Nwokoye, M. O., Chidinna, O. S., & Ndubuisi, A. V. (2024). E commerce strategies and performance of small and medium enterprises in Makurdi Benue State, Nigeria. International Journal of Research and Innovation in Social Science, 8(6), 846–855.
+
+Oxford Business Group. (2024). Booming population and e commerce in Nigeria spur innovation in retail. In The Report: Nigeria 2024. Oxford Business Group. https://oxfordbusinessgroup.com/reports/nigeria/2024-report/retail/

@@ -1,0 +1,199 @@
+CHAPTER TWO
+
+LITERATURE REVIEW
+
+2.1 Introduction
+
+This chapter reviews existing literature, systems and technologies that relate to the design and implementation of a web based e commerce platform for small scale business operations. The purpose of the review is to establish what is already known about e commerce, to examine how similar platforms operate in the Nigerian and wider African market, and to identify the gaps that this project sets out to address.
+
+The review begins with a conceptual discussion of the key ideas underlying the study, including e commerce, online payment, order management, and delivery and tracking. It then examines related studies on e commerce adoption among small businesses, followed by a comparison of existing platforms such as Jumia, Konga and Jiji. After this, the chapter presents the Technology Acceptance Model as the theoretical framework guiding the study, and it reviews the technologies used to build the proposed platform.
+
+The chapter closes with a summary of the findings from the reviewed materials and a statement of the research gap that justifies the development of the proposed system.
+
+2.2 Conceptual Review
+
+Concept of E commerce
+
+E-commerce, or electronic commerce, refers to the buying and selling of goods and services through digital networks. In a business-to-consumer setting, customers can browse products and place orders through a website or application, while the seller may fulfil the order from a physical shop, stall or other location (Onwuka et al., 2024). Onwuka et al. (2024) note that e commerce gives small and medium enterprises the chance to operate in the wider market on a more level footing with large businesses. They add that, because markets change quickly and technology keeps developing, e commerce implementation by small companies is becoming necessary rather than optional.
+
+Growth of E commerce in Nigeria
+
+E commerce in Nigeria has grown quickly. Business to consumer e commerce transactions were reported at 15 billion dollars in 2023 and were projected to pass 33 billion dollars in 2026, although online sales still made up only about 6 percent of total retail sales (Michael, 2025). In 2022 the Federal Government projected that the number of online shoppers would rise from an estimated 76.7 million to 122.5 million by 2025 (Ohajionu & Onasoga, 2023). This growth is attributed to increasing smartphone and internet penetration, fast urban development and a growing middle class (Ohajionu & Onasoga, 2023). These figures are projections and should be read as indicators of direction rather than exact outcomes, but they show that demand for online buying is rising and that small businesses have an opportunity to serve it.
+
+E commerce and Small Scale Businesses
+
+Small scale businesses often have limited capital, limited staff and a customer base restricted to their immediate location. Studies of small enterprises in Nigeria identify market expansion and reduced marketing costs as the main motivations for adopting e commerce (Ekanem & Abiade, 2018). In practice, however, many small sellers have not moved beyond social media. A 2023 GSMA survey reported that 56 percent of micro, small and medium enterprises in Nigeria sell online only through social media, while up to 19 percent combine social media with another platform such as a website or marketplace (Michael, 2025). This suggests that many small businesses sell online without a dedicated system for managing products, orders, payments and deliveries in one place, which is the gap a purpose built platform can fill.
+
+Concept of an Online Marketplace
+
+An online marketplace is a digital platform that connects two or more groups of users, typically buyers and sellers, so that they can exchange products, services or resources (Muurinen, 2024). The key difference from a conventional online store is that a store sells the goods of a single seller, while a marketplace brings together many independent sellers under one platform (Muurinen, 2024). The operator provides the shared infrastructure and usually earns revenue by charging a commission on transactions (Muurinen, 2024). Running a marketplace also brings added requirements. Payments must be handled securely between several parties, sellers need profiles through which they present their offerings, and buyers and sellers need a way to evaluate each other (Muurinen, 2024).
+
+Online Payment Systems
+
+An online payment system allows a customer to pay for goods electronically at the point of purchase. Payment preferences in Nigeria’s e commerce sector combine traditional and digital methods. Account to account transfers, cash on delivery and debit or credit cards remain the most common, while e wallets are growing and are projected to rise from 11 percent of e commerce payments in 2023 to 22 percent by 2027 (Michael, 2025). Cash still accounts for 23 percent of online sales, one of the highest shares in the region (Michael, 2025). Ihenyen et al. (2025) found that digital payment systems had a significant positive influence on the cash management of small and medium scale enterprises in Nigeria, with platforms such as POS, USSD and online transfers improving the tracking of transactions. Trust is a related concern. Many buyers fear that goods will not be delivered or will be substandard, and some sellers hesitate to sell online for fear of fraud and theft. This mutual distrust creates a need for reliable payment and delivery systems that build confidence between buyers and sellers (Ohajionu & Onasoga, 2023).
+
+Concept of Order Management
+
+Order management is the process of handling a customer’s order from the moment it is placed until the goods reach the customer. It typically covers recording the order, confirming payment, checking stock, preparing the goods, arranging delivery and keeping the customer informed of progress. For a small business that handles orders by phone calls, messages or notebooks, this process is prone to errors, such as missed orders, double bookings and unclear delivery status. A web based system addresses this by keeping every order in one place, with a clear status at each stage, so that both the business and the customer can see how far an order has progressed.
+
+Delivery and Order Tracking
+
+Last mile delivery is the final stage of the supply chain, in which goods move from a fulfilment centre to the customer’s doorstep (Ohajionu & Onasoga, 2023). It is widely regarded as the most difficult stage in Nigeria. Poor road networks delay deliveries and raise transport costs, and the lack of a proper street addressing system in many areas makes it hard for delivery companies to locate customers accurately (Ohajionu & Onasoga, 2023). Poor roads, inconsistent electricity supply and high fleet costs also contribute to high delivery costs and longer delivery times (Michael, 2025). Real time tracking is one technology response, and it has been proposed as a way to improve safety and reduce theft during delivery (Ohajionu & Onasoga, 2023). Tracking also raises privacy questions, because the personal data collected for delivery should be used only to reach the right recipient and communicate with the customer, and it should be protected through measures such as encryption (Ohajionu & Onasoga, 2023). Order tracking therefore gives customers visibility of where their order is, and it gives the business a way to monitor deliveries.
+
+2.3 Related Literature
+
+This section reviews earlier studies that bear on the proposed system. They are grouped into e commerce adoption by small businesses, online technology and business performance in Osun State, inventory and order management systems, and delivery and order tracking.
+
+Studies on E commerce Adoption by Small Businesses in Nigeria
+
+Several Nigerian studies have examined why small enterprises adopt e commerce and what it does for them. Ekanem and Abiade (2018) assessed the factors influencing the use of e commerce by small enterprises in Nigeria and identified market expansion and reduced marketing costs as the main motivations. Onwuka et al. (2024) examined the effect of e commerce strategies, namely social media marketing, online advertisement and electronic payment, on the performance of small and medium enterprises in Makurdi, Benue State. Uzoaru (2025) reviewed the literature on e commerce adoption by Nigerian SMEs through the Technology Organization Environment framework, which treats adoption as the product of a firm’s technological readiness, its organisational characteristics and its external environment. Taken together, these studies establish that e commerce matters to small businesses and describe what drives its adoption. They concentrate on strategies and adoption factors, and none of them reports the design of a working platform that a small business can use to manage its sales operations.
+
+Studies on Online Technology and SME Performance in Osun State
+
+The study closest to the setting of this project is that of Ibrahim et al. (2024), who surveyed 250 small and medium enterprises in Osogbo, the commercial capital of Osun State. Their sample was drawn mainly from trading (46.8 percent), catering and food (29.6 percent) and fashion production (18.0 percent), and every respondent already used an online platform. Most of these platforms were social media applications such as Facebook, Instagram, Twitter and WhatsApp. Using multiple regression, the authors found that both social media use and online payment integration were positively and significantly related to business performance, with coefficients of 0.394 and 0.295 respectively (Ibrahim et al., 2024). The study therefore supports the value of online technology for businesses in Osun State. Its scope, however, is limited to social media and payment integration. It does not examine a platform that combines product listing, order management and delivery in one system, and it measures performance rather than evaluating a built system.
+
+Studies on Inventory and Order Management Systems
+
+A number of Nigerian studies have built web based systems to replace manual record keeping. Ogieva (2022) reported that the challenges at the case study organisation were attributed to its manual, paper based inventory process, mainly human error, incorrect inventory reporting and pilferage of items. The prototype web based system developed in that project was reported to be faster, more efficient and more reliable than the manual process. Chukwumuanya et al. (2024) developed a web based inventory management system for a university plastic production unit, using a MySQL database together with a forecasting model, and reported a great improvement in inventory control over the existing practice. Their system included staff, owner or administrator, supplier and customer roles, and its dashboard displayed information such as order status and delivery time. These studies show that web based systems can improve record accuracy and control for small organisations. Their focus is internal operations such as stock levels and production planning. They do not describe a public online storefront, customer payment or customer facing delivery tracking.
+
+Studies on Delivery and Order Tracking
+
+Evidence on delivery and tracking comes mainly from outside Nigeria. Fatmawati and Fajriana (2023) studied post purchase shipping services on a leading Indonesian e commerce platform and found that shipping, tracking, return and customer service each had a positive effect on customer satisfaction. Their study was limited to one marketplace in one region, and the authors themselves recommend wider samples in future research. In the Nigerian setting, the literature points to the problem that tracking could help to address. Poor road networks and the lack of a proper street addressing system make it difficult to locate customers accurately (Ohajionu & Onasoga, 2023), and poor roads, inconsistent electricity supply and high fleet costs raise delivery costs and lengthen delivery times (Michael, 2025). Ohajionu and Onasoga (2023) also suggest that real time tracking can improve safety and reduce theft during delivery. These sources show the need for visibility over delivery in Nigeria, but they do not offer a tested tracking design for small businesses.
+
+Summary of Related Literature
+
+The related literature shows that e-commerce can benefit small businesses in Nigeria and Osun State, that web-based systems can improve internal record keeping, and that tracking is associated with customer satisfaction. Among the studies reviewed, there is a gap in tested systems that combine a public marketplace for multiple small sellers with product listings, order management, payment options and customer-facing delivery-status information. Section 2.7 returns to this point when the research gap is stated.
+
+2.4 Review of Similar/Existing Systems
+
+This section reviews three platforms that Nigerian buyers and small sellers already use: Jumia, Konga and Jiji. Jumia is reported to be the largest player among Nigeria’s online stores by e commerce revenue, and Konga is among the other popular marketplaces (Michael, 2025). Jiji is widely used for classified listings. The descriptions below rely on public statements by the companies and on press coverage, so features may have changed since they were written.
+
+Jumia
+
+Jumia describes itself as a marketplace supported by its own logistics business, Jumia Logistics, and its payment and fintech platform, JumiaPay (Jumia Technologies, 2026). Sellers list products on the platform, and Jumia connects them to buyers while providing delivery and payment services around the transaction. Payment preferences in Nigeria have been shifting towards e wallets, and JumiaPay is one of the wallets named as driving that shift (Michael, 2025). Delivery is built around pickup stations as well as door delivery. In the first quarter of 2026, 74 percent of shipped packages were fulfilled through pickup stations rather than door delivery, up from 67 percent a year earlier, and the company links this approach to lower exposure to fuel costs (MarketBeat, 2026). Jumia’s design therefore answers the payment trust and last mile delivery problems discussed in 2.2 with its own infrastructure, but that infrastructure is built and funded at a scale that a small business could not copy.
+
+Konga
+
+Konga began operating in 2012 and was later acquired by Zinox Group. It combines its own retail business with a marketplace for third party sellers. Its approach to delivery has changed over time. In 2015 it introduced an option that let third party merchants deliver orders themselves instead of using Konga’s own delivery arm, with sellers choosing the areas they would serve, the delivery time and whether they would accept pay on delivery. Konga said it would mediate between customers and sellers and penalise any party that defaulted (TechCabal, 2015). Pay on delivery was suspended while the sale of the company was under discussion and relaunched from August 2018, starting in Lagos (Nairametrics, 2018). On payments, KongaPay is described as a licensed fintech platform of the Central Bank of Nigeria (ITPulse, 2021), and in 2026 Konga added a buy now, pay later option through a partnership with Klump (Brandspur, 2026). Konga’s history shows a platform adjusting how much of delivery and payment it controls itself and how much it leaves to sellers.
+
+Jiji
+
+Jiji is a classifieds marketplace, not a conventional online store. Its chief executive describes the platform as built to let people connect directly to buy and sell, with free listings, moderation of ads, an AI based security system and an integrated chat feature (TechCabal, 2024). Jiji does not handle logistics or payments directly. Buyers and sellers connect and manage transactions between themselves (TechCabal, 2024). Revenue comes mainly from premium services that give sellers more listings and reach, plus advertising income (TechCabal, 2024). The company reports that fraud on the platform is below 1 percent, but this is the company’s own figure and it has not been independently verified. Jiji’s model keeps costs low for sellers and gives them easy entry. The trade off is that payment and delivery are left to the two parties, which is the source of the mutual distrust described by Ohajionu and Onasoga (2023).
+
+Comparison of the Platforms
+
+Table 2.1: Comparison of Jumia, Konga and Jiji
+
+Feature
+
+Jumia
+
+Konga
+
+Jiji
+
+Type of platform
+
+Marketplace with its own logistics and payment arms
+
+Own retail plus third party marketplace
+
+Classifieds marketplace
+
+How sellers reach buyers
+
+List on the marketplace
+
+List on the marketplace
+
+Post ads, with free listings
+
+Payment
+
+JumiaPay and other methods
+
+KongaPay, pay on delivery and buy now, pay later
+
+Left to buyer and seller
+
+Delivery
+
+Own logistics, pickup stations and partners
+
+Konga’s own delivery arm, with a seller delivery option introduced in 2015
+
+Left to buyer and seller
+
+Summary of Existing Systems
+
+The three platforms sit at different points on a spectrum. At one end, Jumia and Konga take on payment and delivery themselves, which builds buyer trust but depends on large infrastructure. At the other, Jiji leaves both to users, which lowers cost but leaves trust and delivery risks with them. This spectrum is the context in which a new platform for small businesses has to be positioned, and 2.7 returns to that point.
+
+2.5 Theoretical Framework
+
+This study is guided by the Technology Acceptance Model (TAM). The platform will only deliver value if the people it is built for are willing to use it, so a theory of how users come to accept technology suits the project better than a theory of how businesses compete.
+
+The Technology Acceptance Model
+
+Davis (1989) developed and validated measurement scales for two beliefs that he proposed as fundamental determinants of whether people accept and use a technology. The first is perceived usefulness, the belief that using a system will improve one’s performance. The second is perceived ease of use, the belief that using the system will be free of effort. In his two studies, both beliefs were significantly correlated with usage, but usefulness had the stronger relationship with usage behaviour (Davis, 1989). His regression analyses also suggested that ease of use may be a causal antecedent of usefulness and not a separate, direct determinant of usage (Davis, 1989). In practical terms, a system that is easy to use is more likely to be seen as useful, and a system seen as useful is more likely to be used.
+
+TAM in Nigerian E commerce Research
+
+Nigerian researchers have applied TAM to online shopping. Opesade and Fabowale (2018) combined the Theory of Reasoned Action with TAM in a study of undergraduate students at the University of Ibadan. They found that perceived ease of use and perceived usefulness significantly influenced attitude towards online shopping, and that attitude, trust and subjective norm influenced the intention to adopt it. Iriobe and Ayotunde (2017) surveyed 227 respondents in Ogun State and found significant relationships between the intention to shop online and perceived usefulness and ease of use, trust and attitude. Facilitating conditions did not have a significant relationship with intention in their study. Oti (2021), reviewing existing empirical reports, found that Nigerian consumers generally perceive e commerce as useful and online shopping as easy, but that transactions often go uncompleted because of the negative influence of facilitating conditions.
+
+In Osun State, Ibrahim et al. (2024) used TAM to interpret their findings on SMEs in Osogbo, arguing that businesses adopt social media and online payment tools when they find them useful and easy to use. Their regression, however, tested social media use and online payment integration as predictors of business performance and did not measure usefulness or ease of use directly. TAM therefore informs their discussion but was not tested in their data.
+
+Trust and the Limits of the Model
+
+The original model contains only two beliefs, and the Nigerian studies above point to factors it leaves out. Trust appears as a significant influence on intention in both Opesade and Fabowale (2018) and Iriobe and Ayotunde (2017), which fits the concern noted in 2.2 that mutual distrust between buyers and sellers is a barrier to online trade (Ohajionu & Onasoga, 2023). Facilitating conditions, such as reliable infrastructure, also matter in practice (Oti, 2021). TAM is therefore best treated as a starting point, with trust and the surrounding conditions kept in view when a system is designed and evaluated.
+
+Relevance of TAM to the Study
+
+TAM supports this study in two ways. First, it gives design priorities. A platform for small businesses must show clear benefits to the people using it, such as saving time on orders or reaching more customers, and it must be simple enough for business owners and customers with limited technical experience to use without training. Second, it provides a basis for evaluating the finished system, since the system’s perceived usefulness and ease of use can be assessed with users. The trust issues raised by the Nigerian studies are a reminder that features such as secure payment and visible order status carry as much weight as the interface.
+
+2.6 Related Technologies
+
+This section describes the technologies used to build the proposed platform and the role each one plays. They are grouped by their function in the system.
+
+Frontend Technologies
+
+React is a library for building user interfaces from individual pieces called components, which are written as JavaScript functions and combined into whole screens and pages (React, n.d.). Vite is the build tool and development server that runs the project. During development it serves source files to the browser as native ES modules, so the server starts quickly and changes appear immediately, and for production it bundles the code into optimised files (Vite, n.d.). TypeScript is a strongly typed language that builds on JavaScript, adding type checks that catch errors before the code runs, and its code is converted to plain JavaScript for the browser or server (TypeScript, n.d.). Tailwind CSS is a utility first framework, meaning designs are built by combining small, low level classes directly in the page markup instead of writing separate style sheets (Tailwind Labs, n.d.). It also provides responsive variants, which suits a platform that customers will open on phones as well as computers. Leaflet is an open source JavaScript library for mobile friendly interactive maps (Leaflet, n.d.), and the platform uses it to display delivery locations and order tracking.
+
+Backend Technologies
+
+The server is built with Express, a minimal and unopinionated web framework for Node.js (Vercel, n.d.-b). It receives requests from the frontend, applies business rules and returns data. Two standards support user authentication. A JSON Web Token (JWT) is a compact, URL safe way of representing claims that are transferred between two parties (Jones et al., 2015). After login, the server issues a token that the frontend sends with later requests to prove who the user is. Passwords are protected with bcrypt, a hashing function designed so that the cost of guessing passwords can be increased as hardware improves (Provos & Mazières, 1999).
+
+Database Technologies
+
+Data is stored in PostgreSQL, hosted on Neon, a serverless Postgres platform that separates storage from compute (Neon, n.d.-a). On the free plan, Neon suspends the database after 5 minutes of inactivity and starts it again when the next connection arrives (Neon, n.d.-b). In this project, that means the first request after a quiet period can take a few seconds. Prisma sits between the server and the database. It is an open source toolkit that generates a type safe client for querying the database and includes Prisma Migrate for managing changes to the database structure (Prisma, n.d.).
+
+Third Party Services
+
+Cloudinary stores and delivers product images. Its service covers uploading, storage, transformation and delivery of media through a content delivery network, which serves images from servers close to the user (Cloudinary, n.d.). Customer support chat uses Stream Chat, a service whose React component library runs on top of Stream’s chat client and includes features such as typing indicators, read state and file uploads (Stream, n.d.). Card payments are handled by Paystack. A payment is started by creating a transaction through the Paystack API, its popup library or one of its SDKs, and each transaction carries a link that the customer uses to complete payment (Paystack, n.d.).
+
+Deployment Platform
+
+The platform is hosted on Vercel. An Express application deployed to Vercel becomes a single Vercel Function (Vercel, n.d.-b), and Vercel scales its functions down to zero when there are no incoming requests (Vercel, n.d.-a). The frontend and backend are deployed as two separate projects.
+
+2.7 Summary and Research Gap
+
+Summary of the Literature Review
+
+This chapter reviewed the concepts, studies, systems and technologies that relate to a web based e commerce platform for small scale business operations. The conceptual review showed that e commerce is growing quickly in Nigeria, but that many small businesses still sell online only through social media (Michael, 2025). It also identified payment trust, order management and last mile delivery as the main practical difficulties (Ohajionu & Onasoga, 2023). The related studies showed that e commerce brings real benefits to small businesses in Nigeria and in Osun State (Ekanem & Abiade, 2018; Ibrahim et al., 2024), that web based systems can improve control over internal records (Chukwumuanya et al., 2024), and that tracking is associated with customer satisfaction (Fatmawati & Fajriana, 2023). The review of Jumia, Konga and Jiji showed a range of designs. Jumia and Konga take on payment and delivery themselves, and Jiji leaves both to buyers and sellers. The Technology Acceptance Model was adopted as the theoretical framework, with trust treated as an important additional influence (Davis, 1989; Opesade & Fabowale, 2018). The chapter closed with the technologies used to build the system.
+
+Research Gap
+
+Among the sources reviewed, four gaps stand out.
+
+First, the Nigerian studies on small business e commerce mostly examine adoption factors and business performance. They do not report the design and testing of a working platform that a small business could use (Ekanem & Abiade, 2018; Onwuka et al., 2024; Ibrahim et al., 2024).
+
+Second, the web based systems reported in the literature concentrate on internal operations such as stock control. They do not describe a public storefront, customer payment or customer facing delivery tracking (Ogieva, 2022; Chukwumuanya et al., 2024).
+
+Third, the existing platforms sit at two extremes. Jumia and Konga provide payment and delivery on an infrastructure that a small business could not build for itself, while Jiji leaves payment and delivery to the two parties, which leaves the trust problem described by Ohajionu and Onasoga (2023) unresolved.
+
+Fourth, the evidence linking delivery tracking to customer satisfaction comes mainly from outside Nigeria (Fatmawati & Fajriana, 2023), and the Nigerian sources describe the delivery problem without offering a tested design for small businesses.
+
+These gaps are stated for the sources reviewed here. They show where the reviewed literature is silent and do not prove that no other study exists.
+
+Position of the Proposed Platform
+
+This study addresses these gaps by designing and implementing Jomu Mart, an integrated web-based marketplace for small-scale business operations, with Osun State as its primary study context. Registered users can submit product listings, which an administrator reviews and approves before they appear. Customers can browse the shared storefront, place orders and view order statuses. Checkout supports Paystack card payments, bank transfer and pay on delivery. Administrators can manage orders and assign delivery partners; the map view displays a stored delivery location for supported areas and does not provide continuous driver GPS tracking. The seller wallet and payout functions are prototype records and do not represent direct bank settlement. Sellers receive an initial free-listing allowance, followed by a monthly listing fee rather than a per-sale commission. The finished system will be assessed against the Technology Acceptance Model, with attention to trust and the practical conditions that surround its use.
