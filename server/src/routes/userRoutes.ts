@@ -2,6 +2,7 @@
 import { Router } from 'express'
 import {
   getMe,
+  getSellerStore,
   requestAccountDeletion,
   cancelAccountDeletion,
   reviewAccountDeletion,
@@ -16,6 +17,7 @@ import { protect, isAdmin, isCustomer } from '../middleware/authMiddleware'
 const router = Router()
 
 router.get('/me', protect, isCustomer, getMe)
+router.get('/:id/store', getSellerStore)
 router.post('/me/deletion-request', protect, isCustomer, requestAccountDeletion)
 router.delete('/me/deletion-request', protect, isCustomer, cancelAccountDeletion)
 router.patch('/password', protect, isCustomer, changePassword)

@@ -67,6 +67,72 @@ export const getMe = async (req: AuthRequest, res: Response) => {
   }
 }
 
+export const getSellerStore = async (req: AuthRequest, res: Response) => {
+  try {
+    const sellerId = req.params.id
+    if (!sellerId || Array.isArray(sellerId)) {
+      return res.status(400).json({ message: 'Seller id is required' })
+    }
+
+    const seller = await prisma.user.findFirst({
+      where: {
+        id: sellerId,
+        products: { some: { status: 'approved' } },
+      },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        isTrustedVendor: true,
+        trustedVendorBusinessName: true,
+        trustedVendorLocation: true,
+        trustedVendorDescription: true,
+        createdAt: true,
+        products: {
+          where: { status: 'approved' },
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            originalPrice: true,
+            image: true,
+            category: true,
+            stock: true,
+            rating: true,
+            reviewCount: true,
+            sellerId: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    })
+
+    if (!seller) {
+      return res.status(404).json({ message: 'Seller store not found' })
+    }
+
+    const { products, ...sellerProfile } = seller
+    return res.json({
+      seller: {
+        ...sellerProfile,
+        trustedVendorBusinessName: seller.isTrustedVendor
+          ? seller.trustedVendorBusinessName
+          : null,
+        trustedVendorLocation: seller.isTrustedVendor
+          ? seller.trustedVendorLocation
+          : null,
+        trustedVendorDescription: seller.isTrustedVendor
+          ? seller.trustedVendorDescription
+          : null,
+      },
+      products,
+    })
+  } catch (error) {
+    console.error('Failed to fetch seller store:', error)
+    return res.status(500).json({ message: 'Failed to fetch seller store' })
+  }
+}
+
 export const requestAccountDeletion = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId

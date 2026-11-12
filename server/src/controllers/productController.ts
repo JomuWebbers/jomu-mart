@@ -42,7 +42,22 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: "Product id is required" });
     }
 
-    const product = await prisma.product.findUnique({ where: { id } });
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            createdAt: true,
+            isTrustedVendor: true,
+            trustedVendorBusinessName: true,
+            trustedVendorLocation: true,
+          },
+        },
+      },
+    });
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -54,7 +69,23 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    res.json(product);
+    const activeListingCount = await prisma.product.count({
+      where: { sellerId: product.sellerId, status: "approved" },
+    });
+
+    res.json({
+      ...product,
+      seller: {
+        ...product.seller,
+        trustedVendorBusinessName: product.seller.isTrustedVendor
+          ? product.seller.trustedVendorBusinessName
+          : null,
+        trustedVendorLocation: product.seller.isTrustedVendor
+          ? product.seller.trustedVendorLocation
+          : null,
+        activeListingCount,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch product" });

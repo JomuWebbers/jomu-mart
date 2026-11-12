@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetail from "./pages/ProductDetail";
+import SellerStore from "./pages/SellerStore";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -43,6 +44,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/sellers/:id" element={<SellerStore />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route element={<CustomerAccessRoute />}>
           <Route path="/cart" element={<Cart />} />

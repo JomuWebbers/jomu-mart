@@ -610,32 +610,6 @@ export default function Homepage() {
         </div>
       </section>
       
-      <section className="overflow-hidden rounded-2xl bg-black py-4 sm:px-4 md:px-8">
-        <div className="mx-auto grid max-w-screen-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
-          {[
-            { title: "Jomu Picks", copy: "Good finds, picked for you", icon: Sparkles, tone: "bg-[#D9E5D7] text-brand-evergreen" },
-            { title: "Seller Spotlights", copy: "Meet trusted local sellers", icon: House, tone: "bg-[#E8C994] text-brand-charcoal" },
-            { title: "Everyday Essentials", copy: "Useful things for every day", icon: ShoppingBag, tone: "bg-[#F1D9CE] text-brand-charcoal" },
-            { title: "Deals Worth a Look", copy: "Fresh offers from the market", icon: Coffee, tone: "bg-brand-evergreen text-white" },
-          ].map(({ title, copy, icon: Icon, tone }) => (
-            <button
-              key={title}
-              type="button"
-              onClick={() => scrollTo(title === "Deals Worth a Look" ? "flash-sale" : "product-grid")}
-              className={`flex min-h-24 items-center gap-3 rounded-card p-3 text-left transition-transform hover:-translate-y-0.5 sm:min-h-28 sm:gap-4 sm:p-4 ${tone}`}
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/60 sm:size-11">
-                <Icon aria-hidden="true" className="size-5 sm:size-6" />
-              </span>
-              <span>
-                <span className="block text-xs font-black sm:text-sm">{title}</span>
-                <span className="mt-1 block text-[10px] leading-4 opacity-75 sm:text-xs">{copy}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
       {/* ── Flash Sale — 2 cols mobile, 4 from sm up ─────────────────────── */}
       <section
         id="flash-sale"

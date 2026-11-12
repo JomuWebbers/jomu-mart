@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Heart, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
+import {
+  BadgeCheck,
+  Heart,
+  MapPin,
+  Package,
+  ShieldCheck,
+  ShoppingCart,
+  Store,
+  Truck,
+} from "lucide-react";
 import { MicroLabel, PageShell } from "../components/wireframe-primitives";
 import { fmt, pct } from "../components/wireframe-helpers";
 import { apiRequest } from "../lib/api";
@@ -28,6 +37,16 @@ type Product = {
   fulfillmentMethod?: string | null;
   sellerState?: string | null;
   sellerLga?: string | null;
+  seller?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+    createdAt: string;
+    isTrustedVendor: boolean;
+    trustedVendorBusinessName: string | null;
+    trustedVendorLocation: string | null;
+    activeListingCount: number;
+  };
   deliveryDays?: number | null;
   chargesDeliveryFee?: boolean | null;
   deliveryFeeAmount?: number | null;
@@ -270,6 +289,17 @@ export default function ProductDetail() {
   const currentReviewData = reviewData?.productId === id ? reviewData : null;
   const reviews = currentReviewData?.reviews ?? [];
   const canReview = Boolean(token && currentReviewData?.canReview);
+  const sellerName =
+    product.seller?.trustedVendorBusinessName?.trim() || product.seller?.name;
+  const sellerLocation =
+    product.seller?.trustedVendorLocation ||
+    [product.sellerLga, product.sellerState].filter(Boolean).join(", ");
+  const sellerMemberSince = product.seller
+    ? new Date(product.seller.createdAt).toLocaleDateString("en-NG", {
+        month: "long",
+        year: "numeric",
+      })
+    : "";
   const ratingCounts = [5, 4, 3, 2, 1].map((value) => ({
     value,
     count: reviews.filter((review) => review.rating === value).length,
@@ -582,50 +612,127 @@ export default function ProductDetail() {
           </div>
         </section>
 
-        <aside className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-5 md:col-span-2 xl:col-span-4">
-          <div className="mb-4 flex items-center gap-2 border-b border-brand-border pb-3">
-            <Truck aria-hidden="true" className="h-5 w-5 text-brand-evergreen" />
-            <h2 className="font-bold">Delivery &amp; fulfilment</h2>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Truck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
-              <div>
-                <p className="text-sm font-semibold">Delivery</p>
-                <p className="mt-1 text-xs leading-5 text-brand-muted">
-                  {product.deliveryDays != null
-                    ? `Estimated delivery in about ${product.deliveryDays} day${product.deliveryDays === 1 ? "" : "s"}.`
-                    : "Delivery timing is confirmed with the seller after order."}
-                </p>
-                {product.chargesDeliveryFee && (
-                  <p className="mt-1 text-xs text-brand-muted">
-                    Seller delivery fee: {fmt(product.deliveryFeeAmount || 0)}
+        <div className="flex flex-col gap-4 md:col-span-2 xl:col-span-4">
+          <aside className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-5">
+            <div className="mb-4 flex items-center gap-2 border-b border-brand-border pb-3">
+              <Truck aria-hidden="true" className="h-5 w-5 text-brand-evergreen" />
+              <h2 className="font-bold">Delivery &amp; fulfilment</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Truck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
+                <div>
+                  <p className="text-sm font-semibold">Delivery</p>
+                  <p className="mt-1 text-xs leading-5 text-brand-muted">
+                    {product.deliveryDays != null
+                      ? `Estimated delivery in about ${product.deliveryDays} day${product.deliveryDays === 1 ? "" : "s"}.`
+                      : "Delivery timing is confirmed with the seller after order."}
                   </p>
+                  {product.chargesDeliveryFee && (
+                    <p className="mt-1 text-xs text-brand-muted">
+                      Seller delivery fee: {fmt(product.deliveryFeeAmount || 0)}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-start gap-3 border-t border-brand-border pt-4">
+                <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
+                <div>
+                  <p className="text-sm font-semibold">Availability &amp; fulfilment</p>
+                  <p className={`mt-1 text-xs font-semibold ${outOfStock ? "text-red-600" : "text-brand-evergreen"}`}>
+                    {outOfStock ? "Out of stock" : product.stock == null ? "Available" : `${product.stock} available`}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-brand-muted">
+                    {product.fulfillmentMethod === "pickup"
+                      ? "Pickup from seller"
+                      : "Seller delivery"}
+                    {" · "}
+                    {[product.sellerLga, product.sellerState].filter(Boolean).join(", ") ||
+                      "Location provided after order"}
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-brand-border pt-4 text-xs leading-5 text-brand-muted">
+                Seller fulfilment details are provided for this listing. Delivery options can be confirmed during checkout.
+              </div>
+            </div>
+          </aside>
+
+          {product.seller && (
+            <aside className="rounded-card border border-brand-border bg-brand-surface p-4 shadow-card sm:p-5">
+              <div className="mb-4 flex items-center justify-between gap-3 border-b border-brand-border pb-3">
+                <h2 className="flex items-center gap-2 font-bold">
+                  <Store aria-hidden="true" className="h-5 w-5 text-brand-evergreen" />
+                  Seller Information
+                </h2>
+                <Link
+                  to={`/sellers/${product.seller.id}`}
+                  className="shrink-0 rounded-control border border-brand-border px-3 py-2 text-sm font-semibold text-brand-accent transition-colors hover:bg-brand-cream"
+                >
+                  View Store
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-evergreen font-black text-white">
+                  {product.seller.avatar ? (
+                    <img
+                      src={product.seller.avatar}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    sellerName?.charAt(0).toUpperCase() || "S"
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-brand-charcoal">
+                    {sellerName}
+                  </p>
+                  <p className="mt-0.5 text-sm text-brand-muted">
+                    On Jomu Mart since {sellerMemberSince}
+                  </p>
+                </div>
+              </div>
+
+              <dl className="mt-4 divide-y divide-brand-border border-t border-brand-border text-sm">
+                <div className="flex items-center justify-between gap-3 py-3">
+                  <dt className="flex items-center gap-2 text-brand-muted">
+                    <Package aria-hidden="true" className="size-4" />
+                    Active listings
+                  </dt>
+                  <dd className="font-bold text-brand-charcoal">
+                    {product.seller.activeListingCount.toLocaleString("en-NG")}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-3 py-3">
+                  <dt className="flex items-center gap-2 text-brand-muted">
+                    {product.seller.isTrustedVendor ? (
+                      <BadgeCheck aria-hidden="true" className="size-4" />
+                    ) : (
+                      <Store aria-hidden="true" className="size-4" />
+                    )}
+                    Seller status
+                  </dt>
+                  <dd className="font-semibold text-brand-charcoal">
+                    {product.seller.isTrustedVendor ? "Trusted seller" : "Marketplace seller"}
+                  </dd>
+                </div>
+                {sellerLocation && (
+                  <div className="flex items-center justify-between gap-3 py-3">
+                    <dt className="flex items-center gap-2 text-brand-muted">
+                      <MapPin aria-hidden="true" className="size-4" />
+                      Location
+                    </dt>
+                    <dd className="text-right font-semibold text-brand-charcoal">
+                      {sellerLocation}
+                    </dd>
+                  </div>
                 )}
-              </div>
-            </div>
-            <div className="flex items-start gap-3 border-t border-brand-border pt-4">
-              <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand-evergreen" />
-              <div>
-                <p className="text-sm font-semibold">Availability &amp; fulfilment</p>
-                <p className={`mt-1 text-xs font-semibold ${outOfStock ? "text-red-600" : "text-brand-evergreen"}`}>
-                  {outOfStock ? "Out of stock" : product.stock == null ? "Available" : `${product.stock} available`}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-brand-muted">
-                  {product.fulfillmentMethod === "pickup"
-                    ? "Pickup from seller"
-                    : "Seller delivery"}
-                  {" · "}
-                  {[product.sellerLga, product.sellerState].filter(Boolean).join(", ") ||
-                    "Location provided after order"}
-                </p>
-              </div>
-            </div>
-            <div className="border-t border-brand-border pt-4 text-xs leading-5 text-brand-muted">
-              Seller fulfilment details are provided for this listing. Delivery options can be confirmed during checkout.
-            </div>
-          </div>
-        </aside>
+              </dl>
+            </aside>
+          )}
+        </div>
       </div>
 
       <nav
