@@ -7,19 +7,20 @@ import {
   useOutletContext,
   useSearchParams,
 } from "react-router-dom";
-import { CATEGORY_NAMES } from "../data/categories";
 import { fmt } from "../components/wireframe-helpers";
 import {
-  Baby,
+  BadgeCheck,
   ChevronLeft,
   ChevronRight,
   Coffee,
+  Flame,
   House,
+  Package,
   Shirt,
   ShoppingBag,
   Smartphone,
   Sparkles,
-  Tv,
+  TrendingDown,
   type LucideIcon,
 } from "lucide-react";
 import StoreProductCard, {
@@ -93,15 +94,30 @@ const HERO_PHRASES = [
 ];
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  "Phones & Tablets": Smartphone,
-  Electronics: Tv,
-  "Home, Furniture & Appliances": House,
+  "Verified Best Prices": BadgeCheck,
+  Groceries: Coffee,
+  "Buy More. Save More": ShoppingBag,
   Fashion: Shirt,
-  "Baby & Kids": Baby,
+  "Flash Sales Reloaded": Flame,
   "Beauty & Personal Care": Sparkles,
-  "Food & Beverages": Coffee,
-  "View All": ShoppingBag,
+  "Home Essentials": House,
+  "Limited Stock": Package,
+  "Hot Deals": Flame,
+  "Bulk Prices Drops": TrendingDown,
 };
+
+const HOMEPAGE_CATEGORY_TILES = [
+  { label: "Verified Best Prices", collection: "discounted" },
+  { label: "Groceries", category: "Food & Beverages" },
+  { label: "Buy More. Save More", collection: "all" },
+  { label: "Fashion", category: "Fashion" },
+  { label: "Flash Sales Reloaded", collection: "discounted" },
+  { label: "Beauty & Personal Care", category: "Beauty & Personal Care" },
+  { label: "Home Essentials", category: "Home, Furniture & Appliances" },
+  { label: "Limited Stock", collection: "limited-stock" },
+  { label: "Hot Deals", collection: "discounted" },
+  { label: "Bulk Prices Drops", collection: "all" },
+] as const;
 
 const CATEGORY_IMAGE_PATHS: Record<string, string> = {
   "Verified Best Prices": "",
@@ -254,6 +270,12 @@ export default function Homepage() {
   const [reloadProducts, setReloadProducts] = useState(0);
   const [savingIds, setSavingIds] = useState<string[]>([]);
   const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
+  const [activeHomepageTile, setActiveHomepageTile] = useState<string | null>(
+    null,
+  );
+  const [activeCollection, setActiveCollection] = useState<
+    "discounted" | "limited-stock" | null
+  >(null);
   const [sideCampaigns] = useState(getSideCampaigns);
   const categoryCarouselRef = useRef<HTMLDivElement>(null);
 
@@ -284,6 +306,13 @@ export default function Homepage() {
   const filtered = products.filter(
     (p) =>
       (activeNav === "All" || p.category === activeNav) &&
+      (activeCollection === null ||
+        (activeCollection === "discounted" &&
+          (p.originalPrice ?? 0) > p.price) ||
+        (activeCollection === "limited-stock" &&
+          p.stock != null &&
+          p.stock > 0 &&
+          p.stock <= 5)) &&
       (q === "" ||
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q)),
@@ -291,7 +320,25 @@ export default function Homepage() {
 
   // what happens when a tile is clicked: filter + jump to the product grid
   const selectCategory = (category: string) => {
+    setActiveHomepageTile(null);
+    setActiveCollection(null);
     setActiveNav(category);
+    scrollTo("product-grid");
+  };
+
+  const selectHomepageTile = (
+    tile: (typeof HOMEPAGE_CATEGORY_TILES)[number],
+  ) => {
+    if ("category" in tile) {
+      selectCategory(tile.category);
+      return;
+    }
+
+    setActiveHomepageTile(tile.label);
+    setActiveNav("All");
+    setActiveCollection(
+      tile.collection === "all" ? null : tile.collection,
+    );
     scrollTo("product-grid");
   };
 
@@ -385,11 +432,6 @@ export default function Homepage() {
       onAddToCart={addProductToCart}
     />
   );
-
-  const categoryTiles = CATEGORY_NAMES.map((name) => ({
-    label: name,
-    count: loading ? null : products.filter((p) => p.category === name).length,
-  }));
 
   // Deals are based on actual current prices and available stock.
   const discountedProducts = products.filter(
@@ -504,16 +546,18 @@ export default function Homepage() {
                 aria-label="Shop by category"
                 className="horizontal-scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-10"
               >
-                {categoryTiles.map((sc) => {
+                {HOMEPAGE_CATEGORY_TILES.map((sc) => {
                   const Icon = CATEGORY_ICONS[sc.label] ?? ShoppingBag;
-                  const selected = activeNav === sc.label;
+                  const selected =
+                    activeHomepageTile === sc.label ||
+                    ("category" in sc && activeNav === sc.category);
                   const imagePath = CATEGORY_IMAGE_PATHS[sc.label] ?? "";
 
                   return (
                     <button
                       key={sc.label}
                       type="button"
-                      onClick={() => selectCategory(sc.label)}
+                      onClick={() => selectHomepageTile(sc)}
                       aria-pressed={selected}
                       className={`group flex w-32 shrink-0 snap-start flex-col items-center gap-2 rounded-lg p-1 text-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63312] sm:w-36 ${
                         selected ? "text-[#E63312]" : "text-neutral-800"
@@ -662,7 +706,13 @@ export default function Homepage() {
           <div className="flex items-baseline justify-between mb-6">
             <div>
               <MicroLabel>
-                {activeNav === "All" ? "All Categories" : activeNav}
+                {activeCollection === "discounted"
+                  ? "Price drops"
+                  : activeCollection === "limited-stock"
+                    ? "Limited stock"
+                    : activeNav === "All"
+                      ? "All Categories"
+                      : activeNav}
               </MicroLabel>
               <h2
                 className="font-black uppercase mt-1"
@@ -670,7 +720,11 @@ export default function Homepage() {
               >
                 {q
                   ? "Search Results"
-                  : activeNav === "All"
+                  : activeCollection === "discounted"
+                    ? "Deals and Discounts"
+                    : activeCollection === "limited-stock"
+                      ? "Limited Stock Products"
+                      : activeNav === "All"
                     ? "Shop Products"
                     : `${activeNav} Products`}
               </h2>
@@ -707,7 +761,7 @@ export default function Homepage() {
             </div>
           ) : filtered.length === 0 ? (
             <p className="py-10 text-center text-neutral-400">
-              {q || activeNav !== "All"
+              {q || activeNav !== "All" || activeCollection !== null
                 ? "No products match this selection."
                 : "No products are available yet."}
             </p>
