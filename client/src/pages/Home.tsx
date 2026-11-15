@@ -125,7 +125,7 @@ const CATEGORY_IMAGE_PATHS: Record<string, string> = {
   "Buy More. Save More": "",
   Fashion: "",
   "Flash Sales Reloaded": "",
-  "Beauty & Personal Care": `public/asset/Nivea-Nigeria.png`,
+  "Beauty & Personal Care": "asset/Nivea-Nigeria.png",
   "Home Essentials": "",
   "Limited Stock": "",
   "Hot Deals": "",
