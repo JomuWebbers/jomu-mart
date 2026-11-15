@@ -104,13 +104,17 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 };
 
 const CATEGORY_IMAGE_PATHS: Record<string, string> = {
-  "Phones & Tablets": "",
-  Electronics: "",
-  "Home, Furniture & Appliances": "",
+  "Verified Best Prices": "",
+  Groceries: "",
+  "Buy More. Save More": "",
   Fashion: "",
-  "Baby & Kids": "",
-  "Beauty & Personal Care": "",
-  "Food & Beverages": "",
+  "Flash Sales Reloaded": "",
+  "Beauty & Personal Care": `public/asset/Nivea-Nigeria.png`,
+  "Home Essentials": "",
+  "Limited Stock": "",
+  "Hot Deals": "",
+  "Bulk Prices Drops": "",
+
 };
 
 type SideCampaign = {
