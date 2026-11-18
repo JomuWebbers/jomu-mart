@@ -125,13 +125,13 @@ const CATEGORY_IMAGE_PATHS: Record<
   "Verified Best Prices": { type: "video", src: "/asset/verified-best-prices.mp4" },
   Groceries: "/asset/groceries.png",
   "Buy More. Save More": "/asset/buymoregiphy.gif",
-  Fashion: "",
-  "Flash Sales Reloaded": "",
+  Fashion: "/asset/fashion.png",
+  "Flash Sales Reloaded": { type: "video", src: "/asset/FLASHsales.mp4" },
   "Beauty & Personal Care": "/asset/Nivea-Nigeria.png",
-  "Home Essentials": "",
-  "Limited Stock": "",
-  "Hot Deals": "",
-  "Bulk Prices Drops": "",
+  "Home Essentials": "/asset/HOMEessentials.png",
+  "Limited Stock": "/asset/LIMITEDstock.png",
+  "Hot Deals": "/asset/HOTdeals.png",
+  "Bulk Prices Drops": { type: "video", src: "/asset/bulk-prices.mp4" },
 };
 
 type SideCampaign = {
